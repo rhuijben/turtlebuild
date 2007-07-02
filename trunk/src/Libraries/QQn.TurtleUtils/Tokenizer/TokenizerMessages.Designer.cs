@@ -95,5 +95,14 @@ namespace QQn.TurtleUtils.Tokenizer {
                 return ResourceManager.GetString("ResponseFileXNotFound", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown argument &apos;{0}&apos;.
+        /// </summary>
+        internal static string UnknownArgumentX {
+            get {
+                return ResourceManager.GetString("UnknownArgumentX", resourceCulture);
+            }
+        }
     }
 }

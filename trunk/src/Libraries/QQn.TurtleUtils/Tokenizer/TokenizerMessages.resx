@@ -129,4 +129,7 @@
   <data name="ResponseFileXNotFound" xml:space="preserve">
     <value>Response file '{0}' not found</value>
   </data>
+  <data name="UnknownArgumentX" xml:space="preserve">
+    <value>Unknown argument '{0}'</value>
+  </data>
 </root>
