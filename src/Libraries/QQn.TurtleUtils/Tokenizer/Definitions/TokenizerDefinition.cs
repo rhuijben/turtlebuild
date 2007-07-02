@@ -7,10 +7,11 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 	public abstract class TokenizerDefinition : TokenItemBase
 	{
 		internal readonly Dictionary<string, TokenMember> _tokens = new Dictionary<string, TokenMember>();
-		readonly Dictionary<string, Token> _csNames = new Dictionary<string, Token>(StringComparer.InvariantCultureIgnoreCase);
-		readonly Dictionary<string, Token> _ciNames = new Dictionary<string, Token>(StringComparer.InvariantCultureIgnoreCase);
-		internal readonly List<TokenMember> _placedItems = new List<TokenMember>();
-		TokenMember _rest;
+		readonly Dictionary<string, TokenItem> _csNames = new Dictionary<string, TokenItem>(StringComparer.InvariantCultureIgnoreCase);
+		readonly Dictionary<string, TokenItem> _ciNames = new Dictionary<string, TokenItem>(StringComparer.InvariantCultureIgnoreCase);
+		private readonly List<TokenItem> _placedItems = new List<TokenItem>();
+
+		TokenItem _rest;
 
 		protected void AddToken(TokenMember token)
 		{
@@ -20,7 +21,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			_tokens.Add(token.Name, token);
 		}
 
-		protected void AddPlaced(int position, TokenMember token)
+		protected void AddPlaced(int position, TokenItem token)
 		{
 			if (token == null)
 				throw new ArgumentNullException("token");
@@ -38,7 +39,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			_placedItems[position] = token;
 		}
 
-		protected void SetRest(TokenMember token)
+		protected void SetRest(TokenItem token)
 		{
 			if (token == null)
 				throw new ArgumentNullException("token");
@@ -51,7 +52,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 
 		public void Validate()
 		{
-			foreach (TokenMember t in _placedItems)
+			foreach (TokenItem t in _placedItems)
 			{
 				if (t == null)
 					throw new InvalidOperationException("Not all placed locations are filled");
@@ -63,13 +64,13 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			get { return _placedItems.Count > 0 || _rest != null; }
 		}
 
-		public virtual bool TryGetToken(string name, bool caseSensitive, out Token token)
+		public virtual bool TryGetToken(string name, bool caseSensitive, out TokenItem token)
 		{
 			if(_csNames.Count == 0)
 			{
 				foreach(TokenMember tm in _tokens.Values)
 				{
-					foreach (Token tk in tm.Tokens)
+					foreach (TokenItem tk in tm.Tokens)
 					{
 						if (tk.Aliases != null)
 						{
@@ -87,12 +88,23 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 				{
 					_ciNames.Clear();
 
-					foreach (KeyValuePair<string, Token> tk in _csNames)
+					foreach (KeyValuePair<string, TokenItem> tk in _csNames)
 						_ciNames.Add(tk.Key, tk.Value);
 				}
 			}
 
 			return (caseSensitive ? _csNames : _ciNames).TryGetValue(name, out token);
 		}
+
+		internal IList<TokenItem> PlacedItems
+		{
+			get { return _placedItems; }
+		}
+
+		public TokenItem RestToken
+		{
+			get { return _rest; }
+		}
+
 	}
 }

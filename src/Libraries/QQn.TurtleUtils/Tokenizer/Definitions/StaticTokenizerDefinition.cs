@@ -25,9 +25,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 				foreach (PositionTokenAttribute pos in mi.GetCustomAttributes(typeof(PositionTokenAttribute), true))
 				{
 					if(pos is RestTokenAttribute)
-						SetRest(token);
+						SetRest(pos.CreateToken(token));
 					else
-						AddPlaced(pos.Position, token);
+						AddPlaced(pos.Position, pos.CreateToken(token));
 				}
 			}
 

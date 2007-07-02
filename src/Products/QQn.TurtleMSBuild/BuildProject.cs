@@ -5,6 +5,7 @@ using System.Collections;
 //using Microsoft.Build.BuildEngine;
 using System.IO;
 using Microsoft.Build.Framework;
+using QQn.TurtleLogger;
 
 namespace QQn.TurtleMSBuild
 {
@@ -14,8 +15,9 @@ namespace QQn.TurtleMSBuild
 		readonly string _targetNames;
 		readonly IEnumerable _properties;
 		readonly IEnumerable _items;
+		readonly BuildParameters _parameters;
 
-		public BuildProject(string projectFile, string targetNames, IEnumerable properties, IEnumerable items)
+		public BuildProject(string projectFile, string targetNames, IEnumerable properties, IEnumerable items, BuildParameters parameters)
 		{
 			if (string.IsNullOrEmpty(projectFile))
 				throw new ArgumentNullException("projectFile");
@@ -25,11 +27,14 @@ namespace QQn.TurtleMSBuild
 				throw new ArgumentNullException("properties");
 			else if (items == null)
 				throw new ArgumentNullException("items");
+			else if (parameters == null)
+				throw new ArgumentNullException("parameters");
 
 			_projectFile = projectFile;
 			_targetNames = targetNames;
 			_properties = properties;
 			_items = items;
+			_parameters = parameters;
 		}
 
 		public string ProjectFile
@@ -134,5 +139,10 @@ namespace QQn.TurtleMSBuild
 			else
 				return null;
 		}
+
+		public BuildParameters Parameters
+		{
+			get { return _parameters; }
+		} 
 	}
 }

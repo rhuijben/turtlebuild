@@ -17,6 +17,7 @@ namespace QQn.TurtleUtils.Tokenizer
 		Type _typeConverter;
 		bool _required;
 		
+		[CLSCompliant(false)]
 		public TokenAttribute(string name, params string[] aliases)
 		{
 			if (string.IsNullOrEmpty(name))
@@ -41,10 +42,35 @@ namespace QQn.TurtleUtils.Tokenizer
 		}
 
 		public TokenAttribute(string name)
-			: this(name, null)
+			: this(name, (string[])null)
 		{
 			
-		}		
+		}
+
+		public TokenAttribute(string name, string alias)
+			: this(name, new string[] { alias })
+		{
+
+		}
+
+		public TokenAttribute(string name, string alias1, string alias2)
+			: this(name, new string[] { alias1, alias2 })
+		{
+
+		}
+
+		public TokenAttribute(string name, string alias1, string alias2, string alias3)
+			: this(name, new string[] { alias1, alias2, alias3 })
+		{
+
+		}
+
+		public TokenAttribute(string name, string alias1, string alias2, string alias3, string alias4)
+			: this(name, new string[] { alias1, alias2, alias3, alias4 })
+		{
+
+		}
+
 
 		protected TokenAttribute()
 		{
@@ -74,9 +100,9 @@ namespace QQn.TurtleUtils.Tokenizer
 			}
 		}
 
-		public virtual Token CreateToken(TokenMember tokenMember)
+		public virtual TokenItem CreateToken(TokenMember tokenMember)
 		{
-			return new Token(tokenMember, Name, this);
+			return new TokenItem(tokenMember, this);
 		}
 
 		public bool Required

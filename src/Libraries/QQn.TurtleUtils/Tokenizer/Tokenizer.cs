@@ -66,6 +66,7 @@ namespace QQn.TurtleUtils.Tokenizer
 			bool atEnd = false;
 			char[] checkChars = args.PlusMinSuffixArguments ? new char[] { args.ArgumentValueSeparator, '+', '-' } : new char[] { args.ArgumentValueSeparator };
 
+			int nPlaced = 0;
 			for (i = 0; i < cArgs.Count; i++)
 			{
 				string a = cArgs[i];
@@ -91,7 +92,7 @@ namespace QQn.TurtleUtils.Tokenizer
 
 						string item = (aTo > 0) ? a.Substring(aFrom, aTo - aFrom) : a.Substring(aFrom);
 
-						Token token;
+						TokenItem token;
 						string value = null;
 
 						if (definition.TryGetToken(item, args.CaseSensitive, out token))
@@ -112,7 +113,7 @@ namespace QQn.TurtleUtils.Tokenizer
 						else
 						{
 							// Look for a shorter argument
-							for (int ii = item.Length - 1; ii > 0; i--)
+							for (int ii = item.Length - 1; ii > 0; ii--)
 							{
 								if (definition.TryGetToken(item.Substring(0, ii), args.CaseSensitive, out token)
 									&& token.AllowDirectValue(item.Substring(ii)))
@@ -168,10 +169,30 @@ namespace QQn.TurtleUtils.Tokenizer
 				}
 				else if (!args.AllowNamedBetweenPlaced)
 					atEnd = true;
+				else if (state.Definition.HasPlacedArguments)
+				{
+					if (nPlaced < state.Definition.PlacedItems.Count)
+					{
+						state.Definition.PlacedItems[nPlaced].Evaluate(cArgs[i], state);
+						nPlaced++;
+					}
+					else if (state.Definition.RestToken != null)
+					{
+						state.Definition.RestToken.Evaluate(cArgs[i], state);
+					}
+					else
+					{
+						args.ErrorMessage = string.Format(TokenizerMessages.UnknownArgumentX, cArgs[i]);
+						return false;
+					}
+				}
 			}
 
+			if (!state.IsComplete)
+				return false;
 
-			return false;
+			to = state.Instance;
+			return true;
 		}
 
 		/// <summary>
@@ -207,13 +228,28 @@ namespace QQn.TurtleUtils.Tokenizer
 			else if (args == null)
 				throw new ArgumentNullException("args");
 
+			to = null;
 			T items;
 			TokenizerState<T> state = NewState<T>(args, out items);
 
+			IList<string> groups = GetWords(connectionString, new string[] { "\"\"", "\'\'" }, '\0', EscapeMode.DoubleItem, ";".ToCharArray());
+
+			foreach (string group in groups)
+			{
+				IList<string> parts = GetWords(group, new string[] { "\"\"", "\'\'" }, '\0', EscapeMode.DoubleItem, "=".ToCharArray());
+
+				TokenItem token;
+				if ((parts.Count == 2) && state.Definition.TryGetToken(parts[0], args.CaseSensitive, out token))
+				{
+					token.Evaluate(parts[1], state);
+				}
+				else
+					return false;
+			}
 			// TODO: Parse connectionstring using definition
 
-			to = null;
-			return false;
+			to = state.Instance;
+			return true;
 		}
 
 		public static bool TryParseConnectionString<T>(NameValueCollection collection, TokenizerArgs args, out T to)
@@ -395,7 +431,7 @@ namespace QQn.TurtleUtils.Tokenizer
 				}
 			}
 
-			if(start > 0)
+			if(start >= 0)
 				words.Add(UnEscape(input.Substring(start), _groups, groups, escapeCharacter, mode, wordSeparators));
 
 			return words;

@@ -5,7 +5,7 @@ using System.Collections;
 
 namespace QQn.TurtleUtils.Tokenizer.Definitions
 {
-	class TokenizerState<T> : Hashtable
+	public class TokenizerState<T> : Hashtable
 		where T : class, new()
 	{
 		readonly T _instance;
@@ -34,6 +34,16 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		public TokenizerDefinition Definition
 		{
 			get { return _definition; }
+		}
+
+		public bool IsComplete
+		{
+			get
+			{
+				// TODO: Verify required arguments
+
+				return true;
+			}
 		}
 	}
 }

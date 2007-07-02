@@ -5,6 +5,8 @@ using Microsoft.Build.Framework;
 using System.IO;
 using System.Xml;
 using System.Collections;
+using QQn.TurtleUtils.Tokenizer;
+using QQn.TurtleLogger;
 
 namespace QQn.TurtleMSBuild
 {
@@ -41,7 +43,7 @@ namespace QQn.TurtleMSBuild
 			{
 				//Console.WriteLine("Started {0}", e.ProjectFile);
 
-				building.Add(e.ProjectFile, new BuildProject(e.ProjectFile, e.TargetNames, e.Properties, e.Items));
+				building.Add(e.ProjectFile, new BuildProject(e.ProjectFile, e.TargetNames, e.Properties, e.Items, _settings));
 			}
 		}
 
@@ -81,11 +83,19 @@ namespace QQn.TurtleMSBuild
 		#endregion
 
 		string _parameters;
+		BuildParameters _settings = new BuildParameters();
 
 		public string Parameters
 		{
 			get { return _parameters; }
-			set { _parameters = value; }
+			set 
+			{
+				BuildParameters settings;
+				if (!Tokenizer.TryParseConnectionString(value, out settings))
+					throw new ArgumentException("Invalid setting string");
+				_parameters = value;
+				_settings = settings;
+			}
 		}
 		
 

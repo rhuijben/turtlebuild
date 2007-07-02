@@ -11,7 +11,7 @@ namespace QQn.TurtleMSBuild
 {
 	static class TurtleFilter
 	{
-		const string Ns = "http://schemas.qqn.nl/2007/AssemblyTurtle";
+		const string Ns = "http://schemas.qqn.nl/2007/TurtleBuild/BuildLog";
 
 		internal static void Execute(BuildProject project)
 		{
@@ -21,7 +21,12 @@ namespace QQn.TurtleMSBuild
 			if (project.OutDir == null)
 				return;
 
-			string atPath = Path.Combine(Path.Combine(project.ProjectPath, project.OutDir), project.ProjectName + ".atLog");
+			string outDir = project.Parameters.OutputDir ?? Path.Combine(project.ProjectPath, project.OutDir);
+
+			if (!Directory.Exists(outDir))
+				Directory.CreateDirectory(outDir);
+
+			string atPath = Path.Combine(outDir, project.ProjectName + ".tbLog");
 
 			using (StreamWriter sw = new StreamWriter(atPath, false, Encoding.UTF8))
 			{
