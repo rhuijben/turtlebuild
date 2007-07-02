@@ -9,5 +9,11 @@ namespace QQn.TurtleLogger
 	{
 		[Token("OutputDir")]
 		public string OutputDir;
+
+		[Token("Indent")]
+		public bool Indent;
+
+		[Token("ScriptExtension")]
+		public string[] ScriptExtensions;
 	}
 }
