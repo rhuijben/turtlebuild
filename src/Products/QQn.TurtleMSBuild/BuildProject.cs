@@ -30,7 +30,7 @@ namespace QQn.TurtleMSBuild
 			else if (parameters == null)
 				throw new ArgumentNullException("parameters");
 
-			_projectFile = projectFile;
+			_projectFile = Path.GetFullPath(projectFile);
 			_targetNames = targetNames;
 			_properties = properties;
 			_items = items;
@@ -143,6 +143,16 @@ namespace QQn.TurtleMSBuild
 		public BuildParameters Parameters
 		{
 			get { return _parameters; }
-		} 
+		}
+
+		internal string MakeRelativePath(string include)
+		{
+
+			Uri includeUri = new Uri(Path.GetFullPath(include).Replace(Path.DirectorySeparatorChar, '/'));
+			Uri projectUri = new Uri(ProjectFile.Replace(Path.DirectorySeparatorChar, '/'));
+			Uri relUri = projectUri.MakeRelativeUri(includeUri);
+
+			return relUri.ToString().Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+		}
 	}
 }

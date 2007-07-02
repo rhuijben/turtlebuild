@@ -31,10 +31,10 @@ namespace QQn.TurtleMSBuild
 			using (StreamWriter sw = new StreamWriter(atPath, false, Encoding.UTF8))
 			{
 				XmlWriterSettings xs = new XmlWriterSettings();
-#if DEBUG
-				xs.Indent = true;
-#endif
-				using (XmlWriter xw = XmlWriter.Create(sw))
+
+				xs.Indent = project.Parameters.Indent;
+
+				using (XmlWriter xw = XmlWriter.Create(sw, xs))
 				{
 					xw.WriteStartDocument();
 					xw.WriteStartElement(null, "TurtleBuild", Ns);
@@ -81,6 +81,7 @@ namespace QQn.TurtleMSBuild
 			xw.WriteStartElement("References");
 			foreach (ProjectItem i in project.BuildItems)
 			{
+				bool isProject = false;
 				if (i.Name == "Reference")
 				{
 					xw.WriteStartElement("Reference", Ns);
@@ -88,11 +89,12 @@ namespace QQn.TurtleMSBuild
 				else if (i.Name == "ProjectReference")
 				{
 					xw.WriteStartElement("Project", Ns);
+					isProject = true;
 				}
 				else
 					continue;
 
-				xw.WriteAttributeString("assembly", i.Include);
+				xw.WriteAttributeString(isProject ? "src" : "assembly", i.Include);
 				if (i.HasMetadata("Name"))
 					xw.WriteAttributeString("name", i.GetMetadata("Name"));
 				if (i.HasMetadata("HintPath"))
@@ -114,7 +116,7 @@ namespace QQn.TurtleMSBuild
 			bool outDirOnly = string.Equals(project.GetProperty("TurtleLogger_OutDirOnly"), "true", StringComparison.InvariantCultureIgnoreCase);
 			
 			foreach(string n in sharedKeys.Split(';'))
-				keys.Add(n, "SharedItem");
+				keys.Add(n, "Shared");
 
 			foreach(string n in publishedKeys.Split(';'))
 					keys.Add(n, "Item");
@@ -140,19 +142,26 @@ namespace QQn.TurtleMSBuild
 				if (!keys.TryGetValue(i.Name, out name))
 					continue;
 
-				if(added.ContainsKey(i.Include))
+				string include = i.Include;
+
+				if (Path.IsPathRooted(include))
+				{
+					include = project.MakeRelativePath(include);	
+				}
+				
+				if(added.ContainsKey(include))
 					continue;
 
-				if(!File.Exists(Path.Combine(project.ProjectPath, i.Include)))
+				if(!File.Exists(Path.Combine(project.ProjectPath, include)))
 				{
-					xw.WriteComment(name +": " + i.Include);
+					xw.WriteComment(name +": " + include);
 					continue;
 				}
 
-				added.Add(i.Include, name);
+				added.Add(include, name);
 
 				xw.WriteStartElement(name, Ns);
-				xw.WriteAttributeString("src", i.Include);
+				xw.WriteAttributeString("src", include);
 				
 				xw.WriteEndElement();
 			}
@@ -203,15 +212,18 @@ namespace QQn.TurtleMSBuild
 			SortedList<string, string> keys = new SortedList<string, string>();
 
 			string scriptKeys = project.GetProperty("TurtleLogger_ScriptItemNames") ?? "Content;None";
-			string scriptExtensions = project.GetProperty("TurtleLogger_ScriptExtensions") ?? ".wxs;.wxi;.wxl;.xmsql";
 
 			foreach (string n in scriptKeys.Split(';'))
 				keys.Add(n, "Item");
 
 			SortedList<string, string> extensions = new SortedList<string, string>();
 
-			foreach (string n in scriptExtensions.Split(';'))
-				extensions.Add(n, "Item");
+			if(project.Parameters.ScriptExtensions != null)
+				foreach (string n in project.Parameters.ScriptExtensions)
+				{
+					string[] parts = n.Split('=');
+					extensions.Add(parts[0], (parts.Length > 1) ? parts[1] : "Item");
+				}
 
 			SortedList<string, string> added = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
 			xw.WriteStartElement("Scripts");
@@ -229,7 +241,8 @@ namespace QQn.TurtleMSBuild
 
 				string extension = Path.GetExtension(i.Include);
 
-				if (!extensions.ContainsKey(extension))
+				string extensionAs;
+				if (!extensions.TryGetValue(extension, out extensionAs))
 					continue;
 
 				if (!File.Exists(Path.Combine(project.ProjectPath, i.Include)))
@@ -240,7 +253,7 @@ namespace QQn.TurtleMSBuild
 
 				added.Add(i.Include, name);
 
-				xw.WriteStartElement(name, Ns);
+				xw.WriteStartElement(extensionAs, Ns);
 				xw.WriteAttributeString("src", i.Include);
 
 				xw.WriteEndElement();

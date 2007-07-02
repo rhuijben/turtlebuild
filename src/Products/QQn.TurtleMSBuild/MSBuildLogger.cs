@@ -32,16 +32,11 @@ namespace QQn.TurtleMSBuild
 		void ProjectBuildStarted(object sender, ProjectStartedEventArgs e)
 		{
 			if (building.ContainsKey(e.ProjectFile))
-				return;
-				//throw new InvalidOperationException("Project already building");
+				return; // Already building
 
-			if (e.Properties == null)
+			if (e.Properties != null)
 			{
-				//Console.WriteLine("X-Started {0}", e.ProjectFile);
-			}
-			else
-			{
-				//Console.WriteLine("Started {0}", e.ProjectFile);
+				// e.Properties = null in current beta version of MSBuild 3.5 when building parallel
 
 				building.Add(e.ProjectFile, new BuildProject(e.ProjectFile, e.TargetNames, e.Properties, e.Items, _settings));
 			}
@@ -50,10 +45,7 @@ namespace QQn.TurtleMSBuild
 		void ProjectBuildFinished(object sender, ProjectFinishedEventArgs e)
 		{
 			if (!building.ContainsKey(e.ProjectFile))
-			{
-				return;
-				//throw new InvalidOperationException("Project not building");
-			}
+				return; // Can't finish if not building; probably reference project
 
 			BuildProject bp = building[e.ProjectFile];
 			building.Remove(e.ProjectFile);
