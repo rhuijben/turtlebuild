@@ -2,25 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using QQn.TurtleUtils.ItemSets;
 
 namespace QQn.TurtlePackage
 {
-	public class TurtleContainer : TurtleItem
+	public class TurtleContainer : Container<TurtlePackage, TurtleContainer, TurtleItem>
 	{
 		readonly string _name;
-		List<TurtleFileItem> _files;
+		List<TurtleItem> _files;
+
+		public TurtleContainer()
+		{
+		}
 
 		protected internal TurtleContainer(bool readOnly, string name)
-			: base(readOnly)
 		{
 			if (string.IsNullOrEmpty(name))
 				throw new ArgumentNullException("name");
 
 			_name = name;
-			_files = new List<TurtleFileItem>();
+			_files = new List<TurtleItem>();
 		}
 
-		public ICollection<TurtleFileItem> Files
+		public ICollection<TurtleItem> Files
 		{
 			get { return _files; }
 		}
@@ -51,12 +55,9 @@ namespace QQn.TurtlePackage
 			else
 				name = Path.GetFileName(filename);
 
-			_files.Add(new TurtleFileItem(name, filename));
+			Add(new TurtleItem(name, filename));
 		}
 
-		public override string Name
-		{
-			get { return _name; }
-		}
+		
 	}
 }

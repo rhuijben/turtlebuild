@@ -1,16 +1,20 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using QQn.TurtleUtils.ItemSets;
 
 namespace QQn.TurtlePackage
 {
-	public class TurtleFileItem : TurtleItem
+	public class TurtleItem : Item<TurtlePackage, TurtleContainer, TurtleItem>
 	{
 		readonly string _filename;
 		readonly string _fromFile;
 
-		protected internal TurtleFileItem(string filename)
-			: base(true)
+		public TurtleItem()
+		{
+		}
+
+		protected internal TurtleItem(string filename)
 		{
 			if (filename == null)
 				throw new ArgumentNullException("filename");
@@ -18,7 +22,7 @@ namespace QQn.TurtlePackage
 			_filename = filename;
 		}
 
-		protected internal TurtleFileItem(string filename, string fromFile)
+		protected internal TurtleItem(string filename, string fromFile)
 			: this(filename)
 		{
 			_fromFile = fromFile;
@@ -27,11 +31,6 @@ namespace QQn.TurtlePackage
 		public string Filename
 		{
 			get { return _filename; }
-		}
-
-		public override string Name
-		{
-			get { return Filename; }
 		}
 	}
 }
