@@ -4,10 +4,11 @@ using System.Text;
 using System.Xml;
 using System.Xml.XPath;
 using System.IO;
+using QQn.TurtleUtils.ItemSets;
 
 namespace QQn.TurtlePackage
 {
-	public class TurtlePackage : TurtleItem
+	public class TurtlePackage : Package<TurtlePackage, TurtleContainer, TurtleItem>
 	{
 		readonly FileInfo _package;
 		readonly IXPathNavigable _manifest;
@@ -19,7 +20,6 @@ namespace QQn.TurtlePackage
 		}
 
 		protected TurtlePackage(FileInfo info, IXPathNavigable manifest)
-			: base(true)
 		{
 			if(info == null)
 				throw new ArgumentNullException("info");
@@ -48,9 +48,9 @@ namespace QQn.TurtlePackage
 
 		protected void EnsureLoaded()
 		{
-			if (!ReadOnly)
-				return;
-			else if (FileInfo.Exists)
+			EnsureWritable();
+
+			if (FileInfo.Exists)
 				throw new InvalidOperationException();
 		}
 
@@ -75,20 +75,6 @@ namespace QQn.TurtlePackage
 			return tp;
 		}
 
-		public TurtleContainer AddContainer(string containerName)
-		{
-			foreach (TurtleContainer tc in Containers)
-			{
-				if (tc.Name == containerName)
-					throw new ArgumentException("Container already exists", "containerName");
-			}
-
-			TurtleContainer tt = new TurtleContainer(false, containerName);
-			_containers.Add(tt);
-
-			return tt;
-		}
-
 		public void Commit()
 		{
 			EnsureLoaded();
@@ -98,13 +84,6 @@ namespace QQn.TurtlePackage
 		public void SetManifest(XmlDocument doc)
 		{
 			throw new Exception("The method or operation is not implemented.");
-		}
-
-
-
-		public override string Name
-		{
-			get { return _package.Name; }
 		}
 	}
 }

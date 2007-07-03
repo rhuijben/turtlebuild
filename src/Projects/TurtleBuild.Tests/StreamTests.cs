@@ -71,7 +71,7 @@ namespace TurtleTests
 
 			//pkg.SetManifest(doc);
 
-			pkg.Commit();
+		//	pkg.Commit();
 		}
 	}
 }
