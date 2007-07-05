@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using QQn.TurtleUtils.Cryptography;
 
 namespace QQn.TurtleUtils.Streams
 {

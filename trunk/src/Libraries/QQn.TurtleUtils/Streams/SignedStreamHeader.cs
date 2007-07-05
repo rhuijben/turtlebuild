@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Security.Cryptography;
+using QQn.TurtleUtils.Cryptography;
 
 namespace QQn.TurtleUtils.Streams
 {
@@ -12,7 +13,7 @@ namespace QQn.TurtleUtils.Streams
 		readonly string _fileType;
 		byte[] _fileHash;
 		byte[] _hashSignature;
-		readonly StrongNameKey _key;
+		readonly StrongNameKey _snk;
 		readonly Guid _guid;
 		long _headerPosition;
 		long _hashPosition;
@@ -38,11 +39,11 @@ namespace QQn.TurtleUtils.Streams
 
 			if (publicKey.Length > 0)
 			{
-				_key = StrongNameKey.LoadFrom(publicKey);
+				_snk = StrongNameKey.LoadFrom(publicKey);
 
 				if (mode != VerificationMode.None)
 				{
-					if (!_key.VerifyHash(_fileHash, _hashSignature))
+					if (!_snk.VerifyHash(_fileHash, _hashSignature))
 						throw new CryptographicException("Stream hash verification failed");
 				}
 			}
@@ -69,7 +70,7 @@ namespace QQn.TurtleUtils.Streams
 			bw.Write(FileType);
 			bw.WriteByteArray(_fileHash);
 			bw.WriteByteArray(_hashSignature);
-			bw.WriteByteArray(_key != null ? _key.GetPublicKeyData() : new byte[0]);
+			bw.WriteByteArray(_snk != null ? _snk.GetPublicKeyData() : new byte[0]);
 			bw.Write(_guid.ToByteArray());
 			bw.Write(_bodyLength);
 			_hashPosition = SafePosition(stream);
@@ -98,9 +99,9 @@ namespace QQn.TurtleUtils.Streams
 			}
 			else
 			{
-				_key = args.StrongName;
-				_fileHash = new byte[_key.HashLength];
-				_hashSignature = new byte[_key.SignatureLength];
+				_snk = args.StrongName;
+				_fileHash = new byte[_snk.HashLength];
+				_hashSignature = new byte[_snk.SignatureLength];
 			}
 			_guid = args.NullGuid ? Guid.Empty : Guid.NewGuid();
 		}
@@ -122,12 +123,12 @@ namespace QQn.TurtleUtils.Streams
 
 		public byte[] PublicKeyToken
 		{
-			get { return (_key != null) ? _key.PublicKeyToken : null; }
+			get { return (_snk != null) ? _snk.PublicKeyToken : null; }
 		}
 
 		public StrongNameKey AssemblyStrongNameKey
 		{
-			get { return _key; }
+			get { return _snk; }
 		}
 
 		long StreamLength(Stream stream)
@@ -154,12 +155,12 @@ namespace QQn.TurtleUtils.Streams
 		internal void UpdateHash(Stream stream)
 		{
 			byte[] fileHash = CalculateHash(stream, true);
-			if (_key != null)
+			if (_snk != null)
 			{
-				if (_key.PublicOnly)
+				if (_snk.PublicOnly)
 					throw new InvalidOperationException();
 
-				byte[] signature = _key.SignHash(fileHash);
+				byte[] signature = _snk.SignHash(fileHash);
 
 				if (signature.Length != _hashSignature.Length)
 					throw new InvalidOperationException();
@@ -181,7 +182,7 @@ namespace QQn.TurtleUtils.Streams
 			if (create)
 				_bodyLength = StreamLength(stream);
 
-			using (HashAlgorithm hasher = (_key != null) ? _key.CreateHasher() : SHA256.Create())
+			using (HashAlgorithm hasher = (_snk != null) ? _snk.CreateHasher() : SHA256.Create())
 			{
 				long newPos = _hashPosition;
 

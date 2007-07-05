@@ -5,7 +5,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Reflection;
 
-namespace QQn.TurtleUtils.Streams
+namespace QQn.TurtleUtils.Cryptography
 {
 	/// <summary>
 	/// An in-memory wrapper of a StrongKeyName (aka Snk file)
