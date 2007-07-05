@@ -45,12 +45,12 @@
     <Compile Include="Streams\MultiStreamItemHeader.cs" />
     <Compile Include="Streams\MultiStreamReader.cs" />
     <Compile Include="Streams\MultiStreamWriter.cs" />
-    <Compile Include="Streams\MultiSubStream.cs" />
+    <Compile Include="Streams\MultiSubStreamWriter.cs" />
     <Compile Include="Streams\MultiSubStreamReader.cs" />
     <Compile Include="Streams\QQnBinaryReader.cs" />
     <Compile Include="Streams\QQnBinaryWriter.cs" />
     <Compile Include="Cryptography\QQnCryptoHelpers.cs" />
-    <Compile Include="Streams\AssuredStreamStream.cs" />
+    <Compile Include="Streams\AssuredStream.cs" />
     <Compile Include="Streams\AssuredStreamCreateArgs.cs" />
     <Compile Include="Streams\AssuredStreamHeader.cs" />
     <Compile Include="Streams\AssuredSubStream.cs" />
