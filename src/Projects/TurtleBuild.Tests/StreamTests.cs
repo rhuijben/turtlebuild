@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Xml;
 using QQn.TurtlePackage.StreamFiles;
 using NUnit.Framework.SyntaxHelpers;
+using QQn.TurtleUtils.Streams;
 
 namespace TurtleTests
 {
@@ -37,6 +38,44 @@ namespace TurtleTests
 				for (int i = 0; i < 10; i++)
 				{
 					using (Stream s = sf.GetNextStream())
+					{
+						using (StreamReader sw = new StreamReader(s))
+						{
+							string line = sw.ReadLine();
+							string shouldBe = string.Format("This is stream {0}", i);
+
+							Assert.That(line, Is.EqualTo(shouldBe));
+						}
+					}
+				}
+			}
+		}
+
+		[Test]
+		public void TestMultiStreamWriter()
+		{
+			string fileName = Path.GetTempFileName() + "q";
+			using (FileStream fs = File.Create(fileName))
+			using (MultiStreamWriter writer = new MultiStreamWriter(fs))
+			{
+				for (int i = 0; i < 10; i++)
+				{
+					using (Stream s = writer.CreateStream())
+					{
+						using (StreamWriter sw = new StreamWriter(s))
+						{
+							sw.WriteLine("This is stream {0}", i);
+						}
+					}
+				}
+			}
+
+			using (FileStream fs = File.OpenRead(fileName))
+			using(MultiStreamReader reader = new MultiStreamReader(fs))
+			{
+				for (int i = 0; i < 10; i++)
+				{
+					using (Stream s = reader.GetNextStream())
 					{
 						using (StreamReader sw = new StreamReader(s))
 						{

@@ -16,7 +16,7 @@ namespace QQn.TurtleUtils.Streams
 		{
 			return base.Read7BitEncodedInt();
 		}
-
+		
 		public byte[] ReadByteArray()
 		{
 			int length = ReadSmartInt();
