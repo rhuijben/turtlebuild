@@ -5,16 +5,19 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Reflection;
 
-namespace QQn.TurtleUtils.Cryptography
+namespace QQn.TurtleUtils.Streams
 {
-	public sealed class AssemblyStrongNameKey
+	/// <summary>
+	/// An in-memory wrapper of a StrongKeyName (aka Snk file)
+	/// </summary>
+	public sealed class StrongNameKey
 	{
 		/// <summary>
 		/// Loads an Snk file
 		/// </summary>
 		/// <param name="path">Path to snk file</param>
 		/// <returns></returns>
-		public static AssemblyStrongNameKey LoadFrom(string path)
+		public static StrongNameKey LoadFrom(string path)
 		{
 			using (FileStream s = File.OpenRead(path))
 			{
@@ -22,7 +25,12 @@ namespace QQn.TurtleUtils.Cryptography
 			}
 		}
 
-		public static AssemblyStrongNameKey LoadFrom(Stream stream)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="stream"></param>
+		/// <returns></returns>
+		public static StrongNameKey LoadFrom(Stream stream)
 		{
 			if (stream == null)
 				throw new ArgumentNullException("stream");
@@ -37,11 +45,16 @@ namespace QQn.TurtleUtils.Cryptography
 				RSACryptoServiceProvider rcsp = new RSACryptoServiceProvider(csp);
 				rcsp.ImportCspBlob(br.ReadBytes((int)br.BaseStream.Length));
 
-				return new AssemblyStrongNameKey(rcsp);
+				return new StrongNameKey(rcsp);
 			}
 		}
 
-		public static AssemblyStrongNameKey LoadFrom(byte[] bytes)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="bytes"></param>
+		/// <returns></returns>
+		public static StrongNameKey LoadFrom(byte[] bytes)
 		{
 			if (bytes == null)
 				throw new ArgumentNullException("bytes");
@@ -52,7 +65,13 @@ namespace QQn.TurtleUtils.Cryptography
 			}
 		}
 
-		public static AssemblyStrongNameKey LoadFromContainer(string containerName, bool machineScope)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="containerName"></param>
+		/// <param name="machineScope"></param>
+		/// <returns></returns>
+		public static StrongNameKey LoadFromContainer(string containerName, bool machineScope)
 		{
 			if (string.IsNullOrEmpty(containerName))
 				throw new ArgumentNullException("containerName");
@@ -64,12 +83,12 @@ namespace QQn.TurtleUtils.Cryptography
 			if (machineScope)
 				csp.Flags |= CspProviderFlags.UseMachineKeyStore;
 
-			return new AssemblyStrongNameKey(new RSACryptoServiceProvider(csp));
+			return new StrongNameKey(new RSACryptoServiceProvider(csp));
 		}
 
 
 		readonly RSACryptoServiceProvider _rcsp;
-		AssemblyStrongNameKey(RSACryptoServiceProvider rcsp)
+		StrongNameKey(RSACryptoServiceProvider rcsp)
 		{
 			if (rcsp == null)
 				throw new ArgumentNullException("rcsp");
@@ -77,6 +96,11 @@ namespace QQn.TurtleUtils.Cryptography
 			_rcsp = rcsp;			
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="hash"></param>
+		/// <returns></returns>
 		public byte[] SignHash(byte[] hash)
 		{
 			if (hash == null)
@@ -85,6 +109,12 @@ namespace QQn.TurtleUtils.Cryptography
 			return _rcsp.SignHash(hash, CryptoConfig.MapNameToOID(HashAlgorithmName));
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="hash"></param>
+		/// <param name="signature"></param>
+		/// <returns></returns>
 		public bool VerifyHash(byte[] hash, byte[] signature)
 		{
 			if (hash == null)
@@ -95,6 +125,10 @@ namespace QQn.TurtleUtils.Cryptography
 			return _rcsp.VerifyHash(hash, CryptoConfig.MapNameToOID(HashAlgorithmName), signature);
 		}
 
+		/// <summary>
+		/// Gets the public key data in a way it can be used to create a public-only <see cref="StrongNameKey"/>
+		/// </summary>
+		/// <returns></returns>
 		public byte[] GetPublicKeyData()
 		{
 			return _rcsp.ExportCspBlob(false);
@@ -122,10 +156,13 @@ namespace QQn.TurtleUtils.Cryptography
 					Array.Reverse(last8);
 					_publicKeyToken = last8;
 				}
-				return _publicKeyToken;
+				return (byte[])_publicKeyToken.Clone();
 			}
 		}
 
+		/// <summary>
+		/// Gets the length of a signature in bytes
+		/// </summary>
 		public int SignatureLength
 		{
 			get
@@ -135,6 +172,9 @@ namespace QQn.TurtleUtils.Cryptography
 		}
 
 		int _hashLength;
+		/// <summary>
+		/// Gets the length of a hash in bytes
+		/// </summary>
 		public int HashLength
 		{
 			get
@@ -150,6 +190,9 @@ namespace QQn.TurtleUtils.Cryptography
 			}
 		}
 
+		/// <summary>
+		/// Gets a boolean indicating whether the <see cref="StrongNameKey"/> only contains a public key
+		/// </summary>
 		public bool PublicOnly
 		{
 			get { return _rcsp.PublicOnly; }
@@ -167,6 +210,10 @@ namespace QQn.TurtleUtils.Cryptography
 			}
 		}
 
+		/// <summary>
+		/// Creates a new <see cref="HashAlgorithm"/> which delivers a hash which can be used with this <see cref="StrongNameKey"/>
+		/// </summary>
+		/// <returns></returns>
 		public HashAlgorithm CreateHasher()
 		{
 			return HashAlgorithm.Create(HashAlgorithmName);

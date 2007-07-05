@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace QQn.TurtleUtils.Cryptography
+namespace QQn.TurtleUtils.Streams
 {
 	class QQnBinaryReader : BinaryReader
 	{

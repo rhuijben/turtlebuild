@@ -5,27 +5,39 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 
-namespace QQn.TurtleUtils.Cryptography
+namespace QQn.TurtleUtils.Streams
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public enum VerificationMode
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		Full,
+		/// <summary>
+		/// 
+		/// </summary>
 		Sign,
+		/// <summary>
+		/// 
+		/// </summary>
 		None
 	}
 
 	/// <summary>
 	/// Stream wrapper with embedded hashing and optionally signing the hash
 	/// </summary>
-	public class SignedStream : StreamProxy
+	public class AssuredStream : StreamProxy
 	{
 		readonly bool _seekable;
 		readonly bool _creating;
 
-		readonly SignedStreamHeader _header;
+		readonly AssuredStreamHeader _header;
 		readonly long _basePosition;
 
-		private SignedStream(Stream stream, bool create)
+		private AssuredStream(Stream stream, bool create)
 			: base(stream, true)
 		{
 			if (stream == null)
@@ -48,10 +60,10 @@ namespace QQn.TurtleUtils.Cryptography
 		/// </summary>
 		/// <param name="stream">The stream to open</param>
 		/// <param name="mode">The verification to use</param>
-		public SignedStream(Stream stream, VerificationMode mode)
+		public AssuredStream(Stream stream, VerificationMode mode)
 			: this(stream, false)
 		{
-			_header = new SignedStreamHeader(stream, mode);
+			_header = new AssuredStreamHeader(stream, mode);
 
 			if (mode == VerificationMode.Full)
 			{
@@ -74,12 +86,17 @@ namespace QQn.TurtleUtils.Cryptography
 		/// <param name="stream">The stream to write to (Must be writable and seekable)</param>
 		/// <param name="strongName">The strong name to hash/sign with (can be null)</param>
 		/// <param name="fileType">The string to use as fileType</param>
-		public SignedStream(Stream stream, AssemblyStrongNameKey strongName, string fileType)
-			: this(stream, new SignedStreamCreateArgs(strongName, fileType))
+		public AssuredStream(Stream stream, StrongNameKey strongName, string fileType)
+			: this(stream, new AssuredStreamCreateArgs(strongName, fileType))
 		{
 		}
 
-		public SignedStream(Stream stream, SignedStreamCreateArgs args)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="stream"></param>
+		/// <param name="args"></param>
+		public AssuredStream(Stream stream, AssuredStreamCreateArgs args)
 			: this(stream, true)
 		{
 			if (args == null)
@@ -89,17 +106,23 @@ namespace QQn.TurtleUtils.Cryptography
 
 			long pos = stream.Position;
 
-			_header = new SignedStreamHeader(args);
+			_header = new AssuredStreamHeader(args);
 			_header.WriteHeader(stream);
 
 			_basePosition = stream.Position;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public string FileType
 		{
 			get { return _header.FileType; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public Guid Guid
 		{
 			get { return _header.Guid; }
@@ -125,7 +148,7 @@ namespace QQn.TurtleUtils.Cryptography
 		/// <summary>
 		/// Gets the <see cref="AssemblyStrongNameKey"/> used for the hash-signature, or null if no such key is provided
 		/// </summary>
-		public AssemblyStrongNameKey AssemblyStrongNameKey
+		public StrongNameKey AssemblyStrongNameKey
 		{
 			get { return _header.AssemblyStrongNameKey; }
 		}
@@ -193,11 +216,21 @@ namespace QQn.TurtleUtils.Cryptography
 			base.Close();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="parentPosition"></param>
+		/// <returns></returns>
 		protected override long PositionToSubStream(long parentPosition)
 		{
 			return parentPosition - _basePosition;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="subStreamPosition"></param>
+		/// <returns></returns>
 		protected override long PositionToParent(long subStreamPosition)
 		{
 			return subStreamPosition + _basePosition;

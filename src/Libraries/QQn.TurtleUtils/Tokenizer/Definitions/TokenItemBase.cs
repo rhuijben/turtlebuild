@@ -5,6 +5,9 @@ using System.Reflection;
 
 namespace QQn.TurtleUtils.Tokenizer.Definitions
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public abstract class TokenItemBase
 	{
 		internal static T GetFirstAttribute<T>(ICustomAttributeProvider attributeProvider)

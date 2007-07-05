@@ -7,6 +7,12 @@ using System.ComponentModel;
 
 namespace QQn.TurtleUtils.ItemSets
 {
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <typeparam name="TPackage"></typeparam>
+	/// <typeparam name="TContainer"></typeparam>
+	/// <typeparam name="TItem"></typeparam>
 	[XmlRoot("Item", IsNullable = false)]
 	public class Item<TPackage, TContainer, TItem> : ItemSetBase<TPackage, TContainer, TItem>
 		where TPackage : Package<TPackage, TContainer, TItem>
@@ -16,6 +22,9 @@ namespace QQn.TurtleUtils.ItemSets
 		string _include;
 		string _type;
 
+		/// <summary>
+		/// 
+		/// </summary>
 		[XmlAttribute("include")]
 		public string Include
 		{
@@ -28,6 +37,9 @@ namespace QQn.TurtleUtils.ItemSets
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		[XmlAttribute("type"), DefaultValue("Item")]
 		public string Type
 		{
@@ -40,6 +52,9 @@ namespace QQn.TurtleUtils.ItemSets
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		[XmlIgnore]
 		public sealed override bool IsReadOnly
 		{

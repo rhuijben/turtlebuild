@@ -4,26 +4,26 @@ using System.Text;
 using System.IO;
 using System.Security.Cryptography;
 
-namespace QQn.TurtleUtils.Cryptography
+namespace QQn.TurtleUtils.Streams
 {
-	class SignedStreamHeader
+	class AssuredStreamHeader
 	{
 		const uint FileSignature = 0xBADCAB;
 		readonly string _fileType;
 		byte[] _fileHash;
 		byte[] _hashSignature;
-		readonly AssemblyStrongNameKey _key;
+		readonly StrongNameKey _key;
 		readonly Guid _guid;
 		long _headerPosition;
 		long _hashPosition;
 		long _bodyLength;
 
-		public SignedStreamHeader(Stream source)
+		public AssuredStreamHeader(Stream source)
 			: this(source, VerificationMode.Full)
 		{
 		}
 
-		public SignedStreamHeader(Stream source, VerificationMode mode)
+		public AssuredStreamHeader(Stream source, VerificationMode mode)
 		{
 			QQnBinaryReader br = new QQnBinaryReader(source);
 			uint vFileSignature = br.ReadUInt32();
@@ -38,7 +38,7 @@ namespace QQn.TurtleUtils.Cryptography
 
 			if (publicKey.Length > 0)
 			{
-				_key = AssemblyStrongNameKey.LoadFrom(publicKey);
+				_key = StrongNameKey.LoadFrom(publicKey);
 
 				if (mode != VerificationMode.None)
 				{
@@ -77,12 +77,12 @@ namespace QQn.TurtleUtils.Cryptography
 
 		const int Sha256HashSize = 256 / 8;
 
-		public SignedStreamHeader(string fileType, AssemblyStrongNameKey snk)
-			: this(new SignedStreamCreateArgs(snk, fileType))
+		public AssuredStreamHeader(string fileType, StrongNameKey snk)
+			: this(new AssuredStreamCreateArgs(snk, fileType))
 		{
 		}
 
-		internal SignedStreamHeader(SignedStreamCreateArgs args)
+		internal AssuredStreamHeader(AssuredStreamCreateArgs args)
 		{
 			if (args == null)
 				throw new ArgumentNullException("args");
@@ -125,7 +125,7 @@ namespace QQn.TurtleUtils.Cryptography
 			get { return (_key != null) ? _key.PublicKeyToken : null; }
 		}
 
-		public AssemblyStrongNameKey AssemblyStrongNameKey
+		public StrongNameKey AssemblyStrongNameKey
 		{
 			get { return _key; }
 		}

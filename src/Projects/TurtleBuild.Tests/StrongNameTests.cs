@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using QQn.TurtleUtils.Cryptography;
+using QQn.TurtleUtils.Streams;
 using NUnit.Framework.SyntaxHelpers;
 using System.IO;
 
@@ -49,31 +49,31 @@ namespace TurtleTests
 		[Test]
 		public void TestMyHash()
 		{
-			AssemblyStrongNameKey snkIn = AssemblyStrongNameKey.LoadFrom(SnkFile);
+			StrongNameKey snkIn = StrongNameKey.LoadFrom(SnkFile);
 			byte[] data = new byte[20];
 			byte[] signature = snkIn.SignHash(data);
 			byte[] publicKeyData = snkIn.GetPublicKeyData();
 
 
-			AssemblyStrongNameKey snkVerify = AssemblyStrongNameKey.LoadFrom(publicKeyData);
+			StrongNameKey snkVerify = StrongNameKey.LoadFrom(publicKeyData);
 			Assert.That(snkVerify.VerifyHash(data, signature), Is.True, "Verification completed");
 		}
 
 		[Test]
 		public void TestTokens()
 		{
-			AssemblyStrongNameKey snkIn = AssemblyStrongNameKey.LoadFrom(SnkFile);
+			StrongNameKey snkIn = StrongNameKey.LoadFrom(SnkFile);
 			Assert.That(QQnCryptoHelpers.HashString(snkIn.PublicKeyToken), Is.EqualTo(QQnCryptoHelpers.HashString(typeof(QQnCryptoHelpers).Assembly.GetName().GetPublicKeyToken())), "Our public-token api matches the .Net one");
 		}
 
 		[Test]
 		public void CreateSignedFile()
 		{
-			AssemblyStrongNameKey snkIn = AssemblyStrongNameKey.LoadFrom(SnkFile);
+			StrongNameKey snkIn = StrongNameKey.LoadFrom(SnkFile);
 
 			string file;
 			using (FileStream f = File.Create(file = TmpPath))
-			using (SignedStream s = new SignedStream(f, snkIn, "TestPackage"))
+			using (AssuredStream s = new AssuredStream(f, snkIn, "TestPackage"))
 			using (BinaryWriter bw = new BinaryWriter(s))
 			{
 				Assert.That(s.Position, Is.EqualTo(0L), "Position 0 within signed file");
@@ -83,7 +83,7 @@ namespace TurtleTests
 			}
 
 			using (FileStream f = File.OpenRead(file))
-			using (SignedStream s = new SignedStream(f, VerificationMode.Full))
+			using (AssuredStream s = new AssuredStream(f, VerificationMode.Full))
 			using (BinaryReader br = new BinaryReader(s))
 			{
 				Assert.That(s.Position, Is.EqualTo(0L), "Position 0 within signed file");				
@@ -99,13 +99,13 @@ namespace TurtleTests
 		public void CreateTrippleSignedFile()
 		{
 			// Tests whether a stream within a signed stream behaves as an outer stream
-			AssemblyStrongNameKey snkIn = AssemblyStrongNameKey.LoadFrom(SnkFile);
+			StrongNameKey snkIn = StrongNameKey.LoadFrom(SnkFile);
 
 			string file;
 			using (FileStream f = File.Create(file = TmpPath))
-			using (SignedStream s = new SignedStream(f, snkIn, "TestPackage"))
-			using (SignedStream s2 = new SignedStream(s, snkIn, "InnerPackage"))
-			using (SignedStream s3 = new SignedStream(s2, snkIn, "InnerPackage"))
+			using (AssuredStream s = new AssuredStream(f, snkIn, "TestPackage"))
+			using (AssuredStream s2 = new AssuredStream(s, snkIn, "InnerPackage"))
+			using (AssuredStream s3 = new AssuredStream(s2, snkIn, "InnerPackage"))
 			using (BinaryWriter bw = new BinaryWriter(s3))
 			{
 				Assert.That(s3.Position, Is.EqualTo(0L), "Position 0 within signed file");
@@ -115,9 +115,9 @@ namespace TurtleTests
 			}
 
 			using (FileStream f = File.OpenRead(file))
-			using (SignedStream s = new SignedStream(f, VerificationMode.Full))
-			using (SignedStream s2 = new SignedStream(s, VerificationMode.Full))
-			using (SignedStream s3 = new SignedStream(s2, VerificationMode.Full))
+			using (AssuredStream s = new AssuredStream(f, VerificationMode.Full))
+			using (AssuredStream s2 = new AssuredStream(s, VerificationMode.Full))
+			using (AssuredStream s3 = new AssuredStream(s2, VerificationMode.Full))
 			using (BinaryReader br = new BinaryReader(s3))
 			{
 				Assert.That(s3.Position, Is.EqualTo(0L), "Position 0 within signed file");
@@ -133,12 +133,12 @@ namespace TurtleTests
 		public void CreateSignedSubFile()
 		{
 			// Tests whether a stream within a signed stream behaves as an outer stream
-			AssemblyStrongNameKey snkIn = AssemblyStrongNameKey.LoadFrom(SnkFile);
+			StrongNameKey snkIn = StrongNameKey.LoadFrom(SnkFile);
 
 			string file;
 			using (FileStream f = File.Create(file = TmpPath))
-			using (SignedStream s = new SignedStream(f, snkIn, "TestPackage"))
-			using (SignedSubStream s2 = new SignedSubStream(s, VerificationMode.Full))
+			using (AssuredStream s = new AssuredStream(f, snkIn, "TestPackage"))
+			using (AssuredSubStream s2 = new AssuredSubStream(s, VerificationMode.Full))
 			using (BinaryWriter bw = new BinaryWriter(s2))
 			{
 				Assert.That(s2.Position, Is.EqualTo(0L), "Position 0 within signed file");
@@ -148,8 +148,8 @@ namespace TurtleTests
 			}
 
 			using (FileStream f = File.OpenRead(file))
-			using (SignedStream s = new SignedStream(f, VerificationMode.Full))
-			using (SignedSubStream s2 = new SignedSubStream(s, VerificationMode.Full))
+			using (AssuredStream s = new AssuredStream(f, VerificationMode.Full))
+			using (AssuredSubStream s2 = new AssuredSubStream(s, VerificationMode.Full))
 			using (BinaryReader br = new BinaryReader(s2))
 			{
 				Assert.That(s2.Position, Is.EqualTo(0L), "Position 0 within signed file");
@@ -166,7 +166,7 @@ namespace TurtleTests
 		{
 			string file;
 			using (FileStream f = File.Create(file = TmpPath))
-			using (SignedSubStream s2 = new SignedSubStream(f, VerificationMode.Full))
+			using (AssuredSubStream s2 = new AssuredSubStream(f, VerificationMode.Full))
 			using (BinaryWriter bw = new BinaryWriter(s2))
 			{
 				Assert.That(s2.Position, Is.EqualTo(0L), "Position 0 within signed file");
@@ -176,7 +176,7 @@ namespace TurtleTests
 			}
 
 			using (FileStream f = File.OpenRead(file))
-			using (SignedSubStream s2 = new SignedSubStream(f, VerificationMode.Full))
+			using (AssuredSubStream s2 = new AssuredSubStream(f, VerificationMode.Full))
 			using (BinaryReader br = new BinaryReader(s2))
 			{
 				Assert.That(s2.Position, Is.EqualTo(0L), "Position 0 within signed file");

@@ -2,19 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QQn.TurtleUtils.Cryptography
+namespace QQn.TurtleUtils.Streams
 {
-	public class SignedStreamCreateArgs
+	/// <summary>
+	/// 
+	/// </summary>
+	public class AssuredStreamCreateArgs
 	{
 		bool _nullGuid;
-		AssemblyStrongNameKey _strongName;
+		StrongNameKey _strongName;
 		string _fileType;
 
-		public SignedStreamCreateArgs()
+		/// <summary>
+		/// 
+		/// </summary>
+		public AssuredStreamCreateArgs()
 		{
 		}
 
-		internal SignedStreamCreateArgs(AssemblyStrongNameKey strongName, string fileType)
+		internal AssuredStreamCreateArgs(StrongNameKey strongName, string fileType)
 		{
 			StrongName = strongName;
 			FileType = fileType;
@@ -26,19 +32,28 @@ namespace QQn.TurtleUtils.Cryptography
 				throw new ArgumentException("FileType must be set on SignedStreamCreateArgs", paramName);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public string FileType
 		{
 			get { return _fileType; }
 			set { _fileType = value; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool NullGuid
 		{
 			get { return _nullGuid; }
 			set { _nullGuid = value; }
 		}
 
-		public AssemblyStrongNameKey StrongName
+		/// <summary>
+		/// 
+		/// </summary>
+		public StrongNameKey StrongName
 		{
 			get { return _strongName; }
 			set { _strongName = value; }

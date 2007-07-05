@@ -5,6 +5,13 @@ using System.Xml.Serialization;
 
 namespace QQn.TurtleUtils.ItemSets
 {
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <typeparam name="TPackage"></typeparam>
+	/// <typeparam name="TContainer"></typeparam>
+	/// <typeparam name="TItem"></typeparam>
 	public abstract class ItemSetList<T, TPackage, TContainer, TItem> : ItemSetBase<TPackage, TContainer, TItem>, IList<T>, System.Collections.IList
 		where T : ItemSetBase<TPackage, TContainer, TItem>, new()
 		where TPackage : Package<TPackage, TContainer, TItem>
@@ -13,6 +20,9 @@ namespace QQn.TurtleUtils.ItemSets
 	{
 		readonly List<T> _innerList = new List<T>();
 
+		/// <summary>
+		/// 
+		/// </summary>
 		protected List<T> InnerList
 		{
 			get { return _innerList; }
@@ -20,11 +30,21 @@ namespace QQn.TurtleUtils.ItemSets
 
 		#region IList<T> Members
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="item"></param>
+		/// <returns></returns>
 		public int IndexOf(T item)
 		{
 			return InnerList.IndexOf(item);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="index"></param>
+		/// <param name="item"></param>
 		public void Insert(int index, T item)
 		{
 			if (IsReadOnly)
@@ -38,6 +58,10 @@ namespace QQn.TurtleUtils.ItemSets
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="index"></param>
 		public void RemoveAt(int index)
 		{
 			if (IsReadOnly)
@@ -47,6 +71,11 @@ namespace QQn.TurtleUtils.ItemSets
 			InnerList.RemoveAt(index);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
 		public T this[int index]
 		{
 			get { return InnerList[index]; }
@@ -71,6 +100,10 @@ namespace QQn.TurtleUtils.ItemSets
 
 		#region ICollection<T> Members
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="item"></param>
 		public void Add(T item)
 		{
 			if (IsReadOnly)
@@ -86,6 +119,9 @@ namespace QQn.TurtleUtils.ItemSets
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Clear()
 		{
 			if (IsReadOnly)
@@ -94,22 +130,40 @@ namespace QQn.TurtleUtils.ItemSets
 			InnerList.Clear();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="item"></param>
+		/// <returns></returns>
 		public bool Contains(T item)
 		{
 			return InnerList.Contains(item);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="array"></param>
+		/// <param name="arrayIndex"></param>
 		public void CopyTo(T[] array, int arrayIndex)
 		{
 			InnerList.CopyTo(array, arrayIndex);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		[XmlIgnore]
 		public int Count
 		{
 			get { return InnerList.Count; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="item"></param>
+		/// <returns></returns>
 		public bool Remove(T item)
 		{
 			if (IsReadOnly)
@@ -122,6 +176,10 @@ namespace QQn.TurtleUtils.ItemSets
 
 		#region IEnumerable<T> Members
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public IEnumerator<T> GetEnumerator()
 		{
 			return InnerList.GetEnumerator();
@@ -229,6 +287,9 @@ namespace QQn.TurtleUtils.ItemSets
 			#endregion
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public override TPackage Package
 		{
 			get

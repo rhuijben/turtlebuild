@@ -6,12 +6,28 @@ using System.Collections;
 
 namespace QQn.TurtleUtils.Tokenizer.Definitions
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public enum TokenMemberMode
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		Default,
+		/// <summary>
+		/// 
+		/// </summary>
 		Array,
+		/// <summary>
+		/// 
+		/// </summary>
 		List
 	}
+
+	/// <summary>
+	/// 
+	/// </summary>
 	public sealed class TokenMember : TokenItemBase
 	{
 		readonly MemberInfo _member;
@@ -19,6 +35,10 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		readonly IList<TokenItem> _tokens;
 		readonly bool _isProperty;
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="member"></param>
 		public TokenMember(MemberInfo member)
 		{
 			if (member == null)
@@ -44,17 +64,26 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 				_tokens = new TokenItem[0];
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public string Name
 		{
 			get { return _name; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public IList<TokenItem> Tokens
 		{
 			get { return _tokens; }
 		}
 
 		Type _fieldType;
+		/// <summary>
+		/// 
+		/// </summary>
 		public Type FieldType
 		{
 			get 
@@ -76,6 +105,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 
 		Type _dataType;
 		TokenMemberMode _tokenMemberMode;
+		/// <summary>
+		/// 
+		/// </summary>
 		public Type DataType
 		{
 			get
@@ -111,6 +143,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public TokenMemberMode TokenMemberMode
 		{
 			get
@@ -122,6 +157,12 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="state"></param>
+		/// <param name="value"></param>
 		public void SetValue<T>(TokenizerState<T> state, object value)
 			where T : class, new()
 		{

@@ -4,6 +4,9 @@ using System.Text;
 
 namespace QQn.TurtleUtils.Tokenizer.Definitions
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public abstract class TokenizerDefinition : TokenItemBase
 	{
 		internal readonly Dictionary<string, TokenMember> _tokens = new Dictionary<string, TokenMember>();
@@ -13,6 +16,10 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 
 		TokenItem _rest;
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="token"></param>
 		protected void AddToken(TokenMember token)
 		{
 			if (token == null)
@@ -21,6 +28,11 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			_tokens.Add(token.Name, token);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="position"></param>
+		/// <param name="token"></param>
 		protected void AddPlaced(int position, TokenItem token)
 		{
 			if (token == null)
@@ -39,6 +51,10 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			_placedItems[position] = token;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="token"></param>
 		protected void SetRest(TokenItem token)
 		{
 			if (token == null)
@@ -50,6 +66,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			_rest = token;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public void Validate()
 		{
 			foreach (TokenItem t in _placedItems)
@@ -59,11 +78,21 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public bool HasPlacedArguments
 		{
 			get { return _placedItems.Count > 0 || _rest != null; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="caseSensitive"></param>
+		/// <param name="token"></param>
+		/// <returns></returns>
 		public virtual bool TryGetToken(string name, bool caseSensitive, out TokenItem token)
 		{
 			if(_csNames.Count == 0)
@@ -101,6 +130,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			get { return _placedItems; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public TokenItem RestToken
 		{
 			get { return _rest; }
