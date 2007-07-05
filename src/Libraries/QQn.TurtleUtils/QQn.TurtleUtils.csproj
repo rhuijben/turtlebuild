@@ -37,8 +37,9 @@
   <ItemGroup>
     <Compile Include="Cryptography\AssemblyStrongNameKey.cs" />
     <Compile Include="Cryptography\QQnCryptoHelpers.cs" />
-    <Compile Include="Cryptography\SignedFile.cs" />
-    <Compile Include="Cryptography\SignedFileHeader.cs" />
+    <Compile Include="Cryptography\SignedStream.cs" />
+    <Compile Include="Cryptography\SignedStreamCreateArgs.cs" />
+    <Compile Include="Cryptography\SignedStreamHeader.cs" />
     <Compile Include="ItemSets\Package.cs" />
     <Compile Include="ItemSets\ItemSetBase.cs" />
     <Compile Include="ItemSets\Container.cs" />

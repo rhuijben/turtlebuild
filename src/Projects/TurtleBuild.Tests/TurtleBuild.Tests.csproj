@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ItemSetTests.cs" />
+    <Compile Include="MSBuildTests.cs" />
     <Compile Include="StreamTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StrongNameTests.cs" />
