@@ -9,10 +9,6 @@ namespace QQn.TurtleUtils.Cryptography
 {
 	public sealed class AssemblyStrongNameKey
 	{
-		private AssemblyStrongNameKey()
-		{
-		}
-
 		/// <summary>
 		/// Loads an Snk file
 		/// </summary>
@@ -36,28 +32,49 @@ namespace QQn.TurtleUtils.Cryptography
 
 			using (BinaryReader br = new BinaryReader(stream))
 			{
-				return new AssemblyStrongNameKey(br);
+				CspParameters csp = new CspParameters(1);
+
+				RSACryptoServiceProvider rcsp = new RSACryptoServiceProvider(csp);
+				rcsp.ImportCspBlob(br.ReadBytes((int)br.BaseStream.Length));
+
+				return new AssemblyStrongNameKey(rcsp);
 			}
 		}
 
 		public static AssemblyStrongNameKey LoadFrom(byte[] bytes)
 		{
-			if(bytes == null)
+			if (bytes == null)
 				throw new ArgumentNullException("bytes");
 
-			using(MemoryStream ms = new MemoryStream(bytes))
+			using (MemoryStream ms = new MemoryStream(bytes))
 			{
 				return LoadFrom(ms);
 			}
 		}
 
-		RSACryptoServiceProvider _dcsp;
-		AssemblyStrongNameKey(BinaryReader binaryReader)
+		public static AssemblyStrongNameKey LoadFromContainer(string containerName, bool machineScope)
 		{
-			CspParameters csp = new CspParameters(1);
+			if (string.IsNullOrEmpty(containerName))
+				throw new ArgumentNullException("containerName");
 
-			_dcsp = new RSACryptoServiceProvider(csp);
-			_dcsp.ImportCspBlob(binaryReader.ReadBytes((int)binaryReader.BaseStream.Length));
+			CspParameters csp = new CspParameters();
+			csp.KeyContainerName = containerName;
+			csp.KeyNumber = 2;
+			csp.Flags = CspProviderFlags.UseNonExportableKey;
+			if (machineScope)
+				csp.Flags |= CspProviderFlags.UseMachineKeyStore;
+
+			return new AssemblyStrongNameKey(new RSACryptoServiceProvider(csp));
+		}
+
+
+		readonly RSACryptoServiceProvider _rcsp;
+		AssemblyStrongNameKey(RSACryptoServiceProvider rcsp)
+		{
+			if (rcsp == null)
+				throw new ArgumentNullException("rcsp");
+
+			_rcsp = rcsp;			
 		}
 
 		public byte[] SignHash(byte[] hash)
@@ -65,31 +82,35 @@ namespace QQn.TurtleUtils.Cryptography
 			if (hash == null)
 				throw new ArgumentNullException("hash");
 
-			return _dcsp.SignHash(hash, CryptoConfig.MapNameToOID("SHA1"));
+			return _rcsp.SignHash(hash, CryptoConfig.MapNameToOID("SHA1"));
 		}
 
 		public bool VerifyHash(byte[] hash, byte[] signature)
 		{
-			if(hash == null)
+			if (hash == null)
 				throw new ArgumentNullException("hash");
-			else if(signature == null)
+			else if (signature == null)
 				throw new ArgumentNullException("signature");
 
-			return _dcsp.VerifyHash(hash, CryptoConfig.MapNameToOID("SHA1"), signature);
+			return _rcsp.VerifyHash(hash, CryptoConfig.MapNameToOID("SHA1"), signature);
 		}
 
 		public byte[] GetPublicKeyData()
 		{
-			return _dcsp.ExportCspBlob(false);
+			return _rcsp.ExportCspBlob(false);
 		}
 
 		byte[] _publicKeyToken;
+		/// <summary>
+		/// Gets the public key token from the public key. This matches the public key token of assemblies signed with the same key
+		/// </summary>
 		public byte[] PublicKeyToken
 		{
 			get
-			{				
+			{
 				if (_publicKeyToken == null)
 				{
+					// We use the StronNameKeyPair class to orden the public key the way .Net does
 					StrongNameKeyPair snkp = new StrongNameKeyPair(GetPublicKeyData());
 					byte[] publicKeyHash;
 					using (SHA1 sha = SHA1.Create())
@@ -109,7 +130,7 @@ namespace QQn.TurtleUtils.Cryptography
 		{
 			get
 			{
-				return _dcsp.KeySize  / 8;
+				return _rcsp.KeySize / 8;
 			}
 		}
 
@@ -131,12 +152,12 @@ namespace QQn.TurtleUtils.Cryptography
 
 		public bool PublicOnly
 		{
-			get { return _dcsp.PublicOnly; }
+			get { return _rcsp.PublicOnly; }
 		}
 
 		public HashAlgorithm CreateHasher()
 		{
-			string alg = _dcsp.SignatureAlgorithm;
+			string alg = _rcsp.SignatureAlgorithm;
 			alg = alg.Substring(alg.LastIndexOf('#') + 1);
 			string[] parts = alg.Split('-');
 
