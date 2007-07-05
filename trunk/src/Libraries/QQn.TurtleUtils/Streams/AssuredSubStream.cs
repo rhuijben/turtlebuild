@@ -45,11 +45,11 @@ namespace QQn.TurtleUtils.Streams
 			}
 			else
 			{
-				QQnBinaryReader br = new QQnBinaryReader(ParentStream);
+				QQnBinaryReader br = new QQnBinaryReader(BaseStream);
 				_streamHash = br.ReadBytes(_streamHash.Length);
 				_hashSignature = br.ReadBytes(_hashSignature.Length);				
 				_hashLength = br.ReadInt64();
-				_hashPosition = ParentStream.Position;
+				_hashPosition = BaseStream.Position;
 
 				if(mode != VerificationMode.None)
 				{
@@ -87,14 +87,14 @@ namespace QQn.TurtleUtils.Streams
 
 		void WriteHeader()
 		{
-			if(ParentStream.Position != _headerPosition)
-				ParentStream.Position = _headerPosition;
+			if(BaseStream.Position != _headerPosition)
+				BaseStream.Position = _headerPosition;
 
-			QQnBinaryWriter bw = new QQnBinaryWriter(ParentStream);
+			QQnBinaryWriter bw = new QQnBinaryWriter(BaseStream);
 			bw.Write(_streamHash);
 			bw.Write(_hashSignature);			
 			bw.Write(_hashLength);
-			_hashPosition = ParentStream.Position;
+			_hashPosition = BaseStream.Position;
 		}
 
 		/// <summary>

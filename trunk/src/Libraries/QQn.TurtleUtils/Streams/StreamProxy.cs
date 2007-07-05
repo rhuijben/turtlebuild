@@ -38,7 +38,7 @@ namespace QQn.TurtleUtils.Streams
 		/// <summary>
 		/// Gets the inner stream
 		/// </summary>
-		protected Stream ParentStream
+		protected Stream BaseStream
 		{
 			get { return _parentStream; }
 		}
@@ -48,7 +48,7 @@ namespace QQn.TurtleUtils.Streams
 		/// </summary>
 		public override bool CanRead
 		{
-			get { return ParentStream.CanRead; }
+			get { return BaseStream.CanRead; }
 		}
 
 		/// <summary>
@@ -56,7 +56,7 @@ namespace QQn.TurtleUtils.Streams
 		/// </summary>
 		public override bool CanSeek
 		{
-			get { return ParentStream.CanSeek; }
+			get { return BaseStream.CanSeek; }
 		}
 
 		/// <summary>
@@ -64,7 +64,7 @@ namespace QQn.TurtleUtils.Streams
 		/// </summary>
 		public override bool CanWrite
 		{
-			get { return ParentStream.CanWrite; }
+			get { return BaseStream.CanWrite; }
 		}
 
 		/// <summary>
@@ -72,7 +72,7 @@ namespace QQn.TurtleUtils.Streams
 		/// </summary>
 		public override bool CanTimeout
 		{
-			get { return ParentStream.CanTimeout; }
+			get { return BaseStream.CanTimeout; }
 		}
 
 		/// <summary>
@@ -80,7 +80,7 @@ namespace QQn.TurtleUtils.Streams
 		/// </summary>
 		public override void Flush()
 		{
-			ParentStream.Flush();
+			BaseStream.Flush();
 		}
 
 		/// <summary>
@@ -88,8 +88,8 @@ namespace QQn.TurtleUtils.Streams
 		/// </summary>
 		public override long Position
 		{
-			get { return PositionToSubStream(ParentStream.Position); }
-			set { ParentStream.Position = PositionToParent(value); }
+			get { return PositionToSubStream(BaseStream.Position); }
+			set { BaseStream.Position = PositionToParent(value); }
 		}
 
 		/// <summary>
@@ -125,7 +125,7 @@ namespace QQn.TurtleUtils.Streams
 						return 0;
 				}
 			}
-			return ParentStream.Read(buffer, offset, count);
+			return BaseStream.Read(buffer, offset, count);
 		}
 
 		/// <summary>
@@ -146,7 +146,7 @@ namespace QQn.TurtleUtils.Streams
 					if ((offset < 0) || (offset > Length))
 						throw new IOException("Seeking outside substream");
 
-					toPosition = ParentStream.Seek(PositionToParent(offset), SeekOrigin.Begin);
+					toPosition = BaseStream.Seek(PositionToParent(offset), SeekOrigin.Begin);
 					break;					
 				case SeekOrigin.Current:
 					long newPos = Position + offset;
@@ -155,13 +155,13 @@ namespace QQn.TurtleUtils.Streams
 					else if (newPos > Length)
 						throw new IOException("Seeking outside substream");
 
-					toPosition = ParentStream.Seek(newPos, SeekOrigin.Begin);
+					toPosition = BaseStream.Seek(newPos, SeekOrigin.Begin);
 					break;
 				case SeekOrigin.End:
 					if((offset < 0) || (offset > Length))
 						throw new IOException("Seeking outside substream");
 
-					toPosition = ParentStream.Seek(Position + Length - offset, SeekOrigin.Begin);
+					toPosition = BaseStream.Seek(Position + Length - offset, SeekOrigin.Begin);
 					break;
 				default:
 					throw new ArgumentOutOfRangeException("origin", origin, "Invalid origin");
@@ -180,7 +180,7 @@ namespace QQn.TurtleUtils.Streams
 			if (!CanWrite)
 				throw new NotSupportedException();
 
-			ParentStream.Write(buffer, offset, count);
+			BaseStream.Write(buffer, offset, count);
 		}
 
 		#region IServiceProvider Members
@@ -198,11 +198,11 @@ namespace QQn.TurtleUtils.Streams
 			if (serviceType.IsAssignableFrom(GetType()))
 				return this;
 
-			IServiceProvider sp = ParentStream as IServiceProvider;
+			IServiceProvider sp = BaseStream as IServiceProvider;
 			if (sp != null)
 				return sp.GetService(serviceType);
-			else if (serviceType.IsAssignableFrom(ParentStream.GetType()))
-				return ParentStream;
+			else if (serviceType.IsAssignableFrom(BaseStream.GetType()))
+				return BaseStream;
 			else
 				return null;
 		}
@@ -216,7 +216,7 @@ namespace QQn.TurtleUtils.Streams
 		{			
 			base.Close();
 			if(_closeParent)
-				ParentStream.Close();
+				BaseStream.Close();
 		}
 
 		/// <summary>
@@ -224,8 +224,8 @@ namespace QQn.TurtleUtils.Streams
 		/// </summary>
 		public override int ReadTimeout
 		{
-			get { return ParentStream.ReadTimeout; }
-			set { ParentStream.ReadTimeout = value; }
+			get { return BaseStream.ReadTimeout; }
+			set { BaseStream.ReadTimeout = value; }
 		}
 
 		/// <summary>
@@ -233,8 +233,8 @@ namespace QQn.TurtleUtils.Streams
 		/// </summary>
 		public override int WriteTimeout
 		{
-			get { return ParentStream.WriteTimeout; }
-			set { ParentStream.WriteTimeout = value; }			
+			get { return BaseStream.WriteTimeout; }
+			set { BaseStream.WriteTimeout = value; }			
 		}
 
 		/// <summary>
@@ -242,7 +242,7 @@ namespace QQn.TurtleUtils.Streams
 		/// </summary>
 		public override long Length
 		{
-			get { return PositionToSubStream(ParentStream.Length); }
+			get { return PositionToSubStream(BaseStream.Length); }
 		}
 
 		/// <summary>
@@ -251,7 +251,10 @@ namespace QQn.TurtleUtils.Streams
 		/// <param name="value"></param>
 		public override void SetLength(long value)
 		{
-			ParentStream.SetLength(PositionToParent(value));
+			if (!CanWrite)
+				throw new NotSupportedException();
+
+			BaseStream.SetLength(PositionToParent(value));
 		}
 
 		/// <summary>

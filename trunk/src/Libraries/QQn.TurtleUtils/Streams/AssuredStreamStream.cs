@@ -16,7 +16,7 @@ namespace QQn.TurtleUtils.Streams
 		/// <summary>
 		/// 
 		/// </summary>
-		Full,
+		Full=0,
 		/// <summary>
 		/// 
 		/// </summary>
@@ -171,7 +171,7 @@ namespace QQn.TurtleUtils.Streams
 			if (!_creating)
 				throw new InvalidOperationException();
 
-			ParentStream.SetLength(PositionToParent(value));
+			BaseStream.SetLength(PositionToParent(value));
 		}
 
 		/// <summary>
@@ -197,7 +197,7 @@ namespace QQn.TurtleUtils.Streams
 			if (!_creating)
 				throw new InvalidOperationException();
 
-			_header.UpdateHash(ParentStream);
+			_header.UpdateHash(BaseStream);
 		}
 
 		bool _closed;

@@ -8,12 +8,12 @@ using System.Resources;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: CLSCompliant(true)]
-[assembly: AssemblyTitle("QQn.AssemblyTurtle.Logger")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("QQn.TurtleMSBuild")]
+[assembly: AssemblyDescription("MSBuild logger Library for The Turtle projects; Visit http://code.google.com/p/turtlebuild/ for more info")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("QQn.AssemblyTurtle.Logger")]
-[assembly: AssemblyCopyright("Copyright © QQn 2007")]
+[assembly: AssemblyProduct("QQn.TurtleMSBuild")]
+[assembly: AssemblyCopyright("Copyright © QQn Project 2007")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
