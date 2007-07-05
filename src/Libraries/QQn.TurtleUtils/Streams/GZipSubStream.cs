@@ -6,6 +6,9 @@ using System.IO;
 
 namespace QQn.TurtleUtils.Streams
 {
+	/// <summary>
+	/// GZip stream wrapper with <see cref="IServiceProvider"/> implementation to find parent streams
+	/// </summary>
 	public class GZipSubStream : GZipStream, IServiceProvider
 	{
 		/// <summary>
