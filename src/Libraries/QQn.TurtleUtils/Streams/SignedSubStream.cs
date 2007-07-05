@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Security.Cryptography;
+using QQn.TurtleUtils.Cryptography;
 
 namespace QQn.TurtleUtils.Streams
 {
@@ -11,7 +12,7 @@ namespace QQn.TurtleUtils.Streams
 	/// </summary>
 	public class AssuredSubStream : StreamProxy
 	{
-		readonly StrongNameKey _key;
+		readonly StrongNameKey _snk;
 		long _headerPosition;
 		long _hashPosition;
 		byte[] _streamHash;
@@ -30,12 +31,12 @@ namespace QQn.TurtleUtils.Streams
 			AssuredStream signedParent = GetService<AssuredStream>();
 			
 			if (signedParent != null)
-				_key = signedParent.AssemblyStrongNameKey;
+				_snk = signedParent.AssemblyStrongNameKey;
 			
 			_headerPosition = parentStream.Position;
 
-			_streamHash = new byte[(_key != null) ? _key.HashLength : 256 / 8]; // 256 = Bits of SHA256
-			_hashSignature = new byte[(_key != null) ? _key.SignatureLength : 0];
+			_streamHash = new byte[(_snk != null) ? _snk.HashLength : 256 / 8]; // 256 = Bits of SHA256
+			_hashSignature = new byte[(_snk != null) ? _snk.SignatureLength : 0];
 
 			if (parentStream.CanWrite && parentStream.CanSeek && parentStream.Position == parentStream.Length)
 			{
@@ -52,7 +53,7 @@ namespace QQn.TurtleUtils.Streams
 
 				if(mode != VerificationMode.None)
 				{
-					if(_key != null && !_key.VerifyHash(_streamHash, _hashSignature))
+					if(_snk != null && !_snk.VerifyHash(_streamHash, _hashSignature))
 						throw new CryptographicException("Stream hash verification failed");
 				}
 
@@ -172,12 +173,12 @@ namespace QQn.TurtleUtils.Streams
 			byte[] fileHash = CalculateHash(true);
 			_streamHash = fileHash;
 
-			if (_key != null)
+			if (_snk != null)
 			{
-				if (_key.PublicOnly)
+				if (_snk.PublicOnly)
 					throw new InvalidOperationException();
 
-				byte[] signature = _key.SignHash(fileHash);
+				byte[] signature = _snk.SignHash(fileHash);
 
 				if (signature.Length != _hashSignature.Length)
 					throw new InvalidOperationException();
@@ -197,7 +198,7 @@ namespace QQn.TurtleUtils.Streams
 
 			long oldPos = Position;
 			Position = 0;
-			using (HashAlgorithm hasher = (_key != null) ? _key.CreateHasher() : SHA256.Create())
+			using (HashAlgorithm hasher = (_snk != null) ? _snk.CreateHasher() : SHA256.Create())
 			{
 				byte[] buffer;
 				using (MemoryStream ms = new MemoryStream(16)) // Use memorystream and writer to resolve endian-issues

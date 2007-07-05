@@ -37,10 +37,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Streams\AssemblyStrongNameKey.cs" />
+    <Compile Include="Cryptography\HashType.cs" />
+    <Compile Include="Cryptography\StrongNameKey.cs" />
     <Compile Include="Streams\QQnBinaryReader.cs" />
     <Compile Include="Streams\QQnBinaryWriter.cs" />
-    <Compile Include="Streams\QQnCryptoHelpers.cs" />
+    <Compile Include="Cryptography\QQnCryptoHelpers.cs" />
     <Compile Include="Streams\SignedStream.cs" />
     <Compile Include="Streams\SignedStreamCreateArgs.cs" />
     <Compile Include="Streams\SignedStreamHeader.cs" />
