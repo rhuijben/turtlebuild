@@ -116,11 +116,11 @@ namespace TurtleTests
 		[Test]
 		public void BuildOne()
 		{
-			ProcessStartInfo psi = new ProcessStartInfo(MSBuild, string.Format("\"{0}\" /noconsolelogger /v:q /p:Configuration={1} \"/logger:MSBuildLogger,{2};OutputDir={3};Indent=true\"", Solution, OtherConfiguration, Logger, LoggerPath));
+			ProcessStartInfo psi = new ProcessStartInfo(MSBuild, string.Format("/nologo \"{0}\" /v:q /p:Configuration={1} \"/logger:MSBuildLogger,{2};OutputDir={3};Indent=true\"", Solution, OtherConfiguration, Logger, LoggerPath));
 			psi.UseShellExecute = false;
 			psi.RedirectStandardOutput = true;
 			psi.RedirectStandardError = true;
-			psi.WindowStyle = ProcessWindowStyle.Hidden;
+			psi.CreateNoWindow = true;
 
 			using (Process p = Process.Start(psi))
 			{
@@ -128,7 +128,10 @@ namespace TurtleTests
 				string output = p.StandardOutput.ReadToEnd();
 				string err = p.StandardError.ReadToEnd();
 
+				Assert.That(err, Is.EqualTo(""), "MSBuild gave no error");
+				Assert.That(output, Is.EqualTo(""), "MSBuild gave no output");
 				Assert.That(p.ExitCode, Is.EqualTo(0), "MSBuild ran successfully");
+				
 			}
 
 			Assert.That(File.Exists(Path.Combine(LoggerPath, "TurtleBuild.Tests.tbLog")), Is.True, "Logfile created");

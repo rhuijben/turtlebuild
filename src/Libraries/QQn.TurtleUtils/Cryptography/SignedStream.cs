@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 
 namespace QQn.TurtleUtils.Cryptography
 {
@@ -16,9 +17,8 @@ namespace QQn.TurtleUtils.Cryptography
 	/// <summary>
 	/// Stream wrapper with embedded hashing and optionally signing the hash
 	/// </summary>
-	public class SignedStream : Stream
+	public class SignedStream : StreamProxy
 	{
-		readonly Stream _innerStream;		
 		readonly bool _seekable;
 		readonly bool _creating;
 
@@ -26,13 +26,13 @@ namespace QQn.TurtleUtils.Cryptography
 		readonly long _basePosition;
 
 		private SignedStream(Stream stream, bool create)
+			: base(stream, true)
 		{
 			if (stream == null)
 				throw new ArgumentNullException("stream");
 			else if (!stream.CanRead)
 				throw new ArgumentException("Must be able to read from the stream");
 
-			_innerStream = stream;
 			_seekable = stream.CanSeek;
 			_creating = create;
 
@@ -60,7 +60,7 @@ namespace QQn.TurtleUtils.Cryptography
 
 				_basePosition = stream.Position;
 				if (!_header.VerifyHash(stream))
-					throw new FormatException("Invalid hash value");
+					throw new CryptographicException("Invalid hash value");
 
 				stream.Position = _basePosition;
 			}
@@ -105,123 +105,102 @@ namespace QQn.TurtleUtils.Cryptography
 			get { return _header.Guid; }
 		}
 
+		/// <summary>
+		/// Gets a string representation of the stream-hash.
+		/// </summary>
+		/// <remarks>When creating the hash is not valid until after closing the stream</remarks>
 		public string HashString
 		{
 			get { return QQnCryptoHelpers.HashString(_header.HashValue); }
 		}
 
+		/// <summary>
+		/// Gets a string representation of a hash over the public key; or null if no public key is available
+		/// </summary>
 		public string PublicKeyToken
 		{
-			get { return QQnCryptoHelpers.HashString(_header.PublicKeyToken); }
+			get { return (_header.AssemblyStrongNameKey != null) ? QQnCryptoHelpers.HashString(_header.PublicKeyToken) : null; }
 		}
 
+		/// <summary>
+		/// Gets the <see cref="AssemblyStrongNameKey"/> used for the hash-signature, or null if no such key is provided
+		/// </summary>
 		public AssemblyStrongNameKey AssemblyStrongNameKey
 		{
 			get { return _header.AssemblyStrongNameKey; }
 		}
-
-		public override bool CanRead
-		{
-			get { return _innerStream.CanRead; }
-		}
-
-		public override bool CanSeek
-		{
-			get { return _innerStream.CanSeek; }
-		}
-
+		
+		/// <summary>
+		/// Gets a boolean indicating whether the stream is writable; See <see cref="Stream.CanWrite"/>
+		/// </summary>
 		public override bool CanWrite
 		{
 			get { return _creating; }
 		}
 
-		public override void Flush()
-		{
-			_innerStream.Flush();
-		}
-
-		public override long Length
-		{
-			get { return _innerStream.Length - _basePosition; }
-		}
-
-		public override long Position
-		{
-			get { return _innerStream.Position - _basePosition; }
-			set 
-			{
-				if(value < 0)
-					throw new ArgumentOutOfRangeException("value", value, "value must be >= 0");
-
-				_innerStream.Position = value + _basePosition; 
-			}			
-		}
-
-		public override int Read(byte[] buffer, int offset, int count)
-		{
-			return _innerStream.Read(buffer, offset, count);
-		}
-
-		public override long Seek(long offset, SeekOrigin origin)
-		{
-			if (!CanSeek)
-				throw new InvalidOperationException();
-
-			switch (origin)
-			{
-				case SeekOrigin.Current:
-				case SeekOrigin.End:
-					return InnerStream.Seek(offset, origin) - _basePosition; // Allows overshooting for now
-				case SeekOrigin.Begin:
-					return InnerStream.Seek(offset + _basePosition, SeekOrigin.Begin) - _basePosition;
-
-				default:
-					throw new ArgumentOutOfRangeException("origin", origin, "Invalid origin");
-			}
-		}
-
+		/// <summary>
+		/// Sets the length of the stream; See <see cref="Stream.SetLength"/>
+		/// </summary>
+		/// <param name="value"></param>
 		public override void SetLength(long value)
 		{
 			if (!_creating)
 				throw new InvalidOperationException();
 
-			InnerStream.SetLength(value + _basePosition);
+			ParentStream.SetLength(PositionToParent(value));
 		}
 
+		/// <summary>
+		/// Writes the buffer to the inner stream; see <see cref="Stream.Write(byte[], int, int)"/>
+		/// </summary>
+		/// <param name="buffer"></param>
+		/// <param name="offset"></param>
+		/// <param name="count"></param>
 		public override void Write(byte[] buffer, int offset, int count)
 		{
 			if (!_creating)
 				throw new InvalidOperationException();
 
-			InnerStream.Write(buffer, offset, count);
+			base.Write(buffer, offset, count);
 		}
 
 		/// <summary>
-		/// Gets the inner stream
+		/// Updates the hash information header
 		/// </summary>
-
-		protected Stream InnerStream
-		{
-			get { return _innerStream; }
-		}
-
+		/// <remarks>Called from Close() just before closing the stream</remarks>
 		protected virtual void UpdateHash()
 		{
 			if (!_creating)
 				throw new InvalidOperationException();
 
-			_header.UpdateHash(InnerStream);
+			_header.UpdateHash(ParentStream);
 		}
 
+		bool _closed;
 		/// <summary>
 		/// Closes the stream
 		/// </summary>
 		public override void Close()
 		{
+			if (_closed)
+				return;
+
+			_closed = true;
+
 			if (_creating)
 				UpdateHash();
 
 			base.Close();
+		}
+
+		protected override long PositionToSubStream(long parentPosition)
+		{
+			return parentPosition - _basePosition;
+		}
+
+		protected override long PositionToParent(long subStreamPosition)
+		{
+			return subStreamPosition + _basePosition;
 		}
 	}
 }

@@ -6,44 +6,6 @@ using System.Security.Cryptography;
 
 namespace QQn.TurtleUtils.Cryptography
 {
-	class MyBinaryReader : BinaryReader
-	{
-		public MyBinaryReader(Stream input)
-			: base(input, Encoding.UTF8)
-		{
-		}
-
-		public int ReadSmartInt()
-		{
-			return base.Read7BitEncodedInt();
-		}
-
-		public byte[] ReadByteArray()
-		{
-			int length = ReadSmartInt();
-			return ReadBytes(length);
-		}
-	}
-
-	class MyBinaryWriter : BinaryWriter
-	{
-		public MyBinaryWriter(Stream output)
-			: base(output, Encoding.UTF8)
-		{
-		}
-
-		public void WriteSmartInt(int value)
-		{
-			Write7BitEncodedInt(value);
-		}
-
-		public void WriteByteArray(byte[] value)
-		{
-			WriteSmartInt(value.Length);
-			base.Write(value);
-		}
-	}
-
 	class SignedStreamHeader
 	{
 		const uint FileSignature = 0xBADCAB;
@@ -63,7 +25,7 @@ namespace QQn.TurtleUtils.Cryptography
 
 		public SignedStreamHeader(Stream source, VerificationMode mode)
 		{
-			MyBinaryReader br = new MyBinaryReader(source);
+			QQnBinaryReader br = new QQnBinaryReader(source);
 			uint vFileSignature = br.ReadUInt32();
 
 			if (vFileSignature != FileSignature)
@@ -80,24 +42,14 @@ namespace QQn.TurtleUtils.Cryptography
 
 				if (mode != VerificationMode.None)
 				{
-					bool unZero = false;
-					foreach (byte b in _fileHash)
-					{
-						if (b != 0)
-						{
-							unZero = true;
-							break;
-						}
-					}
-
-					if (unZero)
-						_key.VerifyHash(_fileHash, _hashSignature);
+					if (!_key.VerifyHash(_fileHash, _hashSignature))
+						throw new CryptographicException("Stream hash verification failed");
 				}
 			}
-
-			_hashPosition = source.Position;
 			_guid = new Guid(br.ReadBytes(16));
 			_bodyLength = br.ReadInt64();
+
+			_hashPosition = source.Position;
 		}
 
 		static long SafePosition(Stream stream)
@@ -110,7 +62,7 @@ namespace QQn.TurtleUtils.Cryptography
 
 		public void WriteHeader(Stream stream)
 		{
-			MyBinaryWriter bw = new MyBinaryWriter(stream);
+			QQnBinaryWriter bw = new QQnBinaryWriter(stream);
 
 			_headerPosition = SafePosition(stream);
 			bw.Write(FileSignature);
@@ -118,26 +70,12 @@ namespace QQn.TurtleUtils.Cryptography
 			bw.WriteByteArray(_fileHash);
 			bw.WriteByteArray(_hashSignature);
 			bw.WriteByteArray(_key != null ? _key.GetPublicKeyData() : new byte[0]);
-			_hashPosition = SafePosition(stream);
 			bw.Write(_guid.ToByteArray());
 			bw.Write(_bodyLength);
+			_hashPosition = SafePosition(stream);
 		}
 
-		static int _sha256HashSize;
-		static int Sha256HashSize
-		{
-			get
-			{
-				if (_sha256HashSize == 0)
-				{
-					using (SHA256 sha256 = SHA256.Create())
-					{
-						_sha256HashSize = sha256.HashSize;
-					}
-				}
-				return _sha256HashSize;
-			}
-		}
+		const int Sha256HashSize = 256 / 8;
 
 		public SignedStreamHeader(string fileType, AssemblyStrongNameKey snk)
 			: this(new SignedStreamCreateArgs(snk, fileType))
@@ -194,7 +132,7 @@ namespace QQn.TurtleUtils.Cryptography
 
 		long StreamLength(Stream stream)
 		{
-			return stream.Length - _hashPosition - 16 - 8;
+			return stream.Length - _hashPosition;
 		}
 
 		internal bool VerifyHash(Stream stream)
@@ -245,7 +183,7 @@ namespace QQn.TurtleUtils.Cryptography
 
 			using (HashAlgorithm hasher = (_key != null) ? _key.CreateHasher() : SHA256.Create())
 			{
-				long newPos = _hashPosition + 16 + 8;
+				long newPos = _hashPosition;
 
 				if (stream.Position != newPos)
 					stream.Position = newPos;
@@ -253,7 +191,7 @@ namespace QQn.TurtleUtils.Cryptography
 				byte[] buffer;
 
 				using (MemoryStream ms = new MemoryStream()) // Use memorystream and writer to resolve endian-issues
-				using (MyBinaryWriter bw = new MyBinaryWriter(ms))
+				using (QQnBinaryWriter bw = new QQnBinaryWriter(ms))
 				{
 					bw.Write(_guid.ToByteArray());
 					bw.Write(_bodyLength);
@@ -263,9 +201,7 @@ namespace QQn.TurtleUtils.Cryptography
 
 				hasher.TransformBlock(buffer, 0, buffer.Length, null, 0);
 
-
-
-				//byte[] buffer = new byte[8192];
+				buffer = new byte[8192];
 
 				int nRead;
 

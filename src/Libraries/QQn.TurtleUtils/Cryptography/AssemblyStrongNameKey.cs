@@ -82,7 +82,7 @@ namespace QQn.TurtleUtils.Cryptography
 			if (hash == null)
 				throw new ArgumentNullException("hash");
 
-			return _rcsp.SignHash(hash, CryptoConfig.MapNameToOID("SHA1"));
+			return _rcsp.SignHash(hash, CryptoConfig.MapNameToOID(HashAlgorithmName));
 		}
 
 		public bool VerifyHash(byte[] hash, byte[] signature)
@@ -92,7 +92,7 @@ namespace QQn.TurtleUtils.Cryptography
 			else if (signature == null)
 				throw new ArgumentNullException("signature");
 
-			return _rcsp.VerifyHash(hash, CryptoConfig.MapNameToOID("SHA1"), signature);
+			return _rcsp.VerifyHash(hash, CryptoConfig.MapNameToOID(HashAlgorithmName), signature);
 		}
 
 		public byte[] GetPublicKeyData()
@@ -155,13 +155,21 @@ namespace QQn.TurtleUtils.Cryptography
 			get { return _rcsp.PublicOnly; }
 		}
 
+		string HashAlgorithmName
+		{
+			get
+			{
+				string alg = _rcsp.SignatureAlgorithm;
+				alg = alg.Substring(alg.LastIndexOf('#') + 1);
+				string[] parts = alg.Split('-');
+
+				return parts[1];
+			}
+		}
+
 		public HashAlgorithm CreateHasher()
 		{
-			string alg = _rcsp.SignatureAlgorithm;
-			alg = alg.Substring(alg.LastIndexOf('#') + 1);
-			string[] parts = alg.Split('-');
-
-			return HashAlgorithm.Create(parts[1]);
+			return HashAlgorithm.Create(HashAlgorithmName);
 		}
 	}
 }
