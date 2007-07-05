@@ -106,7 +106,7 @@ namespace QQn.TurtleUtils.Cryptography
 			if (hash == null)
 				throw new ArgumentNullException("hash");
 
-			return _rcsp.SignHash(hash, CryptoConfig.MapNameToOID(HashAlgorithmName));
+			return _rcsp.SignHash(hash, HashAlgorithmOID);
 		}
 
 		/// <summary>
@@ -122,8 +122,8 @@ namespace QQn.TurtleUtils.Cryptography
 			else if (signature == null)
 				throw new ArgumentNullException("signature");
 
-			return _rcsp.VerifyHash(hash, CryptoConfig.MapNameToOID(HashAlgorithmName), signature);
-		}
+			return _rcsp.VerifyHash(hash, HashAlgorithmOID, signature);
+		}		
 
 		/// <summary>
 		/// Gets the public key data in a way it can be used to create a public-only <see cref="StrongNameKey"/>
@@ -198,15 +198,35 @@ namespace QQn.TurtleUtils.Cryptography
 			get { return _rcsp.PublicOnly; }
 		}
 
+		string _hashAlgorithmName;
 		string HashAlgorithmName
 		{
 			get
 			{
-				string alg = _rcsp.SignatureAlgorithm;
-				alg = alg.Substring(alg.LastIndexOf('#') + 1);
-				string[] parts = alg.Split('-');
+				if (_hashAlgorithmName == null)
+				{
+					string algorithm = _rcsp.SignatureAlgorithm;
 
-				return parts[1];
+					int dash = algorithm.LastIndexOf('#');
+					if (dash < 0)
+						return null;
+
+					int stripe = algorithm.IndexOf('-', dash);
+					_hashAlgorithmName = algorithm.Substring(stripe + 1);
+				}
+				return _hashAlgorithmName;
+			}
+		}
+
+		string _algorithmOid;
+		string HashAlgorithmOID
+		{
+			get
+			{
+				if(_algorithmOid == null)
+					_algorithmOid = CryptoConfig.MapNameToOID(HashAlgorithmName);
+
+				return _algorithmOid;
 			}
 		}
 
