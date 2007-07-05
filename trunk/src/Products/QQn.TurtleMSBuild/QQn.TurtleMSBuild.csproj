@@ -10,8 +10,7 @@
     <RootNamespace>QQn.TurtleMSBuild</RootNamespace>
     <AssemblyName>QQn.TurtleMSBuild</AssemblyName>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>QQn.TurtleMSBuild.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

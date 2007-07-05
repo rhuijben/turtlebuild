@@ -22,7 +22,7 @@ namespace QQn.TurtleUtils.Cryptography
 		readonly bool _seekable;
 		readonly bool _creating;
 
-		readonly SignedFileHeader _header;
+		readonly SignedStreamHeader _header;
 		readonly long _basePosition;
 
 		private SignedStream(Stream stream, bool create)
@@ -51,7 +51,7 @@ namespace QQn.TurtleUtils.Cryptography
 		public SignedStream(Stream stream, VerificationMode mode)
 			: this(stream, false)
 		{
-			_header = new SignedFileHeader(stream, mode);
+			_header = new SignedStreamHeader(stream, mode);
 
 			if (mode == VerificationMode.Full)
 			{
@@ -75,14 +75,21 @@ namespace QQn.TurtleUtils.Cryptography
 		/// <param name="strongName">The strong name to hash/sign with (can be null)</param>
 		/// <param name="fileType">The string to use as fileType</param>
 		public SignedStream(Stream stream, AssemblyStrongNameKey strongName, string fileType)
+			: this(stream, new SignedStreamCreateArgs(strongName, fileType))
+		{
+		}
+
+		public SignedStream(Stream stream, SignedStreamCreateArgs args)
 			: this(stream, true)
 		{
-			if (string.IsNullOrEmpty(fileType))
-				throw new ArgumentNullException("fileSignature");
+			if (args == null)
+				throw new ArgumentNullException("args");
+
+			args.VerifyArgs("args");			
 
 			long pos = stream.Position;
 
-			_header = new SignedFileHeader(fileType, strongName);
+			_header = new SignedStreamHeader(args);
 			_header.WriteHeader(stream);
 
 			_basePosition = stream.Position;

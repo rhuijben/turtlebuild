@@ -44,25 +44,24 @@ namespace QQn.TurtleUtils.Cryptography
 		}
 	}
 
-	class SignedFileHeader
+	class SignedStreamHeader
 	{
 		const uint FileSignature = 0xBADCAB;
 		readonly string _fileType;
 		byte[] _fileHash;
 		byte[] _hashSignature;
-		readonly byte[] _publicKey;
 		readonly AssemblyStrongNameKey _key;
 		readonly Guid _guid;
 		long _headerPosition;
 		long _hashPosition;
 		long _bodyLength;
 
-		public SignedFileHeader(Stream source)
+		public SignedStreamHeader(Stream source)
 			: this(source, VerificationMode.Full)
 		{
 		}
 
-		public SignedFileHeader(Stream source, VerificationMode mode)
+		public SignedStreamHeader(Stream source, VerificationMode mode)
 		{
 			MyBinaryReader br = new MyBinaryReader(source);
 			uint vFileSignature = br.ReadUInt32();
@@ -73,11 +72,11 @@ namespace QQn.TurtleUtils.Cryptography
 			_fileType = br.ReadString();
 			_fileHash = br.ReadByteArray();
 			_hashSignature = br.ReadByteArray();
-			_publicKey = br.ReadByteArray();
+			byte[] publicKey = br.ReadByteArray();
 
-			if (_publicKey.Length > 0)
+			if (publicKey.Length > 0)
 			{
-				_key = AssemblyStrongNameKey.LoadFrom(_publicKey);
+				_key = AssemblyStrongNameKey.LoadFrom(publicKey);
 
 				if (mode != VerificationMode.None)
 				{
@@ -118,7 +117,7 @@ namespace QQn.TurtleUtils.Cryptography
 			bw.Write(FileType);
 			bw.WriteByteArray(_fileHash);
 			bw.WriteByteArray(_hashSignature);
-			bw.WriteByteArray(_publicKey);
+			bw.WriteByteArray(_key != null ? _key.GetPublicKeyData() : new byte[0]);
 			_hashPosition = SafePosition(stream);
 			bw.Write(_guid.ToByteArray());
 			bw.Write(_bodyLength);
@@ -140,27 +139,32 @@ namespace QQn.TurtleUtils.Cryptography
 			}
 		}
 
-		public SignedFileHeader(string fileType, AssemblyStrongNameKey snk)
+		public SignedStreamHeader(string fileType, AssemblyStrongNameKey snk)
+			: this(new SignedStreamCreateArgs(snk, fileType))
 		{
-			if (string.IsNullOrEmpty(fileType))
-				throw new ArgumentNullException("fileType");
+		}
 
-			_fileType = fileType;
+		internal SignedStreamHeader(SignedStreamCreateArgs args)
+		{
+			if (args == null)
+				throw new ArgumentNullException("args");
 
-			if (snk == null)
+			args.VerifyArgs("args");
+
+			_fileType = args.FileType;
+
+			if (args.StrongName == null)
 			{
 				_fileHash = new byte[Sha256HashSize];
 				_hashSignature = new byte[0];
-				_publicKey = new byte[0];
 			}
 			else
 			{
-				_key = snk;
-				_fileHash = new byte[snk.HashLength];
-				_hashSignature = new byte[snk.SignatureLength];
-				_publicKey = snk.GetPublicKeyData();
+				_key = args.StrongName;
+				_fileHash = new byte[_key.HashLength];
+				_hashSignature = new byte[_key.SignatureLength];
 			}
-			_guid = Guid.NewGuid();
+			_guid = args.NullGuid ? Guid.Empty : Guid.NewGuid();
 		}
 
 		public string FileType
