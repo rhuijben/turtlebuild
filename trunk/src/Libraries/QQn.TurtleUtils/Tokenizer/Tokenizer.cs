@@ -8,28 +8,68 @@ using System.Collections.Specialized;
 
 namespace QQn.TurtleUtils.Tokenizer
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public enum EscapeMode
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		None = 0,
+		/// <summary>
+		/// 
+		/// </summary>
 		DoubleItem = 1,
+		/// <summary>
+		/// 
+		/// </summary>
 		EscapeCharacter = 2,
+		/// <summary>
+		/// 
+		/// </summary>
 		EscapeGroupOnly = 3,
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
 	public static class Tokenizer
 	{
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="args"></param>
+		/// <param name="to"></param>
+		/// <returns></returns>
 		public static bool TryParseCommandLine<T>(IList<string> args, out T to)
 			where T : class, new()
 		{
 			return TryParseCommandLine<T>(args, new TokenizerArgs(), out to);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="commandLine"></param>
+		/// <param name="to"></param>
+		/// <returns></returns>
 		public static bool TryParseCommandLine<T>(string commandLine, out T to)
 			where T : class, new()
 		{
 			return TryParseCommandLine<T>(commandLine, new TokenizerArgs(), out to);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="commandLine"></param>
+		/// <param name="args"></param>
+		/// <param name="to"></param>
+		/// <returns></returns>
 		public static bool TryParseCommandLine<T>(string commandLine, TokenizerArgs args, out T to)
 			where T : class, new()
 		{
@@ -39,6 +79,14 @@ namespace QQn.TurtleUtils.Tokenizer
 			return TryParseCommandLine<T>(GetCommandlineWords(commandLine), args, out to);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="commandLineArgs"></param>
+		/// <param name="args"></param>
+		/// <param name="to"></param>
+		/// <returns></returns>
 		public static bool TryParseCommandLine<T>(IList<string> commandLineArgs, TokenizerArgs args, out T to)
 			where T : class, new()
 		{
@@ -214,12 +262,27 @@ namespace QQn.TurtleUtils.Tokenizer
 			return words.AsReadOnly();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="connectionString"></param>
+		/// <param name="to"></param>
+		/// <returns></returns>
 		public static bool TryParseConnectionString<T>(string connectionString, out T to)
 			where T : class, new()
 		{
 			return TryParseConnectionString<T>(connectionString, new TokenizerArgs(), out to);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="connectionString"></param>
+		/// <param name="args"></param>
+		/// <param name="to"></param>
+		/// <returns></returns>
 		public static bool TryParseConnectionString<T>(string connectionString, TokenizerArgs args, out T to)
 			where T : class, new()
 		{
@@ -252,6 +315,14 @@ namespace QQn.TurtleUtils.Tokenizer
 			return true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="collection"></param>
+		/// <param name="args"></param>
+		/// <param name="to"></param>
+		/// <returns></returns>
 		public static bool TryParseConnectionString<T>(NameValueCollection collection, TokenizerArgs args, out T to)
 			where T : class, new()
 		{
@@ -269,12 +340,25 @@ namespace QQn.TurtleUtils.Tokenizer
 			return false;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="from"></param>
+		/// <returns></returns>
 		public static string GenerateConnectionString<T>(T from)
 			where T : class, new()
 		{
 			return GenerateConnectionString<T>(from, new TokenizerArgs());
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="from"></param>
+		/// <param name="args"></param>
+		/// <returns></returns>
 		public static string GenerateConnectionString<T>(T from, TokenizerArgs args)
 			where T : class, new()
 		{
@@ -286,12 +370,27 @@ namespace QQn.TurtleUtils.Tokenizer
 			return "";
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="element"></param>
+		/// <param name="to"></param>
+		/// <returns></returns>
 		public static bool TryParseXmlAttributes<T>(IXPathNavigable element, out T to)
 			where T : class, new()
 		{
 			return TryParseXmlAttributes<T>(element, new TokenizerArgs(), out to);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="element"></param>
+		/// <param name="args"></param>
+		/// <param name="to"></param>
+		/// <returns></returns>
 		public static bool TryParseXmlAttributes<T>(IXPathNavigable element, TokenizerArgs args, out T to)
 			where T : class, new()
 		{
@@ -346,6 +445,15 @@ namespace QQn.TurtleUtils.Tokenizer
 				return char.IsWhiteSpace(c);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="input"></param>
+		/// <param name="groups"></param>
+		/// <param name="escapeCharacter"></param>
+		/// <param name="mode"></param>
+		/// <param name="wordSeparators"></param>
+		/// <returns></returns>
 		public static IList<string> GetWords(string input, string[] groups, char escapeCharacter, EscapeMode mode, char[] wordSeparators)
 		{
 			if (input == null)
@@ -437,6 +545,11 @@ namespace QQn.TurtleUtils.Tokenizer
 			return words;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="commandLine"></param>
+		/// <returns></returns>
 		public static IList<string> GetCommandlineWords(string commandLine)
 		{
 			return GetWords(commandLine, new string[] { "\"\"" }, '\\', EscapeMode.EscapeGroupOnly, null);

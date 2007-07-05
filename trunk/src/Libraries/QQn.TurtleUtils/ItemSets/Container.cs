@@ -6,6 +6,12 @@ using System.Xml;
 
 namespace QQn.TurtleUtils.ItemSets
 {
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <typeparam name="TPackage"></typeparam>
+	/// <typeparam name="TContainer"></typeparam>
+	/// <typeparam name="TItem"></typeparam>
 	[XmlRoot("Container", IsNullable=false)]
 	public class Container<TPackage, TContainer, TItem> : ItemSetList<TItem, TPackage, TContainer, TItem>
 		where TPackage : Package<TPackage, TContainer, TItem>
@@ -14,7 +20,9 @@ namespace QQn.TurtleUtils.ItemSets
 	{
 		string _name;
 		
-
+		/// <summary>
+		/// 
+		/// </summary>
 		[XmlAttribute("name")]
 		public string Name
 		{
@@ -28,6 +36,12 @@ namespace QQn.TurtleUtils.ItemSets
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="include"></param>
+		/// <param name="type"></param>
+		/// <returns></returns>
 		public TItem AddItem(string include, string type)
 		{
 			if (string.IsNullOrEmpty(include))
@@ -45,11 +59,19 @@ namespace QQn.TurtleUtils.ItemSets
 			return t;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="include"></param>
+		/// <returns></returns>
 		public TItem AddItem(string include)
 		{
 			return AddItem(include, "item");
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		[XmlIgnore]
 		public sealed override bool IsReadOnly
 		{

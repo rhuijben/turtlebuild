@@ -4,11 +4,14 @@ using System.Text;
 using System.IO;
 using System.Security.Cryptography;
 
-namespace QQn.TurtleUtils.Cryptography
+namespace QQn.TurtleUtils.Streams
 {
-	public class SignedSubStream : StreamProxy
+	/// <summary>
+	/// 
+	/// </summary>
+	public class AssuredSubStream : StreamProxy
 	{
-		readonly AssemblyStrongNameKey _key;
+		readonly StrongNameKey _key;
 		long _headerPosition;
 		long _hashPosition;
 		byte[] _streamHash;
@@ -16,10 +19,15 @@ namespace QQn.TurtleUtils.Cryptography
 		long _hashLength;
 		bool _updating;
 
-		public SignedSubStream(Stream parentStream, VerificationMode mode)
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="parentStream"></param>
+		/// <param name="mode"></param>
+		public AssuredSubStream(Stream parentStream, VerificationMode mode)
 			: base(parentStream, true)
 		{
-			SignedStream signedParent = GetService<SignedStream>();
+			AssuredStream signedParent = GetService<AssuredStream>();
 			
 			if (signedParent != null)
 				_key = signedParent.AssemblyStrongNameKey;
@@ -56,6 +64,10 @@ namespace QQn.TurtleUtils.Cryptography
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <returns></returns>
 		public bool VerifyHash()
 		{
 			byte[] streamHash = CalculateHash(false);
@@ -84,11 +96,21 @@ namespace QQn.TurtleUtils.Cryptography
 			_hashPosition = ParentStream.Position;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="parentPosition"></param>
+		/// <returns></returns>
 		protected override long PositionToSubStream(long parentPosition)
 		{
 			return parentPosition - _hashPosition;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="subStreamPosition"></param>
+		/// <returns></returns>
 		protected override long PositionToParent(long subStreamPosition)
 		{
 			return subStreamPosition + _hashPosition;
@@ -103,12 +125,22 @@ namespace QQn.TurtleUtils.Cryptography
 			get { return QQnCryptoHelpers.HashString(_streamHash); }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="buffer"></param>
+		/// <param name="offset"></param>
+		/// <param name="count"></param>
 		public override void Write(byte[] buffer, int offset, int count)
 		{			
 			base.Write(buffer, offset, count);
 			_updating = true;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="value"></param>
 		public override void SetLength(long value)
 		{
 			base.SetLength(value);
@@ -132,6 +164,9 @@ namespace QQn.TurtleUtils.Cryptography
 			base.Close();
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		protected virtual void UpdateHash()
 		{
 			byte[] fileHash = CalculateHash(true);

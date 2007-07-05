@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\QQn.TurtleUtils.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -28,6 +29,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\QQn.TurtleUtils.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -35,15 +37,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Cryptography\AssemblyStrongNameKey.cs" />
-    <Compile Include="Cryptography\QQnBinaryReader.cs" />
-    <Compile Include="Cryptography\QQnBinaryWriter.cs" />
-    <Compile Include="Cryptography\QQnCryptoHelpers.cs" />
-    <Compile Include="Cryptography\SignedStream.cs" />
-    <Compile Include="Cryptography\SignedStreamCreateArgs.cs" />
-    <Compile Include="Cryptography\SignedStreamHeader.cs" />
-    <Compile Include="Cryptography\SignedSubStream.cs" />
-    <Compile Include="Cryptography\StreamProxy.cs" />
+    <Compile Include="Streams\AssemblyStrongNameKey.cs" />
+    <Compile Include="Streams\QQnBinaryReader.cs" />
+    <Compile Include="Streams\QQnBinaryWriter.cs" />
+    <Compile Include="Streams\QQnCryptoHelpers.cs" />
+    <Compile Include="Streams\SignedStream.cs" />
+    <Compile Include="Streams\SignedStreamCreateArgs.cs" />
+    <Compile Include="Streams\SignedStreamHeader.cs" />
+    <Compile Include="Streams\SignedSubStream.cs" />
+    <Compile Include="Streams\StreamProxy.cs" />
     <Compile Include="ItemSets\Package.cs" />
     <Compile Include="ItemSets\ItemSetBase.cs" />
     <Compile Include="ItemSets\Container.cs" />

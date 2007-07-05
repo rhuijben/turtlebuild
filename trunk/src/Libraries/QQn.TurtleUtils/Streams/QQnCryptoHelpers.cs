@@ -3,10 +3,18 @@ using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
 
-namespace QQn.TurtleUtils.Cryptography
+namespace QQn.TurtleUtils.Streams
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public static class QQnCryptoHelpers
 	{
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="bytes"></param>
+		/// <returns></returns>
 		public static string HashString(byte[] bytes)
 		{
 			if (bytes == null)

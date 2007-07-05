@@ -3,13 +3,21 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace QQn.TurtleUtils.Cryptography
+namespace QQn.TurtleUtils.Streams
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public abstract class StreamProxy : Stream, IServiceProvider
 	{
 		readonly Stream _parentStream;
 		readonly bool _closeParent;
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="parentStream"></param>
+		/// <param name="closeParent"></param>
 		public StreamProxy(Stream parentStream, bool closeParent)
 		{
 			if (parentStream == null)

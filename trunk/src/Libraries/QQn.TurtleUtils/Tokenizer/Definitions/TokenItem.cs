@@ -5,6 +5,9 @@ using System.ComponentModel;
 
 namespace QQn.TurtleUtils.Tokenizer.Definitions
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class TokenItem : TokenItemBase
 	{
 		readonly TokenMember _member;
@@ -12,6 +15,11 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		readonly IList<string> _aliases;
 		readonly Type _typeConverter;
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="member"></param>
+		/// <param name="attr"></param>
 		public TokenItem(TokenMember member, TokenAttribute attr)
 		{
 			if (member == null)
@@ -24,11 +32,17 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			_typeConverter = attr.TypeConverter;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public TokenMember Member
 		{
 			get { return _member; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public string Name
 		{
 			get { return _name; }
@@ -68,17 +82,26 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			get { return (DataType == typeof(Boolean)); }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public IList<string> Aliases
 		{
 			get { return _aliases ?? new string[0]; }
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		public Type DataType
 		{
 			get { return Member.DataType; }
 		}
 
 		TypeConverter _typeConverterInstance;
+		/// <summary>
+		/// 
+		/// </summary>
 		protected virtual TypeConverter TypeConverter
 		{
 			get 
@@ -115,6 +138,12 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			throw new InvalidOperationException(string.Format("The typeconverter of type {0} (A {1} instance) can't convert a string into a {0}", DataType.FullName, tc.GetType().FullName, DataType.Name));
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="value"></param>
+		/// <param name="state"></param>
 		public virtual void Evaluate<T>(string value, TokenizerState<T> state)
 			where T : class, new()
 		{
