@@ -69,8 +69,7 @@ namespace TurtleTests
 		[Test]
 		public void CreateSignedFile()
 		{
-			string snkFile = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\Libraries\\QQn.TurtleUtils\\QQn.TurtleUtils.snk");
-			AssemblyStrongNameKey snkIn = AssemblyStrongNameKey.LoadFrom(snkFile);
+			AssemblyStrongNameKey snkIn = AssemblyStrongNameKey.LoadFrom(SnkFile);
 
 			string file;
 			using (FileStream f = File.Create(file = TmpPath))
@@ -100,8 +99,7 @@ namespace TurtleTests
 		public void CreateTrippleSignedFile()
 		{
 			// Tests whether a stream within a signed stream behaves as an outer stream
-			string snkFile = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\Libraries\\QQn.TurtleUtils\\QQn.TurtleUtils.snk");
-			AssemblyStrongNameKey snkIn = AssemblyStrongNameKey.LoadFrom(snkFile);
+			AssemblyStrongNameKey snkIn = AssemblyStrongNameKey.LoadFrom(SnkFile);
 
 			string file;
 			using (FileStream f = File.Create(file = TmpPath))
@@ -130,5 +128,63 @@ namespace TurtleTests
 				Assert.That(s.HashString, Is.Not.Null, "Hash is set");
 			}
 		}
+
+		[Test]
+		public void CreateSignedSubFile()
+		{
+			// Tests whether a stream within a signed stream behaves as an outer stream
+			AssemblyStrongNameKey snkIn = AssemblyStrongNameKey.LoadFrom(SnkFile);
+
+			string file;
+			using (FileStream f = File.Create(file = TmpPath))
+			using (SignedStream s = new SignedStream(f, snkIn, "TestPackage"))
+			using (SignedSubStream s2 = new SignedSubStream(s, VerificationMode.Full))
+			using (BinaryWriter bw = new BinaryWriter(s2))
+			{
+				Assert.That(s2.Position, Is.EqualTo(0L), "Position 0 within signed file");
+				bw.Write("Test String");
+
+				Assert.That(s2.Position, Is.Not.EqualTo(0L), "Position 0 within signed file");
+			}
+
+			using (FileStream f = File.OpenRead(file))
+			using (SignedStream s = new SignedStream(f, VerificationMode.Full))
+			using (SignedSubStream s2 = new SignedSubStream(s, VerificationMode.Full))
+			using (BinaryReader br = new BinaryReader(s2))
+			{
+				Assert.That(s2.Position, Is.EqualTo(0L), "Position 0 within signed file");
+				Assert.That(br.ReadString(), Is.EqualTo("Test String"));
+
+				Assert.That(s2.Position, Is.Not.EqualTo(0L), "Position not 0 within signed file");
+
+				Assert.That(s.HashString, Is.Not.Null, "Hash is set");
+			}
+		}
+
+		[Test]
+		public void CreateHashedSubFile()
+		{
+			string file;
+			using (FileStream f = File.Create(file = TmpPath))
+			using (SignedSubStream s2 = new SignedSubStream(f, VerificationMode.Full))
+			using (BinaryWriter bw = new BinaryWriter(s2))
+			{
+				Assert.That(s2.Position, Is.EqualTo(0L), "Position 0 within signed file");
+				bw.Write("Test String");
+
+				Assert.That(s2.Position, Is.Not.EqualTo(0L), "Position 0 within signed file");
+			}
+
+			using (FileStream f = File.OpenRead(file))
+			using (SignedSubStream s2 = new SignedSubStream(f, VerificationMode.Full))
+			using (BinaryReader br = new BinaryReader(s2))
+			{
+				Assert.That(s2.Position, Is.EqualTo(0L), "Position 0 within signed file");
+				Assert.That(br.ReadString(), Is.EqualTo("Test String"));
+
+				Assert.That(s2.Position, Is.Not.EqualTo(0L), "Position not 0 within signed file");
+			}
+		}
+
 	}
 }

@@ -36,10 +36,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cryptography\AssemblyStrongNameKey.cs" />
+    <Compile Include="Cryptography\QQnBinaryReader.cs" />
+    <Compile Include="Cryptography\QQnBinaryWriter.cs" />
     <Compile Include="Cryptography\QQnCryptoHelpers.cs" />
     <Compile Include="Cryptography\SignedStream.cs" />
     <Compile Include="Cryptography\SignedStreamCreateArgs.cs" />
     <Compile Include="Cryptography\SignedStreamHeader.cs" />
+    <Compile Include="Cryptography\SignedSubStream.cs" />
+    <Compile Include="Cryptography\StreamProxy.cs" />
     <Compile Include="ItemSets\Package.cs" />
     <Compile Include="ItemSets\ItemSetBase.cs" />
     <Compile Include="ItemSets\Container.cs" />
