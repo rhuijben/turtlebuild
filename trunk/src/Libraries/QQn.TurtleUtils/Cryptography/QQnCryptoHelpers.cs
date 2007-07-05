@@ -117,7 +117,7 @@ namespace QQn.TurtleUtils.Cryptography
 				{
 					try
 					{
-						hashType = (HashType)Enum.Parse(typeof(HashType), p.Substring(5)) & ~(HashType.PlusSize | HashType.PlusType);
+						hashType = (HashType)Enum.Parse(typeof(HashType), p.Substring(5), true) & ~(HashType.PlusSize | HashType.PlusType);
 
 						if (!Enum.IsDefined(typeof(HashType), hashType))
 							hashType = HashType.Null;
@@ -139,8 +139,6 @@ namespace QQn.TurtleUtils.Cryptography
 					hashValue = p.Substring(5);
 				}
 			}
-
-			
 
 			if (hashType == HashType.Null)
 			{
