@@ -157,6 +157,9 @@ namespace QQn.TurtleUtils.Cryptography
 
 		public override long Seek(long offset, SeekOrigin origin)
 		{
+			if (!CanSeek)
+				throw new InvalidOperationException();
+
 			switch (origin)
 			{
 				case SeekOrigin.Current:
