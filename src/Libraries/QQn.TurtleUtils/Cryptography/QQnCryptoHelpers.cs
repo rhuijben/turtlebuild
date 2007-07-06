@@ -8,14 +8,14 @@ using System.Security.Cryptography;
 namespace QQn.TurtleUtils.Cryptography
 {
 	/// <summary>
-	/// 
+	/// Crypto utilities; used by the other components
 	/// </summary>
 	public static class QQnCryptoHelpers
 	{
 		/// <summary>
-		/// 
+		/// Generates a string version of the byte-array
 		/// </summary>
-		/// <param name="bytes"></param>
+		/// <param name="bytes">The bytes.</param>
 		/// <returns></returns>
 		public static string HashString(byte[] bytes)
 		{
@@ -47,10 +47,10 @@ namespace QQn.TurtleUtils.Cryptography
 		}
 
 		/// <summary>
-		/// 
+		/// Calculates the file hash.
 		/// </summary>
-		/// <param name="filename"></param>
-		/// <param name="hashType"></param>
+		/// <param name="filename">The filename.</param>
+		/// <param name="hashType">Type of the hash.</param>
 		/// <returns></returns>
 		public static string CalculateFileHash(string filename, HashType hashType)
 		{
@@ -67,10 +67,10 @@ namespace QQn.TurtleUtils.Cryptography
 		}
 
 		/// <summary>
-		/// 
+		/// Calculates the stream hash.
 		/// </summary>
-		/// <param name="stream"></param>
-		/// <param name="hashType"></param>
+		/// <param name="stream">The stream.</param>
+		/// <param name="hashType">Type of the hash.</param>
 		/// <returns></returns>
 		public static string CalculateStreamHash(Stream stream, HashType hashType)
 		{
@@ -166,8 +166,8 @@ namespace QQn.TurtleUtils.Cryptography
 		/// <summary>
 		/// Verifies if the hash matches the specified file
 		/// </summary>
-		/// <param name="filename"></param>
-		/// <param name="hash"></param>
+		/// <param name="filename">The filename.</param>
+		/// <param name="hash">The hash.</param>
 		/// <returns></returns>
 		public static bool VerifyFileHash(string filename, string hash)
 		{
@@ -192,8 +192,8 @@ namespace QQn.TurtleUtils.Cryptography
 		/// <summary>
 		/// Verifies if the given hash matches the stream
 		/// </summary>
-		/// <param name="stream"></param>
-		/// <param name="hash"></param>
+		/// <param name="stream">The stream.</param>
+		/// <param name="hash">The hash.</param>
 		/// <returns></returns>
 		public static bool VerifyStreamHash(Stream stream, string hash)
 		{

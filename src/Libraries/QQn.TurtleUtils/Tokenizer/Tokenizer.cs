@@ -5,6 +5,8 @@ using System.Xml.XPath;
 using QQn.TurtleUtils.Tokenizer.Definitions;
 using System.IO;
 using System.Collections.Specialized;
+using System.Text.RegularExpressions;
+using System.Collections;
 
 namespace QQn.TurtleUtils.Tokenizer
 {
@@ -63,12 +65,12 @@ namespace QQn.TurtleUtils.Tokenizer
 		}
 
 		/// <summary>
-		/// 
+		/// Tries to parse a command line
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="commandLine"></param>
-		/// <param name="args"></param>
-		/// <param name="to"></param>
+		/// <typeparam name="T">The type to parse to</typeparam>
+		/// <param name="commandLine">The command line.</param>
+		/// <param name="args">The args.</param>
+		/// <param name="to">If successfull the result of the parsed commandline</param>
 		/// <returns></returns>
 		public static bool TryParseCommandLine<T>(string commandLine, TokenizerArgs args, out T to)
 			where T : class, new()
@@ -80,35 +82,34 @@ namespace QQn.TurtleUtils.Tokenizer
 		}
 
 		/// <summary>
-		/// 
+		/// Tries to parse a command line
 		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="commandLineArgs"></param>
-		/// <param name="args"></param>
-		/// <param name="to"></param>
+		/// <typeparam name="T">The type to parse to</typeparam>
+		/// <param name="commandLineArguments">The command line arguments.</param>
+		/// <param name="args">Arguments to customize the parsing rules</param>
+		/// <param name="to">If successfull the result of the parsed commandline</param>
 		/// <returns></returns>
-		public static bool TryParseCommandLine<T>(IList<string> commandLineArgs, TokenizerArgs args, out T to)
+		public static bool TryParseCommandLine<T>(IList<string> commandLineArguments, TokenizerArgs args, out T to)
 			where T : class, new()
 		{
-			if (commandLineArgs == null)
+			if (commandLineArguments == null)
 				throw new ArgumentNullException("commandLineArgs");
 			else if (args == null)
 				throw new ArgumentNullException("args");
 
-			foreach (string s in commandLineArgs)
+			foreach (string s in commandLineArguments)
 			{
 				if (s == null)
 					throw new ArgumentException("Can't contain null", "commandLineArgs");
 			}
 
-			List<string> cArgs = new List<string>(commandLineArgs);
+			List<string> cArgs = new List<string>(commandLineArguments);
 
 			T items;
 			TokenizerState<T> state = NewState<T>(args, out items);
 			TokenizerDefinition definition = state.Definition;
 			to = null;
 
-			// TODO: Parse commandline using definition
 			int i;
 
 			bool atEnd = false;
@@ -164,9 +165,9 @@ namespace QQn.TurtleUtils.Tokenizer
 							for (int ii = item.Length - 1; ii > 0; ii--)
 							{
 								if (definition.TryGetToken(item.Substring(0, ii), args.CaseSensitive, out token)
-									&& token.AllowDirectValue(item.Substring(ii)))
+									&& token.AllowDirectValue(item.Substring(ii), state))
 								{
-									token.EvaluateDirect(item.Substring(ii));
+									token.EvaluateDirect(item.Substring(ii), state);
 									break;
 								}
 								else
@@ -176,17 +177,21 @@ namespace QQn.TurtleUtils.Tokenizer
 
 						if (token == null)
 						{
+							args.ErrorMessage = string.Format(TokenizerMessages.UnknownArgumentX, a);
 							return false;
 						}
 
 						if (token.RequiresValue && value == null)
 						{
-							if (i < commandLineArgs.Count - 1)
-								value = commandLineArgs[i++];
+							if (i < commandLineArguments.Count - 1)
+								value = commandLineArguments[i++];
 							else
 							{
+								args.ErrorMessage = string.Format(TokenizerMessages.ValueExpectedForArgumentX, a);
+								return false;
 							}
 						}
+						continue;
 					}
 				}
 				else if (!atEnd && args.AllowResponseFile && a.Length > 1 && a[0] == '@')
@@ -217,7 +222,8 @@ namespace QQn.TurtleUtils.Tokenizer
 				}
 				else if (!args.AllowNamedBetweenPlaced)
 					atEnd = true;
-				else if (state.Definition.HasPlacedArguments)
+
+				if (state.Definition.HasPlacedArguments)
 				{
 					if (nPlaced < state.Definition.PlacedItems.Count)
 					{
@@ -460,7 +466,7 @@ namespace QQn.TurtleUtils.Tokenizer
 				throw new ArgumentNullException("input");
 
 			Dictionary<char, char> _groups = new Dictionary<char, char>();
-			if(groups != null)
+			if (groups != null)
 				foreach (string g in groups)
 				{
 					if (g.Length != 2)
@@ -469,7 +475,7 @@ namespace QQn.TurtleUtils.Tokenizer
 						_groups.Add(g[0], g[1]);
 				}
 
-			if(wordSeparators != null && wordSeparators.Length == 0)
+			if (wordSeparators != null && wordSeparators.Length == 0)
 				wordSeparators = null;
 
 			List<string> words = new List<string>();
@@ -477,13 +483,13 @@ namespace QQn.TurtleUtils.Tokenizer
 			char groupEnd = '\0';
 			bool inGroup = false;
 			int start = -1;
-			for(int i = 0; i < input.Length; i++)
+			for (int i = 0; i < input.Length; i++)
 			{
 				char c = input[i];
-				bool hasNext = i+1 < input.Length;
+				bool hasNext = i + 1 < input.Length;
 
 				bool isSeparator = IsSeparator(c, wordSeparators);
-				if(isSeparator && !inGroup)
+				if (isSeparator && !inGroup)
 				{
 					if (hasNext && (mode == EscapeMode.DoubleItem) && input[i + 1] == c)
 					{
@@ -493,7 +499,7 @@ namespace QQn.TurtleUtils.Tokenizer
 						i++;
 						continue;
 					}
-					if(start >= 0)
+					if (start >= 0)
 					{
 						words.Add(UnEscape(input.Substring(start, i - start), _groups, groups, escapeCharacter, mode, wordSeparators));
 						start = -1;
@@ -539,7 +545,7 @@ namespace QQn.TurtleUtils.Tokenizer
 				}
 			}
 
-			if(start >= 0)
+			if (start >= 0)
 				words.Add(UnEscape(input.Substring(start), _groups, groups, escapeCharacter, mode, wordSeparators));
 
 			return words;
@@ -581,6 +587,123 @@ namespace QQn.TurtleUtils.Tokenizer
 				}
 			}
 			return p;
+		}
+
+		/// <summary>
+		/// Tries the expand file list.
+		/// </summary>
+		/// <param name="fileList">The file list.</param>
+		/// <param name="args">The args.</param>
+		/// <returns></returns>
+		public static bool TryExpandFileList(IList<string> fileList, FileExpandArgs args)
+		{
+			if (fileList == null)
+				throw new ArgumentNullException("fileList");
+			else if (args == null)
+				throw new ArgumentNullException("args");
+
+			for (int i = 0; i < fileList.Count; i++)
+			{
+				string word = fileList[i];
+
+				int firstMask = word.IndexOfAny(new char[] { '*', '?' });
+				if (firstMask >= 0)
+				{
+					word = word.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+
+					DirectoryInfo rootDir;
+					string rest = null;
+					int lastSlash = word.LastIndexOf(Path.DirectorySeparatorChar, firstMask);
+					if (lastSlash < 0)
+					{
+						rootDir = new DirectoryInfo(args.BaseDirectory);
+						rest = word;
+					}
+					else
+					{
+						string dir = word.Substring(0, lastSlash);
+						rootDir = new DirectoryInfo(Path.Combine(args.BaseDirectory, dir));
+						rest = word.Substring(lastSlash + 1);
+					}
+
+					Regex fileRegex = ParseFileEx(rootDir, rest, args.FileExpandMode);
+
+					SearchOption si = (args.FileExpandMode == FileExpandMode.DirectoryWildCards) ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+					bool foundOne = true;
+
+					if (args.MatchDirectories)
+						foreach (DirectoryInfo fsi in rootDir.GetDirectories("*", si))
+						{
+							if (fileRegex.Match(fsi.FullName).Success)
+							{
+								fileList.Insert(i++, fsi.FullName);
+								foundOne = true;
+							}
+						}
+					if (args.MatchFiles)
+						foreach (FileInfo fsi in rootDir.GetFiles("*", si))
+						{
+							if (fileRegex.Match(fsi.FullName).Success)
+							{
+								fileList.Insert(i++, fsi.FullName);
+								foundOne = true;
+							}
+						}
+
+					if (!foundOne && !args.RemoveNonExistingFiles)
+						return false;
+
+					fileList.RemoveAt(i--);
+				}
+				else if (args.RemoveNonExistingFiles && !(args.MatchDirectories ? Directory.Exists(word) : File.Exists(word)))
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+
+		private static Regex ParseFileEx(DirectoryInfo rootDir, string rest, FileExpandMode fileExpandMode)
+		{
+			StringBuilder sb = new StringBuilder();
+			string escapedPathSeparator = Regex.Escape(Path.DirectorySeparatorChar.ToString());
+
+			sb.AppendFormat("^{0}{1}", Regex.Escape(rootDir.FullName), escapedPathSeparator);
+
+			for (int i = 0; i < rest.Length; i++)
+			{
+				char c = rest[i];
+				switch (c)
+				{
+					case '?':
+						sb.AppendFormat("[^{0}]", escapedPathSeparator);
+						break;
+					case '*':
+						if (fileExpandMode == FileExpandMode.DirectoryWildCards && (i + 1 < rest.Length) && rest[i + 1] == '*')
+						{
+							i++;
+
+							if ((i + 1 < rest.Length) && rest[i + 1] == Path.DirectorySeparatorChar)
+							{
+								sb.AppendFormat("(.+{0})?", escapedPathSeparator);
+								i++;
+							}
+							else
+								sb.Append(".*");
+						}
+						else
+							sb.AppendFormat("[^{0}]*", escapedPathSeparator);
+						break;					
+					default:
+						if (c == Path.DirectorySeparatorChar)
+							sb.Append(escapedPathSeparator);
+						else
+							sb.Append(Regex.Escape(c.ToString()));
+						break;
+				}
+			}
+			sb.Append("$");
+			return new Regex(sb.ToString(), RegexOptions.IgnoreCase | RegexOptions.Singleline);
 		}
 	}
 }

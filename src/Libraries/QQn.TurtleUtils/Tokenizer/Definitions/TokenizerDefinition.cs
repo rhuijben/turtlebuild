@@ -17,9 +17,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		TokenItem _rest;
 
 		/// <summary>
-		/// 
+		/// Adds the token.
 		/// </summary>
-		/// <param name="token"></param>
+		/// <param name="token">The token.</param>
 		protected void AddToken(TokenMember token)
 		{
 			if (token == null)
@@ -29,10 +29,10 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		}
 
 		/// <summary>
-		/// 
+		/// Adds the placed token.
 		/// </summary>
-		/// <param name="position"></param>
-		/// <param name="token"></param>
+		/// <param name="position">The position.</param>
+		/// <param name="token">The token.</param>
 		protected void AddPlaced(int position, TokenItem token)
 		{
 			if (token == null)
@@ -52,9 +52,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		}
 
 		/// <summary>
-		/// 
+		/// Sets the rest token.
 		/// </summary>
-		/// <param name="token"></param>
+		/// <param name="token">The token.</param>
 		protected void SetRest(TokenItem token)
 		{
 			if (token == null)
@@ -67,7 +67,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		}
 
 		/// <summary>
-		/// 
+		/// Validates this instance.
 		/// </summary>
 		public void Validate()
 		{
@@ -79,19 +79,22 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		}
 
 		/// <summary>
-		/// 
+		/// Gets a value indicating whether this instance has placed arguments.
 		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance has placed arguments; otherwise, <c>false</c>.
+		/// </value>
 		public bool HasPlacedArguments
 		{
 			get { return _placedItems.Count > 0 || _rest != null; }
 		}
 
 		/// <summary>
-		/// 
+		/// Tries to get a token by its name.
 		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="caseSensitive"></param>
-		/// <param name="token"></param>
+		/// <param name="name">The name.</param>
+		/// <param name="caseSensitive">if set to <c>true</c> [case sensitive].</param>
+		/// <param name="token">The token.</param>
 		/// <returns></returns>
 		public virtual bool TryGetToken(string name, bool caseSensitive, out TokenItem token)
 		{
@@ -131,8 +134,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		}
 
 		/// <summary>
-		/// 
+		/// Gets the rest token.
 		/// </summary>
+		/// <value>The rest token.</value>
 		public TokenItem RestToken
 		{
 			get { return _rest; }

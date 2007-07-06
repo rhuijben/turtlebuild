@@ -10,9 +10,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 	public interface IHasTokenDefinition
 	{
 		/// <summary>
-		/// 
+		/// Gets the tokenizer definition.
 		/// </summary>
-		/// <param name="args"></param>
+		/// <param name="args">The args.</param>
 		/// <returns></returns>
 		TokenizerDefinition GetTokenizerDefinition(TokenizerArgs args);
 	}

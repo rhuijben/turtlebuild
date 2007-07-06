@@ -36,9 +36,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		readonly bool _isProperty;
 
 		/// <summary>
-		/// 
+		/// Initializes a new instance of the <see cref="TokenMember"/> class.
 		/// </summary>
-		/// <param name="member"></param>
+		/// <param name="member">The member.</param>
 		public TokenMember(MemberInfo member)
 		{
 			if (member == null)
@@ -65,16 +65,18 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		}
 
 		/// <summary>
-		/// 
+		/// Gets the name.
 		/// </summary>
+		/// <value>The name.</value>
 		public string Name
 		{
 			get { return _name; }
 		}
 
 		/// <summary>
-		/// 
+		/// Gets the tokens.
 		/// </summary>
+		/// <value>The tokens.</value>
 		public IList<TokenItem> Tokens
 		{
 			get { return _tokens; }
@@ -82,8 +84,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 
 		Type _fieldType;
 		/// <summary>
-		/// 
+		/// Gets the type of the field.
 		/// </summary>
+		/// <value>The type of the field.</value>
 		public Type FieldType
 		{
 			get 
@@ -106,8 +109,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		Type _dataType;
 		TokenMemberMode _tokenMemberMode;
 		/// <summary>
-		/// 
+		/// Gets the type of the data.
 		/// </summary>
+		/// <value>The type of the data.</value>
 		public Type DataType
 		{
 			get
@@ -144,8 +148,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		}
 
 		/// <summary>
-		/// 
+		/// Gets the token member mode.
 		/// </summary>
+		/// <value>The token member mode.</value>
 		public TokenMemberMode TokenMemberMode
 		{
 			get
@@ -158,11 +163,11 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		}
 
 		/// <summary>
-		/// 
+		/// Sets the value of the token.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		/// <param name="state"></param>
-		/// <param name="value"></param>
+		/// <param name="state">The state.</param>
+		/// <param name="value">The value.</param>
 		public void SetValue<T>(TokenizerState<T> state, object value)
 			where T : class, new()
 		{

@@ -8,8 +8,10 @@ using QQn.TurtleUtils.Cryptography;
 namespace QQn.TurtleUtils.Streams
 {
 	/// <summary>
-	/// 
+	/// Stream proxy which creates a hashed and optionally signed stream within a parent stream
 	/// </summary>
+	/// <remarks>The public key of a parent <see cref="AssuredStream"/> is used for signing the substream. 
+	/// All between streams must implement <see cref="IServiceProvider"/> to allow finding a parent <see cref="AssuredStream"/></remarks>
 	public class AssuredSubStream : StreamProxy
 	{
 		readonly StrongNameKey _snk;
@@ -21,11 +23,11 @@ namespace QQn.TurtleUtils.Streams
 		bool _updating;
 
 		/// <summary>
-		/// 
+		/// Initializes a new instance of the <see cref="AssuredSubStream"/> class.
 		/// </summary>
-		/// <param name="parentStream"></param>
-		/// <param name="mode"></param>
-		public AssuredSubStream(Stream parentStream, VerificationMode mode)
+		/// <param name="parentStream">The parent stream.</param>
+		/// <param name="verificationMode">The verification mode.</param>
+		public AssuredSubStream(Stream parentStream, VerificationMode verificationMode)
 			: base(parentStream, true)
 		{
 			AssuredStream signedParent = GetService<AssuredStream>();
@@ -51,13 +53,13 @@ namespace QQn.TurtleUtils.Streams
 				_hashLength = br.ReadInt64();
 				_hashPosition = BaseStream.Position;
 
-				if(mode != VerificationMode.None)
+				if(verificationMode != VerificationMode.None)
 				{
 					if(_snk != null && !_snk.VerifyHash(_streamHash, _hashSignature))
 						throw new CryptographicException("Stream hash verification failed");
 				}
 
-				if (mode == VerificationMode.Full)
+				if (verificationMode == VerificationMode.Full)
 				{
 					if (!VerifyHash())
 						throw new CryptographicException("Invalid hash value");
@@ -66,7 +68,7 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Verifies the hash.
 		/// </summary>
 		/// <returns></returns>
 		public bool VerifyHash()
@@ -98,9 +100,9 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Translates a position in the parent stream to one in the substream
 		/// </summary>
-		/// <param name="parentPosition"></param>
+		/// <param name="parentPosition">The parent position.</param>
 		/// <returns></returns>
 		protected override long PositionToSubStream(long parentPosition)
 		{
@@ -108,9 +110,9 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Translates a position in the substream to one in the parent stream
 		/// </summary>
-		/// <param name="subStreamPosition"></param>
+		/// <param name="subStreamPosition">The sub stream position.</param>
 		/// <returns></returns>
 		protected override long PositionToParent(long subStreamPosition)
 		{
@@ -120,6 +122,7 @@ namespace QQn.TurtleUtils.Streams
 		/// <summary>
 		/// Gets a string representation of the stream-hash.
 		/// </summary>
+		/// <value>The hash string.</value>
 		/// <remarks>When creating the hash is not valid until after closing the stream</remarks>
 		public string HashString
 		{
@@ -127,11 +130,17 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Writes a sequence of bytes to the current stream and advances the current position within this stream by the number of bytes written.
 		/// </summary>
-		/// <param name="buffer"></param>
-		/// <param name="offset"></param>
-		/// <param name="count"></param>
+		/// <param name="buffer">An array of bytes. This method copies count bytes from buffer to the current stream.</param>
+		/// <param name="offset">The zero-based byte offset in buffer at which to begin copying bytes to the current stream.</param>
+		/// <param name="count">The number of bytes to be written to the current stream.</param>
+		/// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
+		/// <exception cref="T:System.NotSupportedException">The stream does not support writing. </exception>
+		/// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
+		/// <exception cref="T:System.ArgumentNullException">buffer is null. </exception>
+		/// <exception cref="T:System.ArgumentException">The sum of offset and count is greater than the buffer length. </exception>
+		/// <exception cref="T:System.ArgumentOutOfRangeException">offset or count is negative. </exception>
 		public override void Write(byte[] buffer, int offset, int count)
 		{			
 			base.Write(buffer, offset, count);
@@ -139,9 +148,12 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Sets the length of the current stream
 		/// </summary>
-		/// <param name="value"></param>
+		/// <param name="value">The desired length of the current stream in bytes.</param>
+		/// <exception cref="T:System.NotSupportedException">The stream does not support both writing and seeking, such as if the stream is constructed from a pipe or console output. </exception>
+		/// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
+		/// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
 		public override void SetLength(long value)
 		{
 			base.SetLength(value);
@@ -166,7 +178,7 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Updates the hash.
 		/// </summary>
 		protected virtual void UpdateHash()
 		{

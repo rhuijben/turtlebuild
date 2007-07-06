@@ -7,7 +7,7 @@ using System.IO.Compression;
 namespace QQn.TurtleUtils.Streams
 {
 	/// <summary>
-	/// 
+	/// Allows writing multiple substreams to one parent stream. The individual substream can be read with a <see cref="MultiStreamReader"/>
 	/// </summary>
 	public class MultiStreamWriter : IDisposable
 	{
@@ -20,10 +20,10 @@ namespace QQn.TurtleUtils.Streams
 		Stream _openStream;
 
 		/// <summary>
-		/// 
+		/// Initializes a new instance of the <see cref="MultiStreamWriter"/> class.
 		/// </summary>
-		/// <param name="output"></param>
-		/// <param name="e"></param>
+		/// <param name="output">The output.</param>
+		/// <param name="e">The e.</param>
 		public MultiStreamWriter(Stream output, MultiStreamCreateArgs e)
 		{
 			if (output == null)
@@ -40,9 +40,9 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Initializes a new instance of the <see cref="MultiStreamWriter"/> class.
 		/// </summary>
-		/// <param name="output"></param>
+		/// <param name="output">The output.</param>
 		public MultiStreamWriter(Stream output)
 			: this(output, new MultiStreamCreateArgs())
 		{
@@ -69,8 +69,9 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Gets the base stream.
 		/// </summary>
+		/// <value>The base stream.</value>
 		protected Stream BaseStream
 		{
 			get { return _output; }
@@ -82,7 +83,7 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Creates a new SubStream
 		/// </summary>
 		/// <returns></returns>
 		public Stream CreateStream()
@@ -91,9 +92,9 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Creates a new substream
 		/// </summary>
-		/// <param name="type"></param>
+		/// <param name="type">The type.</param>
 		/// <returns></returns>
 		public Stream CreateStream(short type)
 		{
@@ -106,8 +107,9 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Creates the stream.
 		/// </summary>
+		/// <param name="args">The args.</param>
 		/// <returns></returns>
 		public Stream CreateStream(MultiStreamArgs args)
 		{
@@ -146,7 +148,7 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Closes this instance.
 		/// </summary>
 		public virtual void Close()
 		{

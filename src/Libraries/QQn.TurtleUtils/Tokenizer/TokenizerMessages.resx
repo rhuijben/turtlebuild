@@ -132,4 +132,7 @@
   <data name="UnknownArgumentX" xml:space="preserve">
     <value>Unknown argument '{0}'</value>
   </data>
+  <data name="ValueExpectedForArgumentX" xml:space="preserve">
+    <value>Value expected for argument '{0}'</value>
+  </data>
 </root>

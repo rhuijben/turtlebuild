@@ -4,6 +4,7 @@ using System.Text;
 using QQn.TurtleUtils.Tokenizer;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
+using System.IO;
 
 namespace TurtleTests
 {
@@ -12,6 +13,9 @@ namespace TurtleTests
 	{
 		public class SimpleCommandLine
 		{
+			[PositionToken(0)]
+			public FileInfo File1;
+
 			[RestToken, TokenDescription("Files")]
 			public string[] Files;
 
@@ -45,8 +49,10 @@ namespace TurtleTests
 			Assert.That(scl.ShowHelp, Is.True, "Show help is true via line");
 			Assert.That(scl.Files, Is.Null, "No files via line");
 
-			Assert.That(Tokenizer.TryParseCommandLine("a.b c.d e.f", out scl), Is.True);
+			Assert.That(Tokenizer.TryParseCommandLine("a.b c.d e.f g.h", out scl), Is.True);
+			Assert.That(scl.File1, Is.Not.Null, "Has file1");
 			Assert.That(scl.Files, Is.Not.Null, "Has files");
+			
 			Assert.That(scl.Files.Length, Is.EqualTo(3), "Has 3 files");
 
 			Assert.That(Tokenizer.TryParseCommandLine("-a.b c.d e.f", out scl), Is.False);

@@ -134,11 +134,11 @@ namespace QQn.TurtleUtils.Cryptography
 			return _rcsp.ExportCspBlob(false);
 		}
 
-		byte[] _publicKeyToken;
+		string _publicKeyToken;
 		/// <summary>
 		/// Gets the public key token from the public key. This matches the public key token of assemblies signed with the same key
 		/// </summary>
-		public byte[] PublicKeyToken
+		public string PublicKeyToken
 		{
 			get
 			{
@@ -154,9 +154,9 @@ namespace QQn.TurtleUtils.Cryptography
 					byte[] last8 = new byte[8];
 					Array.Copy(publicKeyHash, publicKeyHash.Length - 8, last8, 0, 8);
 					Array.Reverse(last8);
-					_publicKeyToken = last8;
+					_publicKeyToken = QQnCryptoHelpers.HashString(last8);
 				}
-				return (byte[])_publicKeyToken.Clone();
+				return _publicKeyToken;
 			}
 		}
 

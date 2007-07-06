@@ -66,6 +66,8 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Tokenizer\Definitions\IHasTokenizerDefiniton.cs" />
+    <Compile Include="Tokenizer\FileExpandArgs.cs" />
+    <Compile Include="Tokenizer\FileSystemInfoTypeConverters.cs" />
     <Compile Include="Tokenizer\PlusMinTokenAttribute.cs" />
     <Compile Include="Tokenizer\Definitions\TokenItem.cs" />
     <Compile Include="Tokenizer\Definitions\TokenizerState.cs" />
@@ -102,6 +104,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="QQn.TurtleUtils.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
