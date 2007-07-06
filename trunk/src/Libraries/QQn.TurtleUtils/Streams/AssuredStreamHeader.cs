@@ -92,14 +92,14 @@ namespace QQn.TurtleUtils.Streams
 
 			_fileType = args.FileType;
 
-			if (args.StrongName == null)
+			if (args.StrongNameKey == null)
 			{
 				_fileHash = new byte[Sha256HashSize];
 				_hashSignature = new byte[0];
 			}
 			else
 			{
-				_snk = args.StrongName;
+				_snk = args.StrongNameKey;
 				_fileHash = new byte[_snk.HashLength];
 				_hashSignature = new byte[_snk.SignatureLength];
 			}
@@ -121,7 +121,7 @@ namespace QQn.TurtleUtils.Streams
 			get { return (byte[])_fileHash.Clone(); }
 		}
 
-		public byte[] PublicKeyToken
+		public string PublicKeyToken
 		{
 			get { return (_snk != null) ? _snk.PublicKeyToken : null; }
 		}

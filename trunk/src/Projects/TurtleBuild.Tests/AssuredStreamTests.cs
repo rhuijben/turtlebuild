@@ -66,6 +66,8 @@ namespace TurtleTests
 			using (AssuredStream s = new AssuredStream(f, VerificationMode.Full))
 			using (BinaryReader br = new BinaryReader(s))
 			{
+				Assert.That(s.PublicKeyToken, Is.EqualTo(snkIn.PublicKeyToken), "Public key matches");
+
 				Assert.That(s.Position, Is.EqualTo(0L), "Position 0 within signed file");				
 				Assert.That(br.ReadString(), Is.EqualTo("Test String"));
 

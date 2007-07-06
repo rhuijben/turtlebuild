@@ -6,7 +6,7 @@ using System.IO;
 namespace QQn.TurtleUtils.Streams
 {
 	/// <summary>
-	/// 
+	/// Allows reading multiple substreams from one parent stream. Reads back the streams created with a <see cref="MultiStreamWriter"/>
 	/// </summary>
 	public class MultiStreamReader : IDisposable
 	{
@@ -19,10 +19,10 @@ namespace QQn.TurtleUtils.Streams
 		int _next = 0;
 
 		/// <summary>
-		/// 
+		/// Initializes a new instance of the <see cref="MultiStreamReader"/> class.
 		/// </summary>
-		/// <param name="input"></param>
-		/// <param name="args"></param>
+		/// <param name="input">The input.</param>
+		/// <param name="args">The args.</param>
 		public MultiStreamReader(Stream input, MultiStreamCreateArgs args)
 		{
 			if (input == null)
@@ -32,7 +32,7 @@ namespace QQn.TurtleUtils.Streams
 
 			_input = input;
 			_reader = new QQnBinaryReader(_input);
-			_verificationMode = args.Verification;
+			_verificationMode = args.VerificationMode;
 
 			_maxCount = _reader.ReadInt32();
 			int count = _reader.ReadInt32();
@@ -46,17 +46,18 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Initializes a new instance of the <see cref="MultiStreamReader"/> class.
 		/// </summary>
-		/// <param name="input"></param>
+		/// <param name="input">The input.</param>
 		public MultiStreamReader(Stream input)
 			: this(input, new MultiStreamCreateArgs())
 		{
 		}
 
 		/// <summary>
-		/// 
+		/// Gets the base stream.
 		/// </summary>
+		/// <value>The base stream.</value>
 		protected Stream BaseStream
 		{
 			get { return _input; }
@@ -68,7 +69,7 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Closes this instance.
 		/// </summary>
 		public virtual void Close()
 		{
@@ -77,9 +78,10 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Gets the next stream.
 		/// </summary>
-		/// <returns></returns>
+		/// <returns>The next substream</returns>
+		/// <exception cref="InvalidOperationException">The previous stream is still open</exception>
 		public Stream GetNextStream()
 		{
 			if (_openReader != null)

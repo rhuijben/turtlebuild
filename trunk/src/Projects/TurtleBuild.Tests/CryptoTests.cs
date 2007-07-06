@@ -44,7 +44,7 @@ namespace TurtleTests
 		public void TestTokens()
 		{
 			StrongNameKey snkIn = StrongNameKey.LoadFrom(SnkFile);
-			Assert.That(QQnCryptoHelpers.HashString(snkIn.PublicKeyToken), Is.EqualTo(QQnCryptoHelpers.HashString(typeof(QQnCryptoHelpers).Assembly.GetName().GetPublicKeyToken())), "Our public-token api matches the .Net one");
+			Assert.That(snkIn.PublicKeyToken, Is.EqualTo(QQnCryptoHelpers.HashString(typeof(QQnCryptoHelpers).Assembly.GetName().GetPublicKeyToken())), "Our public-token api matches the .Net one");
 		}
 
 

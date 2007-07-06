@@ -18,19 +18,22 @@ namespace QQn.TurtleUtils.Tokenizer
 		string _errorMessage;
 		char _argumentValueSeparator;
 		bool _noPlusMinArguments;
-		bool _noNamedBetweenPlaced;
+		bool _namedBetweenPlaced;
 		bool _allowResponseFile;
+		char _directValueSeparator;
 
 		/// <summary>
-		/// 
+		/// Initializes a new instance of the <see cref="TokenizerArgs"/> class.
 		/// </summary>
 		public TokenizerArgs()
 		{
+			_directValueSeparator = '=';
 		}
-		
+
 		/// <summary>
-		/// 
+		/// Gets or sets a value indicating whether the definition should be cached for future usage
 		/// </summary>
+		/// <value><c>true</c> if [cache definition]; otherwise, <c>false</c>.</value>
 		public bool CacheDefinition
 		{
 			get { return _cacheDefinition; }
@@ -38,8 +41,9 @@ namespace QQn.TurtleUtils.Tokenizer
 		}
 
 		/// <summary>
-		/// 
+		/// Gets or sets the command line chars.
 		/// </summary>
+		/// <value>The command line chars.</value>
 		public IList<char> CommandLineChars
 		{
 			get { return _commandLineChars ?? _defaultCommandLineChars; }
@@ -53,8 +57,9 @@ namespace QQn.TurtleUtils.Tokenizer
 		}
 
 		/// <summary>
-		/// 
+		/// Gets or sets a value indicating whether [case sensitive].
 		/// </summary>
+		/// <value><c>true</c> if [case sensitive]; otherwise, <c>false</c>.</value>
 		public bool CaseSensitive
 		{
 			get { return _caseSensitive; }
@@ -62,8 +67,9 @@ namespace QQn.TurtleUtils.Tokenizer
 		}
 
 		/// <summary>
-		/// 
+		/// Gets or sets the error message.
 		/// </summary>
+		/// <value>The error message.</value>
 		public string ErrorMessage
 		{
 			get { return _errorMessage; }
@@ -71,8 +77,9 @@ namespace QQn.TurtleUtils.Tokenizer
 		}
 
 		/// <summary>
-		/// 
+		/// Gets or sets a value indicating whether [allow direct args].
 		/// </summary>
+		/// <value><c>true</c> if [allow direct args]; otherwise, <c>false</c>.</value>
 		public bool AllowDirectArgs
 		{
 			get { return !_noDirectArgs; }
@@ -80,8 +87,9 @@ namespace QQn.TurtleUtils.Tokenizer
 		}
 
 		/// <summary>
-		/// 
+		/// Gets or sets the argument value separator.
 		/// </summary>
+		/// <value>The argument value separator.</value>
 		public char ArgumentValueSeparator
 		{
 			get { return _argumentValueSeparator; }
@@ -89,8 +97,11 @@ namespace QQn.TurtleUtils.Tokenizer
 		}
 
 		/// <summary>
-		/// 
+		/// Gets or sets a value indicating whether plus min suffix arguments are allowed.
 		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if plus min suffix arguments are allowed; otherwise, <c>false</c>.
+		/// </value>
 		public bool PlusMinSuffixArguments
 		{
 			get { return !_noPlusMinArguments; }
@@ -98,21 +109,37 @@ namespace QQn.TurtleUtils.Tokenizer
 		}
 
 		/// <summary>
-		/// 
+		/// Gets or sets a value indicating whether [allow named between placed].
 		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if [allow named between placed]; otherwise, <c>false</c>.
+		/// </value>
 		public bool AllowNamedBetweenPlaced
 		{
-			get { return !_noNamedBetweenPlaced; }
-			set { _noNamedBetweenPlaced = !value; }
+			get { return _namedBetweenPlaced; }
+			set { _namedBetweenPlaced = value; }
 		}
 
 		/// <summary>
-		/// 
+		/// Gets or sets a value indicating whether response files are allowed
 		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if response files are allowed; otherwise, <c>false</c>.
+		/// </value>
 		public bool AllowResponseFile
 		{
 			get { return _allowResponseFile; }
 			set { _allowResponseFile = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the direct value separator.
+		/// </summary>
+		/// <value>The direct value separator.</value>
+		public char DirectValueSeparator
+		{
+			get { return _directValueSeparator; }
+			set { _directValueSeparator = value; }
 		}
 	}
 }

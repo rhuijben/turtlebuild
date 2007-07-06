@@ -93,10 +93,10 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Initializes a new instance of the <see cref="AssuredStream"/> class.
 		/// </summary>
-		/// <param name="stream"></param>
-		/// <param name="args"></param>
+		/// <param name="stream">The stream.</param>
+		/// <param name="args">The args.</param>
 		public AssuredStream(Stream stream, AssuredStreamCreateArgs args)
 			: this(stream, true)
 		{
@@ -114,16 +114,18 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Gets the type of the file.
 		/// </summary>
+		/// <value>The type of the file.</value>
 		public string FileType
 		{
 			get { return _header.FileType; }
 		}
 
 		/// <summary>
-		/// 
+		/// Gets the File's GUID.
 		/// </summary>
+		/// <value>The GUID.</value>
 		public Guid Guid
 		{
 			get { return _header.Guid; }
@@ -132,6 +134,7 @@ namespace QQn.TurtleUtils.Streams
 		/// <summary>
 		/// Gets a string representation of the stream-hash.
 		/// </summary>
+		/// <value>The hash string.</value>
 		/// <remarks>When creating the hash is not valid until after closing the stream</remarks>
 		public string HashString
 		{
@@ -141,22 +144,26 @@ namespace QQn.TurtleUtils.Streams
 		/// <summary>
 		/// Gets a string representation of a hash over the public key; or null if no public key is available
 		/// </summary>
+		/// <value>The public key token.</value>
 		public string PublicKeyToken
 		{
-			get { return (_header.AssemblyStrongNameKey != null) ? QQnCryptoHelpers.HashString(_header.PublicKeyToken) : null; }
+			get { return _header.PublicKeyToken; }
 		}
 
 		/// <summary>
 		/// Gets the <see cref="AssemblyStrongNameKey"/> used for the hash-signature, or null if no such key is provided
 		/// </summary>
+		/// <value>The assembly strong name key or null if the assembly has no <see cref="StrongNameKey"/>.</value>
 		public StrongNameKey AssemblyStrongNameKey
 		{
 			get { return _header.AssemblyStrongNameKey; }
 		}
-		
+
 		/// <summary>
 		/// Gets a boolean indicating whether the stream is writable; See <see cref="Stream.CanWrite"/>
 		/// </summary>
+		/// <value></value>
+		/// <returns>true if the stream supports writing; otherwise, false.</returns>
 		public override bool CanWrite
 		{
 			get { return _creating; }
@@ -165,7 +172,10 @@ namespace QQn.TurtleUtils.Streams
 		/// <summary>
 		/// Sets the length of the stream; See <see cref="Stream.SetLength"/>
 		/// </summary>
-		/// <param name="value"></param>
+		/// <param name="value">The desired length of the current stream in bytes.</param>
+		/// <exception cref="T:System.NotSupportedException">The stream does not support both writing and seeking, such as if the stream is constructed from a pipe or console output. </exception>
+		/// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
+		/// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
 		public override void SetLength(long value)
 		{
 			if (!_creating)
@@ -177,9 +187,15 @@ namespace QQn.TurtleUtils.Streams
 		/// <summary>
 		/// Writes the buffer to the inner stream; see <see cref="Stream.Write(byte[], int, int)"/>
 		/// </summary>
-		/// <param name="buffer"></param>
-		/// <param name="offset"></param>
-		/// <param name="count"></param>
+		/// <param name="buffer">An array of bytes. This method copies count bytes from buffer to the current stream.</param>
+		/// <param name="offset">The zero-based byte offset in buffer at which to begin copying bytes to the current stream.</param>
+		/// <param name="count">The number of bytes to be written to the current stream.</param>
+		/// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
+		/// <exception cref="T:System.NotSupportedException">The stream does not support writing. </exception>
+		/// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
+		/// <exception cref="T:System.ArgumentNullException">buffer is null. </exception>
+		/// <exception cref="T:System.ArgumentException">The sum of offset and count is greater than the buffer length. </exception>
+		/// <exception cref="T:System.ArgumentOutOfRangeException">offset or count is negative. </exception>
 		public override void Write(byte[] buffer, int offset, int count)
 		{
 			if (!_creating)
@@ -218,9 +234,9 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// Translates a position in the parent stream to one in the substream
 		/// </summary>
-		/// <param name="parentPosition"></param>
+		/// <param name="parentPosition">The parent position.</param>
 		/// <returns></returns>
 		protected override long PositionToSubStream(long parentPosition)
 		{
@@ -228,9 +244,9 @@ namespace QQn.TurtleUtils.Streams
 		}
 
 		/// <summary>
-		/// 
+		/// translates a position in the substream to one in the parent stream
 		/// </summary>
-		/// <param name="subStreamPosition"></param>
+		/// <param name="subStreamPosition">The sub stream position.</param>
 		/// <returns></returns>
 		protected override long PositionToParent(long subStreamPosition)
 		{

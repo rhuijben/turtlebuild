@@ -13,17 +13,18 @@ namespace QQn.TurtleUtils.Tokenizer
 		readonly string _description;
 
 		/// <summary>
-		/// 
+		/// Initializes a new instance of the <see cref="TokenDescriptionAttribute"/> class.
 		/// </summary>
-		/// <param name="description"></param>
+		/// <param name="description">The description.</param>
 		public TokenDescriptionAttribute(string description)
 		{
 			_description = description;
 		}
 
 		/// <summary>
-		/// 
+		/// Gets the description.
 		/// </summary>
+		/// <value>The description.</value>
 		public string Description
 		{
 			get { return _description ?? ""; }

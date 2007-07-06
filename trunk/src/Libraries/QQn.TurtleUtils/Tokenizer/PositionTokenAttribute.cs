@@ -13,9 +13,9 @@ namespace QQn.TurtleUtils.Tokenizer
 		readonly int _position;
 
 		/// <summary>
-		/// 
+		/// Initializes a new instance of the <see cref="PositionTokenAttribute"/> class.
 		/// </summary>
-		/// <param name="position"></param>
+		/// <param name="position">The position.</param>
 		public PositionTokenAttribute(int position)
 		{
 			if (position < 0)
@@ -25,8 +25,9 @@ namespace QQn.TurtleUtils.Tokenizer
 		}
 
 		/// <summary>
-		/// 
+		/// Gets the position.
 		/// </summary>
+		/// <value>The position.</value>
 		public int Position
 		{
 			get { return _position; }

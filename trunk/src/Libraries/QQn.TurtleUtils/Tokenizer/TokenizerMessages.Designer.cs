@@ -104,5 +104,14 @@ namespace QQn.TurtleUtils.Tokenizer {
                 return ResourceManager.GetString("UnknownArgumentX", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value expected for argument &apos;{0}&apos;.
+        /// </summary>
+        internal static string ValueExpectedForArgumentX {
+            get {
+                return ResourceManager.GetString("ValueExpectedForArgumentX", resourceCulture);
+            }
+        }
     }
 }

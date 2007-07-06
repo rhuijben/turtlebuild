@@ -12,18 +12,18 @@ namespace QQn.TurtleUtils.Tokenizer
 	public class PlusMinTokenAttribute : TokenAttribute
 	{
 		/// <summary>
-		/// 
+		/// Initializes a new instance of the <see cref="PlusMinTokenAttribute"/> class.
 		/// </summary>
-		/// <param name="name"></param>
+		/// <param name="name">The name.</param>
 		public PlusMinTokenAttribute(string name)
 			: base(name)
 		{
 		}
 
 		/// <summary>
-		/// 
+		/// Creates a <see cref="TokenItem"/> instance.
 		/// </summary>
-		/// <param name="tokenMember"></param>
+		/// <param name="tokenMember">The token member.</param>
 		/// <returns></returns>
 		public override QQn.TurtleUtils.Tokenizer.Definitions.TokenItem CreateToken(QQn.TurtleUtils.Tokenizer.Definitions.TokenMember tokenMember)
 		{
