@@ -209,9 +209,17 @@ namespace QQn.TurtleUtils.Tokenizer
 						int n = i + 1;
 						while (null != (line = sr.ReadLine()))
 						{
-							foreach (string word in GetCommandlineTokens(line))
+							line = line.TrimStart();
+
+							if (line.Length > 1)
 							{
-								cArgs.Insert(n++, word);
+								if (line[0] != '#')
+								{
+									foreach (string word in GetCommandlineTokens(line))
+									{
+										cArgs.Insert(n++, word);
+									}
+								}
 							}
 						}
 					}
