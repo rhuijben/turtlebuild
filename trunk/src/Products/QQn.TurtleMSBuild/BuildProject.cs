@@ -72,7 +72,7 @@ namespace QQn.TurtleMSBuild
 			List<ProjectItem> buildItems = new List<ProjectItem>();
 			foreach (DictionaryEntry o in ItemsEnumerable)
 			{
-				buildItems.Add(new ProjectItem((string)o.Key, (ITaskItem)o.Value));
+				buildItems.Add(new ProjectItem(this, (string)o.Key, (ITaskItem)o.Value));
 			}
 
 			_buildProperties = buildProperties;
