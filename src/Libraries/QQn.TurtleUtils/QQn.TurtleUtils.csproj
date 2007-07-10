@@ -57,8 +57,7 @@
     <Compile Include="Streams\StreamProxy.cs" />
     <Compile Include="ItemSets\Package.cs" />
     <Compile Include="ItemSets\ItemSetBase.cs" />
-    <Compile Include="ItemSets\Container.cs" />
-    <Compile Include="ItemSets\Item.cs" />
+    <Compile Include="ItemSets\ItemSetItem.cs" />
     <Compile Include="ItemSets\ItemSetList.cs" />
     <Compile Include="ItemSets\ItemSetStrings.Designer.cs">
       <DependentUpon>ItemSetStrings.resx</DependentUpon>
