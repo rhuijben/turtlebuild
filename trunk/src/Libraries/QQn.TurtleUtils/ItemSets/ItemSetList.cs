@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
+using System.Collections;
 
 namespace QQn.TurtleUtils.ItemSets
 {
@@ -9,23 +10,33 @@ namespace QQn.TurtleUtils.ItemSets
 	/// 
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	/// <typeparam name="TPackage"></typeparam>
-	/// <typeparam name="TContainer"></typeparam>
-	/// <typeparam name="TItem"></typeparam>
-	public abstract class ItemSetList<T, TPackage, TContainer, TItem> : ItemSetBase<TPackage, TContainer, TItem>, IList<T>, System.Collections.IList
-		where T : ItemSetBase<TPackage, TContainer, TItem>, new()
-		where TPackage : Package<TPackage, TContainer, TItem>
-		where TContainer : Container<TPackage, TContainer, TItem>, new()
-		where TItem : Item<TPackage, TContainer, TItem>, new()
+	/// <typeparam name="TList">The type of the list.</typeparam>
+	/// <typeparam name="TRoot">The type of the root.</typeparam>
+	/// <typeparam name="TLeaf">The type of the leaf.</typeparam>
+	public abstract class ItemSetList<T, TList, TRoot, TLeaf> : ItemSetBase<TRoot>, IList<T>, System.Collections.IList, IDictionary<string, T>, IDictionary
+		where T : NamedItemSetBase<TRoot>, new()
+		where TRoot : ItemSetRoot<TRoot>
+		where TList : ItemSetList<T, TList, TRoot, TLeaf>, new()
 	{
+		readonly SortedList<string, T> _sortedList = new SortedList<string, T>();
 		readonly List<T> _innerList = new List<T>();
 
 		/// <summary>
-		/// 
+		/// Gets the inner list.
 		/// </summary>
+		/// <value>The inner list.</value>
 		protected List<T> InnerList
 		{
 			get { return _innerList; }
+		}
+
+		/// <summary>
+		/// Gets the inner list.
+		/// </summary>
+		/// <value>The inner list.</value>
+		protected SortedList<string, T> InnerSortedList 
+		{
+			get { return _sortedList; }
 		}
 
 		#region IList<T> Members
@@ -54,7 +65,8 @@ namespace QQn.TurtleUtils.ItemSets
 
 			using (new Inserter(this, item))
 			{
-				InnerList.Insert(index, item);
+				InnerSortedList.Add(item.Name, item);
+				InnerList.Insert(index, item);				
 			}
 		}
 
@@ -69,6 +81,7 @@ namespace QQn.TurtleUtils.ItemSets
 
 			T item = this[index];
 			InnerList.RemoveAt(index);
+			InnerSortedList.Remove(item.Name);
 		}
 
 		/// <summary>
@@ -263,9 +276,9 @@ namespace QQn.TurtleUtils.ItemSets
 
 		sealed class Inserter : IDisposable
 		{
-			readonly ItemSetList<T, TPackage, TContainer, TItem> _owner;
+			readonly ItemSetList<T, TList, TRoot, TLeaf> _owner;
 			readonly T _item;
-			public Inserter(ItemSetList<T, TPackage, TContainer, TItem> owner, T item)
+			public Inserter(ItemSetList<T, TList, TRoot, TLeaf> owner, T item)
 			{
 				_owner = owner;
 				_item = item;
@@ -288,9 +301,10 @@ namespace QQn.TurtleUtils.ItemSets
 		}
 
 		/// <summary>
-		/// 
+		/// Gets or sets the package.
 		/// </summary>
-		public override TPackage Package
+		/// <value>The package.</value>
+		public override TRoot Package
 		{
 			get
 			{
@@ -298,6 +312,7 @@ namespace QQn.TurtleUtils.ItemSets
 			}
 			internal set
 			{
+				EnsureWritable();
 				base.Package = value;
 				foreach (T i in this)
 				{
@@ -305,5 +320,177 @@ namespace QQn.TurtleUtils.ItemSets
 				}
 			}
 		}
+
+		#region IDictionary<string,T> Members
+
+		void IDictionary<string, T>.Add(string key, T value)
+		{
+			if (ContainsKey(key) || value.Name != key)
+				throw new ArgumentException("Invalid key", "key");
+
+			Add(value);
+		}
+
+		public bool ContainsKey(string key)
+		{
+			return InnerSortedList.ContainsKey(key);
+		}
+
+		/// <summary>
+		/// Gets an <see cref="T:System.Collections.Generic.ICollection`1"></see> containing the keys of the <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
+		/// </summary>
+		/// <value></value>
+		/// <returns>An <see cref="T:System.Collections.Generic.ICollection`1"></see> containing the keys of the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"></see>.</returns>
+		public ICollection<string> Keys
+		{
+			get { return InnerSortedList.Keys; }
+		}
+
+		/// <summary>
+		/// Removes the element with the specified key from the <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
+		/// </summary>
+		/// <param name="key">The key of the element to remove.</param>
+		/// <returns>
+		/// true if the element is successfully removed; otherwise, false.  This method also returns false if key was not found in the original <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
+		/// </returns>
+		/// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IDictionary`2"></see> is read-only.</exception>
+		/// <exception cref="T:System.ArgumentNullException">key is null.</exception>
+		public bool Remove(string key)
+		{
+			T value;
+			if (InnerSortedList.TryGetValue((string)key, out value))
+			{
+				Remove(value);
+				return true;
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Tries the get value.
+		/// </summary>
+		/// <param name="key">The key.</param>
+		/// <param name="value">The value.</param>
+		/// <returns></returns>
+		public bool TryGetValue(string key, out T value)
+		{
+			return InnerSortedList.TryGetValue(key, out value);
+		}
+
+		public ICollection<T> Values
+		{
+			get { return InnerList.AsReadOnly(); }
+		}
+
+		/// <summary>
+		/// Gets the <see cref="T"/> with the specified key.
+		/// </summary>
+		/// <value></value>
+		public T this[string key]
+		{
+			get { return InnerSortedList[key]; }
+		}
+
+		T IDictionary<string, T>.this[string key]
+		{
+			get { return this[key]; }			
+			set
+			{
+				throw new InvalidOperationException();
+			}
+		}
+
+		#endregion
+
+		#region ICollection<KeyValuePair<string,T>> Members
+
+		void ICollection<KeyValuePair<string, T>>.Add(KeyValuePair<string, T> item)
+		{
+			Add(item.Value);
+		}
+
+		bool ICollection<KeyValuePair<string, T>>.Contains(KeyValuePair<string, T> item)
+		{
+			return ((ICollection<KeyValuePair<string, T>>)InnerSortedList).Contains(item);
+		}
+
+		void ICollection<KeyValuePair<string, T>>.CopyTo(KeyValuePair<string, T>[] array, int arrayIndex)
+		{
+			((ICollection<KeyValuePair<string, T>>)InnerSortedList).CopyTo(array, arrayIndex);
+		}
+
+		bool ICollection<KeyValuePair<string, T>>.Remove(KeyValuePair<string, T> item)
+		{
+			return Remove(item.Value);
+		}
+
+		#endregion
+
+		#region IEnumerable<KeyValuePair<string,T>> Members
+
+		IEnumerator<KeyValuePair<string, T>> IEnumerable<KeyValuePair<string, T>>.GetEnumerator()
+		{
+			return InnerSortedList.GetEnumerator();
+		}
+
+		#endregion
+
+		#region IDictionary Members
+
+		void IDictionary.Add(object key, object value)
+		{
+			Add((T)value);
+		}
+
+		bool IDictionary.Contains(object key)
+		{
+			return Contains(key as T);
+		}
+
+		IDictionaryEnumerator IDictionary.GetEnumerator()
+		{
+			return ((IDictionary)InnerSortedList).GetEnumerator();
+		}
+
+		bool IDictionary.IsFixedSize
+		{
+			get { return false; }
+		}
+
+		ICollection IDictionary.Keys
+		{
+			get { return (ICollection)Keys; }
+		}
+
+		void IDictionary.Remove(object key)
+		{
+			T value;
+			if (InnerSortedList.TryGetValue((string)key, out value))
+				Remove(value);
+		}
+
+		ICollection IDictionary.Values
+		{
+			get { return (ICollection)Values; }
+		}
+
+		object IDictionary.this[object key]
+		{
+			get
+			{
+				T value;
+				if (InnerSortedList.TryGetValue((string)key, out value))
+					return value;
+				else
+					return null;
+			}
+			set
+			{
+				throw new InvalidOperationException();
+			}
+		}
+
+		#endregion
 	}
 }

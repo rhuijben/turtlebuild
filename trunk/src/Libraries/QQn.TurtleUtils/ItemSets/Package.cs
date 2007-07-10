@@ -9,22 +9,18 @@ namespace QQn.TurtleUtils.ItemSets
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <typeparam name="TPackage"></typeparam>
-	/// <typeparam name="TContainer"></typeparam>
-	/// <typeparam name="TItem"></typeparam>
-	public class Package<TPackage, TContainer, TItem> : ItemSetList<TContainer, TPackage, TContainer, TItem>
-		where TPackage : Package<TPackage, TContainer, TItem>
-		where TContainer : Container<TPackage, TContainer, TItem>, new()
-		where TItem : Item<TPackage, TContainer, TItem>, new()
+	/// <typeparam name="TRoot">The type of the root.</typeparam>
+	public class ItemSetRoot<TRoot> : ItemSetBase<TRoot>
+		where TRoot: ItemSetRoot<TRoot>
 	{
 		bool _readOnly;
 		
 		/// <summary>
 		/// 
 		/// </summary>
-		protected Package()
+		protected ItemSetRoot()
 		{
-			Package = (TPackage)this;
+			Package = (TRoot)this;
 		}
 
 		/// <summary>
@@ -34,79 +30,14 @@ namespace QQn.TurtleUtils.ItemSets
 		{
 			get { return _readOnly; }
 		}
-
-		/// <summary>
-		/// Adds or retrieves a container with the specified name
-		/// </summary>
-		/// <param name="name"></param>
-		/// <returns></returns>
-		public TContainer AddContainer(string name)
-		{
-			if(string.IsNullOrEmpty(name))
-				throw new ArgumentNullException("name");
-
-			foreach (TContainer c in this)
-			{
-				if (c.Name == name)
-					return c;
-			}
-
-			TContainer newC = new TContainer();
-			newC.Name = name;
-
-			Add(newC);
-			return newC;
-		}
-
+		
 		/// <summary>
 		/// 
 		/// </summary>
 		protected void SetReadOnly()
 		{
 			_readOnly = true;
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="name"></param>
-		/// <returns></returns>
-		public TContainer this[string name]
-		{
-			get
-			{
-				foreach (TContainer c in this)
-				{
-					if (c.Name == name)
-						return c;
-				}
-				throw new KeyNotFoundException();
-			}
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="container"></param>
-		/// <returns></returns>
-		public bool TryGetContainer(string name, out TContainer container)
-		{
-			if (string.IsNullOrEmpty(name))
-				throw new ArgumentNullException("name");
-
-			foreach (TContainer c in this)
-			{
-				if (c.Name == name)
-				{
-					container = c;
-					return true;
-				}
-			}
-
-			container = null;
-			return false;
-		}
+		}				
 
 		/// <summary>
 		/// 
