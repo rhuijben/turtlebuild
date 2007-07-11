@@ -55,7 +55,7 @@
     <Compile Include="Streams\AssuredStreamHeader.cs" />
     <Compile Include="Streams\AssuredSubStream.cs" />
     <Compile Include="Streams\StreamProxy.cs" />
-    <Compile Include="ItemSets\Package.cs" />
+    <Compile Include="ItemSets\ItemSetRoot.cs" />
     <Compile Include="ItemSets\ItemSetBase.cs" />
     <Compile Include="ItemSets\ItemSetItem.cs" />
     <Compile Include="ItemSets\ItemSetList.cs" />

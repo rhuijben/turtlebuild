@@ -13,10 +13,10 @@ namespace QQn.TurtleUtils.ItemSets
 	/// <typeparam name="TPackage"></typeparam>
 	/// <typeparam name="TContainer"></typeparam>
 	/// <typeparam name="TItem"></typeparam>
-	public abstract class ItemSetItem<TRoot, TList, TLeaf> : ItemSetBase<TRoot, TLeaf>
+	public abstract class ItemSetItem<TList, TLeaf, TRoot> : ItemSetBase<TLeaf, TRoot>, ILeafEnumerable<TLeaf>
 		where TRoot : ItemSetRoot<TRoot>
-		where TList : ItemSetList<TLeaf, TList, TRoot, TLeaf>, new()
-		where TLeaf : ItemSetItem<TRoot, TList, TLeaf>, new()
+		where TList : ItemSetList<TLeaf, TList, TLeaf, TRoot>, new()
+		where TLeaf : ItemSetItem<TList, TLeaf, TRoot>, new()
 	{
 		string _name;
 
@@ -28,7 +28,16 @@ namespace QQn.TurtleUtils.ItemSets
 		public override string Name
 		{
 			get { return _name; }
-			set { EnsureWritable(); _name = value; }
+			set
+			{
+				if (value == _name)
+					return;
+				else if (_name != null)
+					throw new InvalidOperationException();
+
+				EnsureWritable(); 
+				_name = value; 
+			}
 		}
 
 		/// <summary>
@@ -41,6 +50,17 @@ namespace QQn.TurtleUtils.ItemSets
 		public sealed override bool IsReadOnly
 		{
 			get { return (Package != null) ? Package.IsReadOnly : false; }
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		IEnumerable<TLeaf> ILeafEnumerable<TLeaf>.AllLeaves
+		{
+			get
+			{
+				yield return (TLeaf)this;
+			}
 		}
 	}
 }
