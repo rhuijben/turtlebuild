@@ -21,8 +21,15 @@ namespace QQn.TurtleUtils.ItemSets
 		[XmlIgnore]
 		public virtual TRoot Package
 		{
-			get { return _package ?? (this as TRoot); }
-			internal set { _package = value; }
+			get { return _package ?? (_package = (this as TRoot)); }
+			set 
+			{
+				if (value == _package)
+					return;
+				else if (_package != null)
+					throw new InvalidOperationException();
+				_package = value;
+			}
 		}
 
 		/// <summary>
@@ -63,17 +70,26 @@ namespace QQn.TurtleUtils.ItemSets
 			get;
 			set;
 		}
+
+		/// <summary>
+		/// Initializes and sets the name of the item.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <remarks>Called from List.AddItem</remarks>
+		protected internal virtual void InitializeAndSetName(string name)
+		{
+			Name = name;
+		}
 	}
 
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <typeparam name="TPackage"></typeparam>
-	/// <typeparam name="TContainer"></typeparam>
-	/// <typeparam name="TItem"></typeparam>
-	public abstract class ItemSetBase<TRoot, TLeaf> : NamedItemSetBase<TRoot>
+	/// <typeparam name="TLeaf">The type of the leaf.</typeparam>
+	/// <typeparam name="TRoot">The type of the root.</typeparam>
+	public abstract class ItemSetBase<TLeaf, TRoot> : NamedItemSetBase<TRoot>
 		where TRoot : ItemSetRoot<TRoot>
-		where TLeaf : ItemSetBase<TRoot, TLeaf>, new()
+		where TLeaf : ItemSetBase<TLeaf, TRoot>, new()
 	{
 		
 	}

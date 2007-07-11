@@ -3,9 +3,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
 using System.Collections;
+using System.ComponentModel;
+using System.Diagnostics;
 
 namespace QQn.TurtleUtils.ItemSets
 {
+	public interface ILeafEnumerable<TLeaf>
+	{
+		IEnumerable<TLeaf> AllLeaves { get; }
+	}
 	/// <summary>
 	/// 
 	/// </summary>
@@ -13,10 +19,11 @@ namespace QQn.TurtleUtils.ItemSets
 	/// <typeparam name="TList">The type of the list.</typeparam>
 	/// <typeparam name="TRoot">The type of the root.</typeparam>
 	/// <typeparam name="TLeaf">The type of the leaf.</typeparam>
-	public abstract class ItemSetList<T, TList, TRoot, TLeaf> : ItemSetBase<TRoot>, IList<T>, System.Collections.IList, IDictionary<string, T>, IDictionary
-		where T : NamedItemSetBase<TRoot>, new()
+	public abstract class ItemSetList<T, TList, TLeaf, TRoot> : NamedItemSetBase<TRoot>, /* IList<T>, System.Collections.IList, IDictionary<string, T>,*/ ILeafEnumerable<TLeaf>
+		where T : NamedItemSetBase<TRoot>, ILeafEnumerable<TLeaf>, new()
 		where TRoot : ItemSetRoot<TRoot>
-		where TList : ItemSetList<T, TList, TRoot, TLeaf>, new()
+		where TList : ItemSetList<T, TList, TLeaf, TRoot>, new()
+		where TLeaf : NamedItemSetBase<TRoot>
 	{
 		readonly SortedList<string, T> _sortedList = new SortedList<string, T>();
 		readonly List<T> _innerList = new List<T>();
@@ -76,8 +83,7 @@ namespace QQn.TurtleUtils.ItemSets
 		/// <param name="index"></param>
 		public void RemoveAt(int index)
 		{
-			if (IsReadOnly)
-				throw new InvalidOperationException(ItemSetStrings.ReadOnly);
+			EnsureWritable();
 
 			T item = this[index];
 			InnerList.RemoveAt(index);
@@ -91,23 +97,14 @@ namespace QQn.TurtleUtils.ItemSets
 		/// <returns></returns>
 		public T this[int index]
 		{
-			get { return InnerList[index]; }
-			set
-			{
-				if (IsReadOnly)
-					throw new InvalidOperationException(ItemSetStrings.ReadOnly);
-				else if (value == null)
-					throw new ArgumentNullException("value");
-				else if (value.Package != null)
-					throw new InvalidOperationException();
-
-				T item = this[index];
-				using (new Inserter(this, item))
-				{
-					InnerList[index] = value;
-				}
-			}
+			get { return InnerList[index]; }			
 		}
+
+		/*T IList<T>.this[int index]
+		{
+			get { return this[index]; }
+			set { throw new InvalidOperationException(); }
+		}*/
 
 		#endregion
 
@@ -202,16 +199,16 @@ namespace QQn.TurtleUtils.ItemSets
 
 		#region IEnumerable Members
 
-		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+		/*System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
 		{
 			return GetEnumerator();
-		}
+		}*/
 
 		#endregion
 
 		#region IList Members
 
-		int System.Collections.IList.Add(object value)
+		/*int System.Collections.IList.Add(object value)
 		{
 			T tValue = (T)value;
 
@@ -247,10 +244,7 @@ namespace QQn.TurtleUtils.ItemSets
 		object System.Collections.IList.this[int index]
 		{
 			get { return this[index]; }
-			set
-			{
-				this[index] = (T)value;
-			}
+			set { throw new InvalidOperationException(); }
 		}
 
 		#endregion
@@ -270,15 +264,15 @@ namespace QQn.TurtleUtils.ItemSets
 		object System.Collections.ICollection.SyncRoot
 		{
 			get { return _innerList; }
-		}
+		}*/
 
 		#endregion
 
 		sealed class Inserter : IDisposable
 		{
-			readonly ItemSetList<T, TList, TRoot, TLeaf> _owner;
+			readonly ItemSetList<T, TList, TLeaf, TRoot> _owner;
 			readonly T _item;
-			public Inserter(ItemSetList<T, TList, TRoot, TLeaf> owner, T item)
+			public Inserter(ItemSetList<T, TList, TLeaf, TRoot> owner, T item)
 			{
 				_owner = owner;
 				_item = item;
@@ -310,9 +304,8 @@ namespace QQn.TurtleUtils.ItemSets
 			{
 				return base.Package;
 			}
-			internal set
+			set
 			{
-				EnsureWritable();
 				base.Package = value;
 				foreach (T i in this)
 				{
@@ -323,13 +316,13 @@ namespace QQn.TurtleUtils.ItemSets
 
 		#region IDictionary<string,T> Members
 
-		void IDictionary<string, T>.Add(string key, T value)
+		/*void IDictionary<string, T>.Add(string key, T value)
 		{
 			if (ContainsKey(key) || value.Name != key)
 				throw new ArgumentException("Invalid key", "key");
 
 			Add(value);
-		}
+		}*/
 
 		public bool ContainsKey(string key)
 		{
@@ -392,20 +385,20 @@ namespace QQn.TurtleUtils.ItemSets
 			get { return InnerSortedList[key]; }
 		}
 
-		T IDictionary<string, T>.this[string key]
+		/*T IDictionary<string, T>.this[string key]
 		{
 			get { return this[key]; }			
 			set
 			{
 				throw new InvalidOperationException();
 			}
-		}
+		}*/
 
 		#endregion
 
 		#region ICollection<KeyValuePair<string,T>> Members
 
-		void ICollection<KeyValuePair<string, T>>.Add(KeyValuePair<string, T> item)
+		/*void ICollection<KeyValuePair<string, T>>.Add(KeyValuePair<string, T> item)
 		{
 			Add(item.Value);
 		}
@@ -423,74 +416,144 @@ namespace QQn.TurtleUtils.ItemSets
 		bool ICollection<KeyValuePair<string, T>>.Remove(KeyValuePair<string, T> item)
 		{
 			return Remove(item.Value);
-		}
+		}*/
 
 		#endregion
 
 		#region IEnumerable<KeyValuePair<string,T>> Members
 
-		IEnumerator<KeyValuePair<string, T>> IEnumerable<KeyValuePair<string, T>>.GetEnumerator()
+		/*IEnumerator<KeyValuePair<string, T>> IEnumerable<KeyValuePair<string, T>>.GetEnumerator()
 		{
 			return InnerSortedList.GetEnumerator();
-		}
+		}*/
 
 		#endregion
 
-		#region IDictionary Members
-
-		void IDictionary.Add(object key, object value)
+		/// <summary>
+		/// Gets a value indicating whether this instance is read only.
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if this instance is read only; otherwise, <c>false</c>.
+		/// </value>
+		public sealed override bool IsReadOnly
 		{
-			Add((T)value);
+			get { return (Package != null) ? Package.IsReadOnly : false; }
 		}
 
-		bool IDictionary.Contains(object key)
+		/// <summary>
+		/// Gets or sets the name.
+		/// </summary>
+		/// <value>The name.</value>
+		/// <exception cref="InvalidOperationException">When setting the name</exception>
+		[XmlIgnore]
+		public override string Name
 		{
-			return Contains(key as T);
+			get { return null; }
+			set { throw new InvalidOperationException(); }
 		}
 
-		IDictionaryEnumerator IDictionary.GetEnumerator()
+		/// <summary>
+		/// Adds the item.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <returns>The added item</returns>
+		/// <exception cref="ArgumentException">An item with the specified name exists</exception>
+		public T AddItem(string name)
 		{
-			return ((IDictionary)InnerSortedList).GetEnumerator();
+			if (ContainsKey(name))
+				throw new ArgumentException("Key exists", "key");
+
+			T item = new T();
+			item.InitializeAndSetName(name);
+
+			Add(item);
+			return item;
 		}
 
-		bool IDictionary.IsFixedSize
-		{
-			get { return false; }
-		}
-
-		ICollection IDictionary.Keys
-		{
-			get { return (ICollection)Keys; }
-		}
-
-		void IDictionary.Remove(object key)
-		{
-			T value;
-			if (InnerSortedList.TryGetValue((string)key, out value))
-				Remove(value);
-		}
-
-		ICollection IDictionary.Values
-		{
-			get { return (ICollection)Values; }
-		}
-
-		object IDictionary.this[object key]
+		/// <summary>
+		/// Gets all leaves.
+		/// </summary>
+		/// <value>All leaves.</value>
+		public IEnumerable<TLeaf> AllLeaves
 		{
 			get
 			{
-				T value;
-				if (InnerSortedList.TryGetValue((string)key, out value))
-					return value;
-				else
-					return null;
-			}
-			set
-			{
-				throw new InvalidOperationException();
+				foreach (T item in this)
+				{
+					TLeaf leaf = item as TLeaf;
+					if (leaf != null)
+					{
+						yield return leaf;
+						continue;
+					}
+
+					foreach (TLeaf sLeaf in item.AllLeaves)
+					{
+						yield return sLeaf;
+					}
+				}
 			}
 		}
 
-		#endregion
+		/// <summary>
+		/// [Xml Serialization helper property]
+		/// </summary>
+		[XmlElement("item"), Browsable(false), DebuggerNonUserCode]
+		public List<T> Items
+		{
+			get 
+			{ 
+				return new List<T>(InnerList);; 
+			}
+			set
+			{
+				EnsureWritable();
+				if (value != null)
+				{
+					InnerList.AddRange(value);
+					foreach (T item in value)
+					{
+						InnerSortedList.Add(item.Name, item);
+					}
+				}
+			}
+		}
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	/// <typeparam name="TList">The type of the list.</typeparam>
+	/// <typeparam name="TRoot">The type of the root.</typeparam>
+	/// <typeparam name="TLeaf">The type of the leaf.</typeparam>
+	public abstract class NamedItemSetList<T, TList, TLeaf, TRoot> : ItemSetList<T, TList, TLeaf, TRoot>
+		where T : NamedItemSetBase<TRoot>, ILeafEnumerable<TLeaf>, new()
+		where TRoot : ItemSetRoot<TRoot>
+		where TList : NamedItemSetList<T, TList, TLeaf, TRoot>, new()
+		where TLeaf : NamedItemSetBase<TRoot>
+	{
+		string _name;
+
+		/// <summary>
+		/// Gets or sets the name.
+		/// </summary>
+		/// <value>The name.</value>
+		/// <exception cref="InvalidOperationException">When setting the name if readonly</exception>
+		[XmlAttribute("name")]
+		public override string Name
+		{
+			get { return _name; }
+			set 
+			{
+				if (value == _name)
+					return;
+				else if (_name != null)
+					throw new InvalidOperationException();
+
+				EnsureWritable(); 
+				_name = value; 
+			}
+		}
 	}
 }
