@@ -48,7 +48,7 @@ namespace QQn.TurtleMSBuild
 					WriteProjectOutput(xw, project);
 					WriteContent(xw, project);
 
-					WriteSpecialFiles(xw, project);
+					WriteScripts(xw, project);
 
 					//WriteItem(xw, project, "ReferenceCopyLocalPaths");
 				}
@@ -141,6 +141,39 @@ namespace QQn.TurtleMSBuild
 			xw.WriteEndElement();
 		}
 
+		static IEnumerable<string> GetParameters(BuildProject project, string name, IEnumerable<string> furtherItems, string alternateValue)
+		{
+			Dictionary<string, string> used = new Dictionary<string, string>();
+
+			if (furtherItems != null)
+				foreach (string i in furtherItems)
+				{
+					if (!used.ContainsKey(i))
+					{
+						used.Add(i, i);
+						yield return i;
+					}
+				}
+
+			string propertyValue;
+			if (!project.BuildProperties.TryGetValue("TurtleMSBuild_" + name, out propertyValue))
+				propertyValue = alternateValue;
+
+			if(propertyValue != null)
+			{
+				foreach (string i in propertyValue.Split(';'))
+				{
+					if (string.IsNullOrEmpty(i))
+						continue;
+
+					if (!used.ContainsKey(i))
+					{
+						used.Add(i, i);
+						yield return i;
+					}
+				}
+			}
+		}
 
 		private static void WriteProjectOutput(XmlWriter xw, BuildProject project)
 		{
@@ -148,22 +181,27 @@ namespace QQn.TurtleMSBuild
 			SortedList<string, string> localItems = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
 			SortedList<string, string> copyItems = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
 
-			string sharedKeys = project.GetProperty("TurtleLogger_SharedItemNames") ?? "";
-			string publishedKeys = project.GetProperty("TurtleLogger_ItemNames") ?? "";
 			SortedList<string, string> keys = new SortedList<string, string>();
+			SortedList<string, string> copyKeys = new SortedList<string, string>();
 
-			foreach (string n in sharedKeys.Split(';'))
+			foreach (string v in GetParameters(project, "SharedItems", project.Parameters.SharedItems, ""))
 			{
-				if(!string.IsNullOrEmpty(n))
-					keys.Add(n, "Shared");
+				if (!keys.ContainsKey(v))
+					keys.Add(v, "Shared");
 			}
 
-			foreach (string n in publishedKeys.Split(';'))
+			foreach (string v in GetParameters(project, "LocalItems", project.Parameters.LocalItems, ""))
 			{
-				if(!string.IsNullOrEmpty(n))
-					keys.Add(n, "Item");
+				if (!keys.ContainsKey(v))
+					keys.Add(v, "Item");
 			}
-			
+
+			foreach (string v in GetParameters(project, "CopyItems", project.Parameters.LocalItems, "None;Compile;Content;EmbeddedResource"))
+			{
+				if (!copyKeys.ContainsKey(v))
+					copyKeys.Add(v, "Copy");
+			}
+
 			string outDir = project.OutDir.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
 			string outPath = Path.Combine(project.ProjectPath, outDir);
 			string outPathS = Path.Combine(project.ProjectPath, outDir).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
@@ -199,7 +237,7 @@ namespace QQn.TurtleMSBuild
 
 				if (Path.IsPathRooted(include))
 					include = project.MakeRelativePath(include);
-				
+
 				switch (pi.Name)
 				{
 					case "IntermediateAssembly":
@@ -213,6 +251,7 @@ namespace QQn.TurtleMSBuild
 							localItems.Add(target, include);
 						break;
 					case "ContentWithTargetPath":
+					case "AllItemsFullPathWithTargetPath":
 						if (!copyItems.ContainsKey(target))
 						{
 							string condition;
@@ -224,7 +263,7 @@ namespace QQn.TurtleMSBuild
 										copyItems.Add(target, include);
 										break;
 								}
-						}							
+						}
 						break;
 					case "ReferenceComWrappersToCopyLocal":
 					case "ResolvedIsolatedComModules":
@@ -250,18 +289,24 @@ namespace QQn.TurtleMSBuild
 									if (!localItems.ContainsKey(target))
 										localItems.Add(target, pi.Include);
 									break;
-								default:
-									break;
 							}
 						break;
 				}
 
-				if(pi.TryGetMetaData("CopyToOutputDirectory", out copyCondition) && !copyItems.ContainsKey(target))
-					switch (copyCondition)
+				if (copyKeys.ContainsKey(pi.Name))
+					switch (keys[pi.Name])
 					{
-						case "Always":
-						case "PreserveNewest":
-							copyItems.Add(target, include);
+						case "Copy":
+							if (pi.TryGetMetaData("CopyToOutputDirectory", out copyCondition) && !copyItems.ContainsKey(target))
+								switch (copyCondition)
+								{
+									case "Always":
+									case "PreserveNewest":
+										copyItems.Add(target, include);
+										break;
+								}
+							break;
+						default:
 							break;
 					}
 			}
@@ -349,31 +394,30 @@ namespace QQn.TurtleMSBuild
 			xw.WriteEndElement();
 		}
 
-		private static void WriteSpecialFiles(XmlWriter xw, BuildProject project)
+		private static void WriteScripts(XmlWriter xw, BuildProject project)
 		{
 			SortedList<string, string> keys = new SortedList<string, string>();
 
-			string scriptKeys = project.GetProperty("TurtleLogger_ScriptItemNames") ?? "Content;None";
+			string scriptKeys = project.GetProperty("TurtleLogger_ScriptItemNames") ?? "Content;None;Compile";
 
 			foreach (string n in scriptKeys.Split(';'))
-				keys.Add(n, "Item");
+			{
+				if (!string.IsNullOrEmpty(n))
+					keys.Add(n, "Item");
+			}
 
 			SortedList<string, string> extensions = new SortedList<string, string>();
 
 			if(project.Parameters.ScriptExtensions != null)
 				foreach (string n in project.Parameters.ScriptExtensions)
 				{
-					string[] parts = n.Split('=');
-					extensions.Add(parts[0], (parts.Length > 1) ? parts[1] : "Item");
+					extensions.Add(n, "Item");
 				}
 
 			SortedList<string, string> added = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
 			xw.WriteStartElement("Scripts");
 			foreach (ProjectItem i in project.BuildItems)
 			{
-				if (i.Name.StartsWith("_"))
-					continue;
-
 				string name;
 				if (!keys.TryGetValue(i.Name, out name))
 					continue;

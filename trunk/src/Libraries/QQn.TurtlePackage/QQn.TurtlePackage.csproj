@@ -36,8 +36,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="FileHash.cs" />
-    <Compile Include="StreamFiles\StreamFile.cs" />
-    <Compile Include="StreamFiles\StreamFile10.cs" />
+    <Compile Include="PackContainer.cs" />
+    <Compile Include="PackContainerList.cs" />
+    <Compile Include="Pack.cs" />
+    <Compile Include="PackFile.cs" />
     <Compile Include="TurtleContainer.cs" />
     <Compile Include="TurtleExtractArgs.cs" />
     <Compile Include="TurtleFileItem.cs" />

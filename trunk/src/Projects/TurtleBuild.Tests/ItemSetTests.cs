@@ -17,7 +17,7 @@ namespace TurtleTests
 		{
 			MyPackage pkg = new MyPackage();
 
-			MyContainer container = pkg.AddContainer("bin");
+			MyContainer container = pkg.Containers.AddItem("bin");
 			container.AddItem("bin/release/MyApp.dll");
 			container.AddItem("bin/release/MyApp.xml");
 			container.AddItem("bin/release/MyApp.pdb");
@@ -28,23 +28,39 @@ namespace TurtleTests
 				pkg.WriteTo(xw);
 			}
 
-			System.Diagnostics.Debug.WriteLine(doc.DocumentElement.ToString());
+			System.Diagnostics.Debug.WriteLine(doc.DocumentElement.OuterXml);
 		}
 	}
 
 	[XmlRoot("container")]
-	public class MyContainer : Container<MyPackage, MyContainer, MyItem>
+	public class MyContainer : NamedItemSetList<MyItem, MyContainer, MyItem, MyPackage>
 	{
-		
+		[XmlAttribute("q")]
+		public string Q = "a";
 	}
 
 	[XmlRoot("item")]
-	public class MyItem : Item<MyPackage, MyContainer, MyItem>
+	public class MyItem : ItemSetItem<MyContainer, MyItem, MyPackage>
 	{
+		[XmlAttribute("q")]
+		public string Q = "b";
 	}
 
-	[XmlRoot("package")]
-	public class MyPackage : Package<MyPackage, MyContainer, MyItem>
+	[XmlRoot("package", Namespace="qq")]
+	public class MyPackage : ItemSetRoot<MyPackage>
 	{
+		[XmlAttribute("q")]
+		public string Q = "c";
+
+		//[XmlArrayItem("Container", typeof(MyContainer))]
+		public MyContainerList Containers = new MyContainerList();
+		
+	}
+
+	[XmlRoot("Containers")]
+	public class MyContainerList : ItemSetList<MyContainer, MyContainerList, MyItem, MyPackage>
+	{
+		[XmlAttribute("q")]
+		public string Q = "d";
 	}
 }

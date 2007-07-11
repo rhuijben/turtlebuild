@@ -8,13 +8,27 @@ using QQn.TurtleUtils.ItemSets;
 
 namespace QQn.TurtlePackage
 {
-	public class TurtlePackage : Package<TurtlePackage, TurtleContainer, TurtleItem>
+	public class TurtlePackage : Pack
 	{
 		readonly FileInfo _package;
 		readonly IXPathNavigable _manifest;
-		internal List<TurtleContainer> _containers;
 
-		protected TurtlePackage(string fileName, IXPathNavigable manifest)
+		public TurtlePackage()
+		{
+		}
+
+
+		public static TurtlePackage Create(string fileName, Pack definition)
+		{
+			return null;
+		}
+
+		public static TurtlePackage LoadFrom(Uri uri)
+		{
+			return null;
+		}
+
+		/*protected TurtlePackage(string fileName, IXPathNavigable manifest)
 			: this(new FileInfo(fileName), manifest)
 		{
 		}
@@ -84,6 +98,6 @@ namespace QQn.TurtlePackage
 		public void SetManifest(XmlDocument doc)
 		{
 			throw new Exception("The method or operation is not implemented.");
-		}
+		}*/
 	}
 }
