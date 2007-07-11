@@ -400,7 +400,7 @@ namespace QQn.TurtleMSBuild
 			SortedList<string, string> extensions = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
 			SortedList<string, string> added = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
 
-			foreach (string v in GetParameters(project, "ScriptItems", project.Parameters.ScriptItems, null))
+			foreach (string v in GetParameters(project, "ScriptItems", project.Parameters.ScriptItems, "Content;Compile;EmbeddedResource;None"))
 			{
 				if(!items.ContainsKey(v))
 					items.Add(v, "Item");
