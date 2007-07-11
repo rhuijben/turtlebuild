@@ -294,7 +294,7 @@ namespace QQn.TurtleMSBuild
 				}
 
 				if (copyKeys.ContainsKey(pi.Name))
-					switch (keys[pi.Name])
+					switch (copyKeys[pi.Name])
 					{
 						case "Copy":
 							if (pi.TryGetMetaData("CopyToOutputDirectory", out copyCondition) && !copyItems.ContainsKey(target))
@@ -396,30 +396,32 @@ namespace QQn.TurtleMSBuild
 
 		private static void WriteScripts(XmlWriter xw, BuildProject project)
 		{
-			SortedList<string, string> keys = new SortedList<string, string>();
+			SortedList<string, string> items = new SortedList<string, string>();
+			SortedList<string, string> extensions = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
+			SortedList<string, string> added = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
 
-			string scriptKeys = project.GetProperty("TurtleLogger_ScriptItemNames") ?? "Content;None;Compile";
-
-			foreach (string n in scriptKeys.Split(';'))
+			foreach (string v in GetParameters(project, "ScriptItems", project.Parameters.ScriptItems, null))
 			{
-				if (!string.IsNullOrEmpty(n))
-					keys.Add(n, "Item");
+				if(!items.ContainsKey(v))
+					items.Add(v, "Item");
 			}
 
-			SortedList<string, string> extensions = new SortedList<string, string>();
+			foreach (string v in GetParameters(project, "ScriptExtensions", project.Parameters.ScriptExtensions, null))
+			{
+				string ext = v;
 
-			if(project.Parameters.ScriptExtensions != null)
-				foreach (string n in project.Parameters.ScriptExtensions)
-				{
-					extensions.Add(n, "Item");
-				}
+				if (!ext.StartsWith("."))
+					ext = '.' + ext;
 
-			SortedList<string, string> added = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
+				if(!extensions.ContainsKey(ext))
+					extensions.Add(ext, "Item");
+			}
+			
 			xw.WriteStartElement("Scripts");
 			foreach (ProjectItem i in project.BuildItems)
 			{
 				string name;
-				if (!keys.TryGetValue(i.Name, out name))
+				if (!items.TryGetValue(i.Name, out name))
 					continue;
 
 				if (added.ContainsKey(i.Include))

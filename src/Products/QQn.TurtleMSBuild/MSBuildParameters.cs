@@ -16,6 +16,9 @@ namespace QQn.TurtleLogger
 		[Token("ScriptExtension")]
 		public string[] ScriptExtensions;
 
+		[Token("ScriptItem")]
+		public string[] ScriptItems;
+
 		[Token("SharedItem")]
 		public string[] SharedItems;
 
