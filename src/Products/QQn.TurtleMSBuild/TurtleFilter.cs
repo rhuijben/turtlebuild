@@ -212,7 +212,7 @@ namespace QQn.TurtleMSBuild
 				localItems[Path.Combine(project.OutDir, dllName)] = Path.Combine(project.IntermediateOutputPath, dllName);
 			}
 
-			if (project.BuildProperties.ContainsKey("_DebugSymbolsProduced"))
+			if (project.BuildProperties.ContainsKey("_DebugSymbolsProduced") && project.GetProperty("_DebugSymbolsProduced") == "true")
 			{
 				string pdbName = project.GetProperty("TargetName") + ".pdb";
 				localItems[Path.Combine(project.OutDir, pdbName)] = Path.Combine(project.IntermediateOutputPath, pdbName);
