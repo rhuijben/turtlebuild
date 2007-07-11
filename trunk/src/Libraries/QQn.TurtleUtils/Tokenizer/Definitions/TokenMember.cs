@@ -187,7 +187,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 						if (a != null)
 						{
 							aNew = Array.CreateInstance(FieldType.GetElementType(), a.Length + 1);
-							if (a.Length > 1)
+							if (a.Length >= 1)
 								a.CopyTo(aNew, 0);
 						}
 						else

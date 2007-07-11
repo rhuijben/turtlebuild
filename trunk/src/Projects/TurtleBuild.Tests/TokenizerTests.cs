@@ -35,6 +35,12 @@ namespace TurtleTests
 			public string UserId;
 		}
 
+		public class MultiItem
+		{
+			[Token("File")]
+			public string[] Files;
+		}
+
 		[Test]
 		public void TestParseCommandLine()
 		{
@@ -106,6 +112,20 @@ namespace TurtleTests
 			Assert.That(to.DataSource, Is.EqualTo("myserver"));
 			Assert.That(to.IntegratedSecurity, Is.EqualTo("SSPI"));
 			Assert.That(to.UserId, Is.EqualTo("Bert= Huijben"));
+		}
+
+		[Test]
+		public void MultipleItem()
+		{
+			MultiItem scl;
+
+			Assert.That(Tokenizer.TryParseConnectionString("File=.a;File=.b;File=.c", out scl), Is.True, "Can parse string");
+
+
+			Assert.That(scl.Files.Length, Is.EqualTo(3));
+			Assert.That(scl.Files[0], Is.EqualTo(".a"));
+			Assert.That(scl.Files[1], Is.EqualTo(".b"));
+			Assert.That(scl.Files[2], Is.EqualTo(".c"));
 		}
 	}
 }
