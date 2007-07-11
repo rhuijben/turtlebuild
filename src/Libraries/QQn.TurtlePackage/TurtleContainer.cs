@@ -6,6 +6,7 @@ using QQn.TurtleUtils.ItemSets;
 
 namespace QQn.TurtlePackage
 {
+#if Q
 	public class TurtleContainer : Container<TurtlePackage, TurtleContainer, TurtleItem>
 	{
 		readonly string _name;
@@ -60,4 +61,5 @@ namespace QQn.TurtlePackage
 
 		
 	}
+#endif
 }

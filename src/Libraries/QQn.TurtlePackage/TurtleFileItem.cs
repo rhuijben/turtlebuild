@@ -5,7 +5,8 @@ using QQn.TurtleUtils.ItemSets;
 
 namespace QQn.TurtlePackage
 {
-	public class TurtleItem : Item<TurtlePackage, TurtleContainer, TurtleItem>
+#if Q
+	public class PackFile : ItemSetItem<TurtlePackage, PackFileSet, PackFile>
 	{
 		readonly string _filename;
 		readonly string _fromFile;
@@ -33,4 +34,5 @@ namespace QQn.TurtlePackage
 			get { return _filename; }
 		}
 	}
+#endif
 }

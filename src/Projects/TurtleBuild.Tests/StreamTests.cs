@@ -6,51 +6,16 @@ using QQn.TurtlePackage;
 using System.IO;
 using System.Reflection;
 using System.Xml;
-using QQn.TurtlePackage.StreamFiles;
 using NUnit.Framework.SyntaxHelpers;
 using QQn.TurtleUtils.Streams;
+using System.Net;
+using System.Net.Cache;
 
 namespace TurtleTests
 {
 	[TestFixture]
 	public class StreamTests
 	{
-		[Test]
-		public void TestStreams()
-		{
-			string fileName = Path.GetTempFileName()+"q";
-			using (StreamFile sf = new StreamFile(fileName, 16))
-			{
-				for (int i = 0; i < 10; i++)
-				{
-					using (Stream s = sf.CreateNextStream())
-					{
-						using (StreamWriter sw = new StreamWriter(s))
-						{
-							sw.WriteLine("This is stream {0}", i);
-						}
-					}
-				}
-			}
-
-			using (StreamFile sf = StreamFile.Open(fileName))
-			{
-				for (int i = 0; i < 10; i++)
-				{
-					using (Stream s = sf.GetNextStream())
-					{
-						using (StreamReader sw = new StreamReader(s))
-						{
-							string line = sw.ReadLine();
-							string shouldBe = string.Format("This is stream {0}", i);
-
-							Assert.That(line, Is.EqualTo(shouldBe));
-						}
-					}
-				}
-			}
-		}
-
 		[Test]
 		public void TestMultiStreamWriter()
 		{
@@ -90,7 +55,7 @@ namespace TurtleTests
 		}
 
 
-		[Test]
+		/*[Test]
 		public void CreatePackage()
 		{
 			XmlDocument minimanifest = new XmlDocument();
@@ -111,6 +76,63 @@ namespace TurtleTests
 			//pkg.SetManifest(doc);
 
 		//	pkg.Commit();
+		}*/
+
+		[Test]
+		public void ReadStatic()
+		{
+			for (int i = 0; i < 2; i++)
+			{
+				WebRequest request = WebRequest.Create(new Uri("http://qqn.nl/~bert/upnp.zip"));
+				HttpWebRequest wr = request as HttpWebRequest;
+
+				if (wr != null)
+				{
+					wr.CachePolicy = new RequestCachePolicy(RequestCacheLevel.CacheIfAvailable);
+				}
+				using (WebResponse response = request.GetResponse())
+				{
+					using (Stream s = response.GetResponseStream())
+					{
+						if (i > 1)
+							Assert.That(s.CanSeek, Is.True, "Can seek on second request");
+						byte[] buffer = new byte[8192];
+
+						while (0 != s.Read(buffer, 0, buffer.Length))
+						{
+
+						}
+						s.ReadByte();
+					}
+				}
+			}
+		}
+
+		[Test]
+		public void ReadStaticFile()
+		{
+			HttpWebRequest.DefaultCachePolicy = new RequestCachePolicy(RequestCacheLevel.Revalidate);
+
+			WebRequest request = WebRequest.Create(new Uri("file:///f:/fout.swf"));
+			HttpWebRequest wr = request as HttpWebRequest;
+
+			if (wr != null)
+			{
+				wr.CachePolicy = new RequestCachePolicy(RequestCacheLevel.CacheIfAvailable);
+			}
+			using (WebResponse response = request.GetResponse())
+			{
+				using (Stream s = response.GetResponseStream())
+				{
+					byte[] buffer = new byte[8192];
+
+					while (0 != s.Read(buffer, 0, buffer.Length))
+					{
+						Assert.That(s.CanSeek, Is.True, "Can seek");
+					}
+					s.ReadByte();
+				}
+			}
 		}
 	}
 }

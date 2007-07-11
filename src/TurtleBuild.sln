@@ -8,8 +8,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QQn.TurtlePackage", "Libraries\QQn.TurtlePackage\QQn.TurtlePackage.csproj", "{D5E2380F-F59B-4C52-83A3-4CF08FFCC111}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurtleBuild.Tests", "Projects\TurtleBuild.Tests\TurtleBuild.Tests.csproj", "{CBEA4FC8-3263-41B2-BDEC-C72E3D53463F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{15BEEA8C-9ADB-40C7-AF5A-C1A0AD0CDD5F} = {15BEEA8C-9ADB-40C7-AF5A-C1A0AD0CDD5F}
+	EndProjectSection
 EndProject
 Global
+	GlobalSection(TextTemplating) = postSolution
+		TextTemplating = 1
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
