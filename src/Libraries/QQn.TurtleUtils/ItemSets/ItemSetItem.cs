@@ -10,9 +10,9 @@ namespace QQn.TurtleUtils.ItemSets
 	/// <summary>
 	/// 
 	/// </summary>
-	/// <typeparam name="TPackage"></typeparam>
-	/// <typeparam name="TContainer"></typeparam>
-	/// <typeparam name="TItem"></typeparam>
+	/// <typeparam name="TList">The type of the list.</typeparam>
+	/// <typeparam name="TLeaf">The type of the leaf.</typeparam>
+	/// <typeparam name="TRoot">The type of the root.</typeparam>
 	public abstract class ItemSetItem<TList, TLeaf, TRoot> : ItemSetBase<TLeaf, TRoot>, ILeafEnumerable<TLeaf>
 		where TRoot : ItemSetRoot<TRoot>
 		where TList : ItemSetList<TLeaf, TList, TLeaf, TRoot>, new()
