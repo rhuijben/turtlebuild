@@ -8,8 +8,16 @@ using System.Diagnostics;
 
 namespace QQn.TurtleUtils.ItemSets
 {
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <typeparam name="TLeaf">The type of the leaf.</typeparam>
 	public interface ILeafEnumerable<TLeaf>
 	{
+		/// <summary>
+		/// Gets all leaves.
+		/// </summary>
+		/// <value>All leaves.</value>
 		IEnumerable<TLeaf> AllLeaves { get; }
 	}
 	/// <summary>
@@ -324,6 +332,13 @@ namespace QQn.TurtleUtils.ItemSets
 			Add(value);
 		}*/
 
+		/// <summary>
+		/// Determines whether the list contains key.
+		/// </summary>
+		/// <param name="key">The key.</param>
+		/// <returns>
+		/// 	<c>true</c> if the specified key contains key; otherwise, <c>false</c>.
+		/// </returns>
 		public bool ContainsKey(string key)
 		{
 			return InnerSortedList.ContainsKey(key);
@@ -371,13 +386,17 @@ namespace QQn.TurtleUtils.ItemSets
 			return InnerSortedList.TryGetValue(key, out value);
 		}
 
+		/// <summary>
+		/// Gets the values.
+		/// </summary>
+		/// <value>The values.</value>
 		public ICollection<T> Values
 		{
 			get { return InnerList.AsReadOnly(); }
 		}
 
 		/// <summary>
-		/// Gets the <see cref="T"/> with the specified key.
+		/// Gets the item with the specified key.
 		/// </summary>
 		/// <value></value>
 		public T this[string key]
