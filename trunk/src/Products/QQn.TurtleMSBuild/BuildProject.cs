@@ -147,7 +147,6 @@ namespace QQn.TurtleMSBuild
 
 		internal string MakeRelativePath(string include)
 		{
-
 			Uri includeUri = new Uri(Path.GetFullPath(include).Replace(Path.DirectorySeparatorChar, '/'));
 			Uri projectUri = new Uri(ProjectFile.Replace(Path.DirectorySeparatorChar, '/'));
 			Uri relUri = projectUri.MakeRelativeUri(includeUri);

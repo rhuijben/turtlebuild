@@ -7,10 +7,16 @@ using System.IO;
 
 namespace QQn.TurtleMSBuild
 {
-	class ProjectItem
+	class ProjectItem : ITaskItem
 	{
-		readonly IDictionary _metaData;
+		readonly Dictionary<string, string> _metaData;
 		readonly BuildProject _project;
+
+		internal BuildProject Project
+		{
+			get { return _project; }
+		} 
+
 		readonly string _name;
 		readonly string _include;
 
@@ -25,7 +31,8 @@ namespace QQn.TurtleMSBuild
 
 			_project = project;
 			_name = itemName;
-			_metaData = taskItem.CloneCustomMetadata();
+			_metaData = new Dictionary<string, string>();
+			taskItem.CopyMetadataTo(this);
 			_include = taskItem.ItemSpec;
 		}
 
@@ -34,27 +41,88 @@ namespace QQn.TurtleMSBuild
 			get { return _name; }
 		}
 
+		/// <summary>
+		/// Gets the include.
+		/// </summary>
+		/// <value>The include.</value>
 		public string Include
 		{
 			get { return _include; }
 		}
 
-		public bool TryTransformMetaData(string metaDataName, out string value)
+		/// <summary>
+		/// Gets the full path.
+		/// </summary>
+		/// <value>The full path.</value>
+		public string FullPath
+		{
+			get { return Path.Combine(_project.ProjectPath, Include); }
+		}
+
+		/// <summary>
+		/// Gets the filename.
+		/// </summary>
+		/// <value>The filename.</value>
+		public string Filename
+		{
+			get { return Path.GetFileName(Include); }
+		}
+
+		/// <summary>
+		/// Gets the extension.
+		/// </summary>
+		/// <value>The extension.</value>
+		public string Extension
+		{
+			get { return Extension; }
+		}
+
+		public string QNames
+		{
+			get
+			{
+				StringBuilder sb = new StringBuilder();
+				foreach (string v in _metaData.Keys)
+				{
+					sb.Append(v);
+					sb.Append("!");
+				}
+				return sb.ToString();
+			}
+		}
+
+		public bool TryGetMetaData(string metaDataName, out string value)
+		{
+			if (TryTransformMetaData(metaDataName, out value))
+				return true;
+			else if(_metaData.TryGetValue(metaDataName, out value))
+				return true;
+
+			return false;
+		}
+
+		/// <summary>
+		/// Tries to get the generated metadata item.
+		/// </summary>
+		/// <param name="metaDataName">Name of the meta data.</param>
+		/// <param name="value">The value.</param>
+		/// <returns></returns>
+		bool TryTransformMetaData(string metaDataName, out string value)
 		{
 			int n;
 			switch (metaDataName)
 			{
 				case "FullPath":
-					value = Path.Combine(_project.ProjectPath, Include);
+					value = FullPath;
 					return true;
 				case "RootDir":
 					value = Path.GetPathRoot(Path.Combine(_project.ProjectPath, Include));
 					return true;
 				case "Filename":
-					value = Path.GetFileName(Include);
+					value = Filename;
 					return true;
 				case "Extension":
-					value = Path.GetExtension(Include);
+					value = Extension;
 					return true;
 				case "RelativeDir":
 					n = Include.LastIndexOfAny(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
@@ -94,25 +162,74 @@ namespace QQn.TurtleMSBuild
 
 			string result;
 
-			return _metaData.Contains(metaDataName) || TryTransformMetaData(metaDataName, out result);
+			return _metaData.ContainsKey(metaDataName) || TryTransformMetaData(metaDataName, out result);
 		}
 
 		public string GetMetadata(string metaDataName)
 		{
-			if (string.IsNullOrEmpty(metaDataName))
-				throw new ArgumentNullException("metaDataName");
+			string result;
 
-			string value;
-
-			if (TryTransformMetaData(metaDataName, out value))
-				return value;
-
-			value = (string)_metaData[metaDataName];
-
-			if (value == null)
+			if (!TryGetMetaData(metaDataName, out result))
 				throw new ArgumentOutOfRangeException("metaDataName", metaDataName, "Meta data not available");
 
-			return value;
+			return result;
 		}
+
+		#region ITaskItem Members
+
+		IDictionary ITaskItem.CloneCustomMetadata()
+		{
+			throw new NotImplementedException();
+		}
+
+		void ITaskItem.CopyMetadataTo(ITaskItem destinationItem)
+		{
+			throw new NotImplementedException();
+		}
+
+		string ITaskItem.GetMetadata(string metadataName)
+		{
+			string result;
+			if(TryTransformMetaData(metadataName, out result))
+				return result;
+
+			if(_metaData.TryGetValue(metadataName, out result))
+				return result;
+
+			return null;
+		}
+
+		string ITaskItem.ItemSpec
+		{
+			get { return _include; }
+			set
+			{
+				if (_include == value)
+					return;
+				throw new InvalidOperationException();
+			}
+		}
+
+		int ITaskItem.MetadataCount
+		{
+			get { return _metaData.Count; }
+		}
+
+		ICollection ITaskItem.MetadataNames
+		{
+			get { return _metaData.Keys; }
+		}
+
+		void ITaskItem.RemoveMetadata(string metadataName)
+		{
+			_metaData.Remove(metadataName);
+		}
+
+		void ITaskItem.SetMetadata(string metadataName, string metadataValue)
+		{
+			_metaData[metadataName] = metadataValue;
+		}
+
+		#endregion
 	}
 }
