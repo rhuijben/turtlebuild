@@ -42,7 +42,7 @@ namespace QQn.TurtleMSBuild
 			get { return _projectFile; }
 		}
 
-		public string TargetName
+		public string BuildTargetName
 		{
 			get { return _targetNames; }
 		}
@@ -109,6 +109,12 @@ namespace QQn.TurtleMSBuild
 		public string OutDir
 		{
 			get { return _outDir ?? (_outDir = GetProperty("OutDir")); }
+		}
+
+		string _targetName;
+		public string TargetName
+		{
+			get { return _targetName ?? (_targetName = GetProperty("TargetName")); }
 		}
 
 		string _intermediateOutputPath;

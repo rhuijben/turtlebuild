@@ -52,7 +52,7 @@ namespace QQn.TurtleMSBuild
 
 			bool isBuild = false;
 
-			foreach (string target in bp.TargetName.Split(';'))
+			foreach (string target in bp.BuildTargetName.Split(';'))
 			{
 				if (string.IsNullOrEmpty(target))
 					isBuild = true;
