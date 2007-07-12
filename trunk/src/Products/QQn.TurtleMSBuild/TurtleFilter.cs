@@ -88,6 +88,7 @@ namespace QQn.TurtleMSBuild
 			xw.WriteAttributeString("path", project.ProjectPath);
 			xw.WriteAttributeString("configuration", project.Configuration);
 			xw.WriteAttributeString("outputDir", project.OutDir);
+			xw.WriteAttributeString("targetName", project.TargetName);
 			string keyFile;
 			if (project.BuildProperties.TryGetValue("AssemblyOriginatorKeyFile", out keyFile))
 			{
