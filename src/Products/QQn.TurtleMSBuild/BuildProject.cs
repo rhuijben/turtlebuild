@@ -117,6 +117,12 @@ namespace QQn.TurtleMSBuild
 			get { return _targetName ?? (_targetName = GetProperty("TargetName")); }
 		}
 
+		string _targetExt;
+		public string TargetExt
+		{
+			get { return _targetExt ?? (_targetExt = GetProperty("TargetExt")); }
+		}
+
 		string _intermediateOutputPath;
 		public string IntermediateOutputPath
 		{
