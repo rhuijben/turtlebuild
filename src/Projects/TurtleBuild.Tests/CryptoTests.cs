@@ -72,5 +72,19 @@ namespace TurtleTests
 			SignAndVerify(HashType.SHA1 | HashType.PlusSize | HashType.PlusType);
 		}
 
+		[Test]
+		public void GuidTests()
+		{
+			Guid baseGuid = new Guid("0D166EB6-69BC-47DB-A243-C31ECE55E715");
+			string item = "http://qqn.qqn.nl/qqn//qqn.qqn";
+
+			Guid calcGuid = QQnCryptoHelpers.GuidFromHash(baseGuid, Encoding.UTF8.GetBytes(item));
+
+			Assert.That(calcGuid, Is.EqualTo(new Guid("014C3195-DE6C-5A19-9563-163716A49EC6")), "Calculated guids are equal");
+
+			calcGuid = QQnCryptoHelpers.GuidFromString(baseGuid, item);
+
+			Assert.That(calcGuid, Is.EqualTo(new Guid("014C3195-DE6C-5A19-9563-163716A49EC6")), "Calculated guids are equal");
+		}
 	}
 }

@@ -40,6 +40,7 @@
     <Compile Include="Cryptography\HashType.cs" />
     <Compile Include="Cryptography\StrongNameKey.cs" />
     <Compile Include="Streams\GZipSubStream.cs" />
+    <Compile Include="Streams\IVerifiableFile.cs" />
     <Compile Include="Streams\MultiStreamArgs.cs" />
     <Compile Include="Streams\MultiStreamCreateArgs.cs" />
     <Compile Include="Streams\MultiStreamItemHeader.cs" />
@@ -64,6 +65,7 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
+    <Compile Include="Streams\WebFormWriter.cs" />
     <Compile Include="Tokenizer\Definitions\IHasTokenizerDefiniton.cs" />
     <Compile Include="Tokenizer\FileExpandArgs.cs" />
     <Compile Include="Tokenizer\FileSystemInfoTypeConverters.cs" />

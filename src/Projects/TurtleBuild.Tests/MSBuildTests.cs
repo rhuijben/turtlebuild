@@ -6,6 +6,8 @@ using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using System.Diagnostics;
 using System.Reflection;
+using System.Xml.XPath;
+using System.Xml;
 
 namespace TurtleTests
 {
@@ -134,7 +136,15 @@ namespace TurtleTests
 				
 			}
 
-			Assert.That(File.Exists(Path.Combine(LoggerPath, "TurtleBuild.Tests.tbLog")), Is.True, "Logfile created");
+			Assert.That(File.Exists(Path.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog")), Is.True, "Logfile created");
+
+			XPathDocument doc = new XPathDocument(Path.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog"));
+
+			XPathNavigator nav = doc.CreateNavigator();
+			XmlNamespaceManager nsMgr = new XmlNamespaceManager(nav.NameTable);
+			nsMgr.AddNamespace("tb", "http://schemas.qqn.nl/2007/TurtleBuild/BuildResult");
+			Assert.That(nav.SelectSingleNode("//tb:Project", nsMgr).GetAttribute("outputDir", ""), Is.Not.EqualTo(""), "Outputdir is set");
+			//doc.CreateNavigator().SelectSingleNode("
 		}
 	}
 }
