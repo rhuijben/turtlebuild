@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 using System.Collections;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
 
 namespace QQn.TurtleUtils.ItemSets
 {
@@ -517,12 +518,12 @@ namespace QQn.TurtleUtils.ItemSets
 		/// <summary>
 		/// [Xml Serialization helper property]
 		/// </summary>
-		[XmlElement("item"), Browsable(false), DebuggerNonUserCode]
-		public List<T> Items
+		[XmlElement("item"), Browsable(false)]
+		public Collection<T> Items
 		{
 			get 
 			{ 
-				return new List<T>(InnerList);; 
+				return new Collection<T>(InnerList);
 			}
 			set
 			{

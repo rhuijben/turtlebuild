@@ -33,7 +33,7 @@ namespace QQn.TurtleMSBuild
 			_name = itemName;
 			_metaData = new Dictionary<string, string>();
 			taskItem.CopyMetadataTo(this);
-			_include = taskItem.ItemSpec;
+			_include = taskItem.ItemSpec.Replace("%20", "");
 		}
 
 		public string Name

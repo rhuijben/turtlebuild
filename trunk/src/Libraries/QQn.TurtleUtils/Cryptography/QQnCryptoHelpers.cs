@@ -4,6 +4,7 @@ using System.Text;
 using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
+using System.Net;
 
 namespace QQn.TurtleUtils.Cryptography
 {
@@ -211,6 +212,77 @@ namespace QQn.TurtleUtils.Cryptography
 				return false;
 
 			return string.Equals(CalculateStreamHash(stream, hashType), hashValue, StringComparison.InvariantCultureIgnoreCase);
+		}
+
+		/// <summary>
+		/// Generates a unique guid from the specified hash value with the algorithm specified by RFC 4122
+		/// </summary>
+		/// <param name="baseGuid">The base GUID.</param>
+		/// <param name="bytesToHash">The bytes to hash.</param>
+		/// <returns>The guid</returns>
+		public static Guid GuidFromHash(Guid baseGuid, byte[] bytesToHash)
+		{
+			if(bytesToHash == null)
+				throw new ArgumentNullException("bytesToHash");
+
+			// See RFC 4122 for C implementation examples
+
+			byte[] hash;
+			using (SHA1 sha1 = SHA1.Create())
+			{
+				sha1.TransformBlock(ToNetworkOrder(baseGuid.ToByteArray()), 0, 16, null, 0);
+				sha1.TransformFinalBlock(bytesToHash, 0, bytesToHash.Length);
+
+				hash = sha1.Hash;
+			}
+
+			hash = ToHostOrder(hash); // Treat as guid
+
+			Int32 timeLow = BitConverter.ToInt32(hash, 0);
+			Int16 timeMid = BitConverter.ToInt16(hash, 4);
+			Int16 timeHiAndVersion = BitConverter.ToInt16(hash, 6);
+			Byte clockSeqHi = hash[8];
+			Byte clockSeqLow = hash[9];
+
+			return new Guid(timeLow, timeMid, (short)((timeHiAndVersion & 0xFFF) | (5 << 12)), (byte)((clockSeqHi & 0x35) | 0x80), clockSeqLow, hash[10], hash[11], hash[12], hash[13], hash[14], hash[15]);
+		}
+
+		/// <summary>
+		/// Calculates a unique guid based on baseGuid and stringToHash
+		/// </summary>
+		/// <param name="baseGuid"></param>
+		/// <param name="stringToHash"></param>
+		/// <returns></returns>
+		/// <remarks>Uses the UTF-8 representation of stringToHash with <see cref="GuidFromHash"/></remarks>
+		public static Guid GuidFromString(Guid baseGuid, string stringToHash)
+		{
+			if (stringToHash == null)
+				throw new ArgumentNullException("bytesToHash");
+
+			return GuidFromHash(baseGuid, Encoding.UTF8.GetBytes(stringToHash));
+		}
+
+		private static byte[] ToHostOrder(byte[] a)
+		{
+			if (BitConverter.IsLittleEndian)
+			{
+				Array.Reverse(a, 0, 4);
+				Array.Reverse(a, 4, 2);
+				Array.Reverse(a, 6, 2);
+			}
+			return a;
+		}
+
+		private static byte[] ToNetworkOrder(byte[] a)
+		{
+			if (BitConverter.IsLittleEndian)
+			{
+				Array.Reverse(a, 0, 4);
+				Array.Reverse(a, 4, 2);
+				Array.Reverse(a, 6, 2);
+			}
+
+			return a;
 		}
 	}
 }

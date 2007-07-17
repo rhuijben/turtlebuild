@@ -27,5 +27,8 @@ namespace QQn.TurtleLogger
 
 		[Token("LocalItem")]
 		public string[] LocalItems;
+
+		[Token("ContentItem")]
+		public string[] ContentItems;
 	}
 }

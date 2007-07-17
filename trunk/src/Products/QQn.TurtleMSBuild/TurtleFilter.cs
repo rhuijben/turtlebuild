@@ -182,6 +182,8 @@ namespace QQn.TurtleMSBuild
 			SortedList<string, string> sharedItems = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
 			SortedList<string, string> localItems = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
 			SortedList<string, string> copyItems = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
+			SortedList<string, string> localCopyItems = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
+			SortedList<string, string> sources = new SortedList<string, string>(StringComparer.InvariantCulture);
 
 			SortedList<string, string> keys = new SortedList<string, string>();
 			SortedList<string, string> copyKeys = new SortedList<string, string>();
@@ -279,6 +281,7 @@ namespace QQn.TurtleMSBuild
 						if (!copyItems.ContainsKey(target))
 							copyItems.Add(target, include);
 						break;
+
 					default:
 						if (keys.ContainsKey(pi.Name))
 							switch (keys[pi.Name])
@@ -304,7 +307,10 @@ namespace QQn.TurtleMSBuild
 								{
 									case "Always":
 									case "PreserveNewest":
-										copyItems.Add(target, include);
+										if (!copyItems.ContainsKey(target))
+											copyItems.Add(target, include);
+										if (!localCopyItems.ContainsKey(target))
+											localCopyItems.Add(target, include);
 										break;
 								}
 							break;
@@ -318,41 +324,44 @@ namespace QQn.TurtleMSBuild
 			foreach (KeyValuePair<string, string> v in localItems)
 			{
 				if (!sharedItems.ContainsKey(v.Key))
-				{
-					xw.WriteStartElement("Item", Ns);
-					xw.WriteAttributeString("src", v.Key);
-					xw.WriteAttributeString("fromSrc", v.Value);
-
-					xw.WriteEndElement();
-				}
+					WriteProjectOutputItem(xw, "Item", v);
 			}
 
 			if ((xw.Settings != null) && xw.Settings.Indent)
 				xw.WriteComment("Copy Items");
 
-			foreach (KeyValuePair<string, string> v in copyItems)
+			foreach (KeyValuePair<string, string> v in localCopyItems)
 			{
 				if (!sharedItems.ContainsKey(v.Key) && !localItems.ContainsKey(v.Key))
-				{
-					xw.WriteStartElement("Copy", Ns);
-					xw.WriteAttributeString("src", v.Key);
-					xw.WriteAttributeString("fromSrc", v.Value);
-
-					xw.WriteEndElement();
-				}
-			}
+					WriteProjectOutputItem(xw, "Copy", v);
+			}			
 
 			if ((xw.Settings != null) && xw.Settings.Indent)
 				xw.WriteComment("Shared Items");
 
 			foreach (KeyValuePair<string, string> v in sharedItems)
 			{
-				xw.WriteStartElement("Shared", Ns);
-				xw.WriteAttributeString("src", v.Key);
-				xw.WriteAttributeString("fromSrc", v.Value);
-
-				xw.WriteEndElement();
+				WriteProjectOutputItem(xw, "Shared", v);
 			}
+
+			if ((xw.Settings != null) && xw.Settings.Indent)
+				xw.WriteComment("Shared Copy Items");
+
+			foreach (KeyValuePair<string, string> v in copyItems)
+			{
+				if (!sharedItems.ContainsKey(v.Key) && !localItems.ContainsKey(v.Key) && !localCopyItems.ContainsKey(v.Key))
+					WriteProjectOutputItem(xw, "SharedCopy", v);
+			}
+
+			xw.WriteEndElement();
+		}
+
+		static readonly string _dotDotUp = ".." + Path.DirectorySeparatorChar;
+		private static void WriteProjectOutputItem(XmlWriter xw, string itemName, KeyValuePair<string, string> v)
+		{
+			xw.WriteStartElement(itemName, Ns);
+			xw.WriteAttributeString("src", v.Key);
+			xw.WriteAttributeString("fromSrc", v.Value);
 
 			xw.WriteEndElement();
 		}
@@ -361,12 +370,13 @@ namespace QQn.TurtleMSBuild
 		{
 			SortedList<string, string> keys = new SortedList<string, string>();
 
-			string contentKeys = project.GetProperty("TurtleLogger_ContentItemNames") ?? "Content";
-
-			foreach (string n in contentKeys.Split(';'))
-				keys.Add(n, "Item");
+			foreach (string v in GetParameters(project, "ContentItems", project.Parameters.ContentItems, "Content"))
+			{
+				keys.Add(v, "Item");
+			}
 
 			SortedList<string, string> added = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
+
 			xw.WriteStartElement("Content");
 			foreach (ProjectItem i in project.BuildItems)
 			{
@@ -379,12 +389,6 @@ namespace QQn.TurtleMSBuild
 
 				if (added.ContainsKey(i.Include))
 					continue;
-
-				if (!File.Exists(Path.Combine(project.ProjectPath, i.Include)))
-				{
-					xw.WriteComment(name + ": " + i.Include);
-					continue;
-				}
 
 				added.Add(i.Include, name);
 
@@ -433,13 +437,7 @@ namespace QQn.TurtleMSBuild
 
 				string extensionAs;
 				if (!extensions.TryGetValue(extension, out extensionAs))
-					continue;
-
-				if (!File.Exists(Path.Combine(project.ProjectPath, i.Include)))
-				{
-					xw.WriteComment(name + ": " + i.Include);
-					continue;
-				}
+					continue;				
 
 				added.Add(i.Include, name);
 
