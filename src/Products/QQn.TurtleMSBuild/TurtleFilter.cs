@@ -299,24 +299,30 @@ namespace QQn.TurtleMSBuild
 				}
 
 				if (copyKeys.ContainsKey(pi.Name))
+				{
+					string copyTarget = Path.Combine(project.OutDir, include);
+
 					switch (copyKeys[pi.Name])
 					{
 						case "Copy":
-							if (pi.TryGetMetaData("CopyToOutputDirectory", out copyCondition) && !copyItems.ContainsKey(target))
+							if (pi.TryGetMetaData("CopyToOutputDirectory", out copyCondition))
 								switch (copyCondition)
 								{
 									case "Always":
 									case "PreserveNewest":
-										if (!copyItems.ContainsKey(target))
-											copyItems.Add(target, include);
-										if (!localCopyItems.ContainsKey(target))
-											localCopyItems.Add(target, include);
+										{
+											if (!copyItems.ContainsKey(copyTarget))
+												copyItems.Add(copyTarget, include);
+											if (!localCopyItems.ContainsKey(copyTarget))
+												localCopyItems.Add(copyTarget, include);
+										}
 										break;
 								}
 							break;
 						default:
 							break;
 					}
+				}
 			}
 
 			xw.WriteStartElement("ProjectOutput");
