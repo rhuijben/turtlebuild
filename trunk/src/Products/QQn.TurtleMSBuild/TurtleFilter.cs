@@ -177,6 +177,8 @@ namespace QQn.TurtleMSBuild
 			}
 		}
 
+		static readonly string _dotSlash = "." + Path.DirectorySeparatorChar;
+
 		private static void WriteProjectOutput(XmlWriter xw, BuildProject project)
 		{
 			SortedList<string, string> sharedItems = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
@@ -239,7 +241,7 @@ namespace QQn.TurtleMSBuild
 				else
 					target = Path.Combine(outDir, pi.Filename);
 
-				if (Path.IsPathRooted(include))
+				if (Path.IsPathRooted(include) || include.Contains(_dotSlash))
 					include = project.MakeRelativePath(include);
 
 				switch (pi.Name)
@@ -300,7 +302,11 @@ namespace QQn.TurtleMSBuild
 
 				if (copyKeys.ContainsKey(pi.Name))
 				{
-					string copyTarget = Path.Combine(project.OutDir, include);
+					string copyTarget;
+					if (!Path.IsPathRooted(include) && !include.StartsWith(".." + Path.DirectorySeparatorChar))
+						copyTarget = Path.Combine(project.OutDir, include);
+					else
+						copyTarget = Path.Combine(project.OutDir, Path.GetFileName(include));
 
 					switch (copyKeys[pi.Name])
 					{
