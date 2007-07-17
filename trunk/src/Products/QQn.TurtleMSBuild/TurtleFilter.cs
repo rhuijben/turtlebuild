@@ -321,6 +321,9 @@ namespace QQn.TurtleMSBuild
 
 			xw.WriteStartElement("ProjectOutput");
 
+			if ((xw.Settings != null) && xw.Settings.Indent)
+				xw.WriteComment("Project Items");
+
 			foreach (KeyValuePair<string, string> v in localItems)
 			{
 				if (!sharedItems.ContainsKey(v.Key))
@@ -328,7 +331,7 @@ namespace QQn.TurtleMSBuild
 			}
 
 			if ((xw.Settings != null) && xw.Settings.Indent)
-				xw.WriteComment("Copy Items");
+				xw.WriteComment("Project Copy Items");
 
 			foreach (KeyValuePair<string, string> v in localCopyItems)
 			{
