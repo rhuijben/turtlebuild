@@ -100,7 +100,7 @@ namespace QQn.TurtleMSBuild
 			string buildManifest;
 			if (project.BuildProperties.TryGetValue("BuildManifest", out buildManifest))
 			{
-				if(!File.Exists(buildManifest))
+				if (!File.Exists(buildManifest))
 					throw new FileNotFoundException("BuildManifest specified in the BuildManifestProperty not found", buildManifest);
 
 				XmlDocument doc = new XmlDocument();
@@ -161,7 +161,7 @@ namespace QQn.TurtleMSBuild
 			if (!project.BuildProperties.TryGetValue("TurtleMSBuild_" + name, out propertyValue))
 				propertyValue = alternateValue;
 
-			if(propertyValue != null)
+			if (propertyValue != null)
 			{
 				foreach (string i in propertyValue.Split(';'))
 				{
@@ -177,51 +177,99 @@ namespace QQn.TurtleMSBuild
 			}
 		}
 
+		enum TargetType
+		{
+			None,
+			Item,
+			Copy,
+			Shared,
+			SharedCopy
+		}
+
+		sealed class TargetItem
+		{
+			readonly string _target;
+			readonly string _include;
+			readonly ProjectItem _projectItem;
+			TargetType _targetType;
+
+			public TargetItem(string targetPath, string include, TargetType targetType)
+				: this(targetPath, include, targetType, null)
+			{
+			}
+			public TargetItem(string targetPath, string include, TargetType targetType, ProjectItem projectItem)
+			{
+				_target = targetPath;
+				_include = include;
+				_targetType = targetType;
+				_projectItem = projectItem;
+			}
+
+			public ProjectItem Item
+			{
+				get { return _projectItem; }
+			}
+
+			public string Include
+			{
+				get { return _include; }
+			}
+
+			public string Target
+			{
+				get { return _target; }
+			}
+
+			public TargetType Type
+			{
+				get { return _targetType; }
+				set { _targetType = value; }
+			}
+		}
+
 		static readonly string _dotSlash = "." + Path.DirectorySeparatorChar;
 
 		private static void WriteProjectOutput(XmlWriter xw, BuildProject project)
 		{
-			SortedList<string, string> sharedItems = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
-			SortedList<string, string> localItems = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
-			SortedList<string, string> copyItems = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
-			SortedList<string, string> localCopyItems = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
-			SortedList<string, string> sources = new SortedList<string, string>(StringComparer.InvariantCulture);
+			SortedList<string, TargetItem> items = new SortedList<string, TargetItem>(StringComparer.InvariantCultureIgnoreCase);
+			SortedList<string, bool> localCopyItems = new SortedList<string, bool>(StringComparer.InvariantCultureIgnoreCase);
 
-			SortedList<string, string> keys = new SortedList<string, string>();
-			SortedList<string, string> copyKeys = new SortedList<string, string>();
+			SortedList<string, TargetType> keys = new SortedList<string, TargetType>();
+			SortedList<string, bool> copyKeys = new SortedList<string, bool>();
 
 			foreach (string v in GetParameters(project, "SharedItems", project.Parameters.SharedItems, ""))
 			{
 				if (!keys.ContainsKey(v))
-					keys.Add(v, "Shared");
+					keys.Add(v, TargetType.Shared);
 			}
 
 			foreach (string v in GetParameters(project, "LocalItems", project.Parameters.LocalItems, ""))
 			{
 				if (!keys.ContainsKey(v))
-					keys.Add(v, "Item");
+					keys.Add(v, TargetType.Item);
 			}
 
 			foreach (string v in GetParameters(project, "CopyItems", project.Parameters.LocalItems, "None;Compile;Content;EmbeddedResource"))
 			{
 				if (!copyKeys.ContainsKey(v))
-					copyKeys.Add(v, "Copy");
+					copyKeys.Add(v, true);
 			}
 
-			string outDir = project.OutDir.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
-			string outPath = Path.Combine(project.ProjectPath, outDir);
-			string outPathS = Path.Combine(project.ProjectPath, outDir).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+			string target = Path.Combine(project.OutDir, project.TargetName + project.TargetExt);
+			items.Add(target, new TargetItem(target, Path.Combine(project.IntermediateOutputPath, project.TargetName + project.TargetExt), TargetType.Item));
 
 			if (project.BuildProperties.ContainsKey("_SGenDllCreated") && project.GetProperty("_SGenDllCreated") == "true" && project.BuildProperties.ContainsKey("_SGenDllName"))
 			{
 				string dllName = project.GetProperty("_SGenDllName");
-				localItems[Path.Combine(project.OutDir, dllName)] = Path.Combine(project.IntermediateOutputPath, dllName);
+				target = Path.Combine(project.OutDir, dllName);
+				items.Add(target, new TargetItem(target, Path.Combine(project.IntermediateOutputPath, dllName), TargetType.Item));
 			}
 
 			if (project.BuildProperties.ContainsKey("_DebugSymbolsProduced") && project.GetProperty("_DebugSymbolsProduced") == "true")
 			{
 				string pdbName = project.GetProperty("TargetName") + ".pdb";
-				localItems[Path.Combine(project.OutDir, pdbName)] = Path.Combine(project.IntermediateOutputPath, pdbName);
+				target = Path.Combine(project.OutDir, pdbName);
+				items.Add(target, new TargetItem(target, Path.Combine(project.IntermediateOutputPath, pdbName), TargetType.Item));
 			}
 
 			foreach (ProjectItem pi in project.BuildItems)
@@ -230,153 +278,145 @@ namespace QQn.TurtleMSBuild
 					continue;
 
 				string include = pi.Include;
-				string target;
+				
 				string destinationSubDirectory;
 				string copyCondition;
 
 				if (pi.TryGetMetaData("TargetPath", out target))
-					target = Path.Combine(outDir, target);
+					target = Path.Combine(project.OutDir, target);
 				else if (pi.TryGetMetaData("DestinationSubDirectory", out destinationSubDirectory))
-					target = Path.Combine(Path.Combine(outDir, destinationSubDirectory), pi.Filename);
+					target = Path.Combine(Path.Combine(project.OutDir, destinationSubDirectory), pi.Filename);
 				else
-					target = Path.Combine(outDir, pi.Filename);
+					target = Path.Combine(project.OutDir, pi.Filename);
 
 				if (Path.IsPathRooted(include) || include.Contains(_dotSlash))
 					include = project.MakeRelativePath(include);
 
-				switch (pi.Name)
+				if (Path.IsPathRooted(target) || target.Contains(_dotSlash))
+					target = project.MakeRelativePath(include);
+
+				if (!items.ContainsKey(target))
 				{
-					case "IntermediateAssembly":
-						localItems[target] = include;
-						break;
-					case "AddModules":
-					case "DocFileItem":
-					case "IntermediateSatelliteAssembliesWithTargetPath":
-						// Default Microsoft items
-						if (!localItems.ContainsKey(target))
-							localItems.Add(target, include);
-						break;
-					case "ContentWithTargetPath":
-					case "AllItemsFullPathWithTargetPath":
-						if (!copyItems.ContainsKey(target))
-						{
-							string condition;
+					string condition;
+					TargetType type = TargetType.None;
+					switch (pi.Name)
+					{
+							// TODO: Rewrite to a per-language infrastructure
+						case "IntermediateAssembly":
+						case "AddModules":
+						case "DocFileItem":
+						case "IntermediateSatelliteAssembliesWithTargetPath":
+							type = TargetType.Item;
+							break;
+						case "ContentWithTargetPath":
+						case "AllItemsFullPathWithTargetPath":
+						case "ReferenceCopyLocal":
 							if (pi.TryGetMetaData("CopyToOutputDirectory", out condition))
+							{
 								switch (condition)
 								{
 									case "Always":
 									case "PreserveNewest":
-										copyItems.Add(target, include);
+										type = TargetType.SharedCopy;
+										break;
+									default:
 										break;
 								}
-						}
-						break;
-					case "ReferenceComWrappersToCopyLocal":
-					case "ResolvedIsolatedComModules":
-					case "_DeploymentLooseManifestFile":
-					case "ReferenceCopyLocalPaths":
-					case "NativeReferenceFile":
-						if (!sharedItems.ContainsKey(target))
-							sharedItems.Add(target, include);
-						break;
-					case "ReferenceCopyLocal":
-						if (!copyItems.ContainsKey(target))
-							copyItems.Add(target, include);
-						break;
-
-					default:
-						if (keys.ContainsKey(pi.Name))
-							switch (keys[pi.Name])
-							{
-								case "Shared":
-									if (!sharedItems.ContainsKey(target))
-										sharedItems.Add(target, pi.Include);
-									break;
-								case "Item":
-									if (!localItems.ContainsKey(target))
-										localItems.Add(target, pi.Include);
-									break;
 							}
-						break;
+							if (type == TargetType.None)
+								goto default;
+							break;
+						case "ReferenceComWrappersToCopyLocal":
+						case "ResolvedIsolatedComModules":
+						case "_DeploymentLooseManifestFile":
+						case "ReferenceCopyLocalPaths":
+						case "NativeReferenceFile":
+							type = TargetType.Shared;
+							break;
+						default:
+							if (!keys.TryGetValue(pi.Name, out type))
+								type = TargetType.None;
+							break;
+					}
+
+					if (type != TargetType.None)
+						items.Add(target, new TargetItem(target, include, type, pi));
 				}
 
 				if (copyKeys.ContainsKey(pi.Name))
 				{
-					string copyTarget;
-					if (!Path.IsPathRooted(include) && !include.StartsWith(".." + Path.DirectorySeparatorChar))
-						copyTarget = Path.Combine(project.OutDir, include);
-					else
-						copyTarget = Path.Combine(project.OutDir, Path.GetFileName(include));
-
-					switch (copyKeys[pi.Name])
-					{
-						case "Copy":
-							if (pi.TryGetMetaData("CopyToOutputDirectory", out copyCondition))
-								switch (copyCondition)
+					if (pi.TryGetMetaData("CopyToOutputDirectory", out copyCondition))
+						switch (copyCondition)
+						{
+							case "Always":
+							case "PreserveNewest":
 								{
-									case "Always":
-									case "PreserveNewest":
-										{
-											if (!copyItems.ContainsKey(copyTarget))
-												copyItems.Add(copyTarget, include);
-											if (!localCopyItems.ContainsKey(copyTarget))
-												localCopyItems.Add(copyTarget, include);
-										}
-										break;
+									localCopyItems[include] = true;
 								}
-							break;
-						default:
-							break;
-					}
+								break;
+						}
+
+				}
+			}
+
+			foreach (TargetItem ti in items.Values)
+			{
+				if (ti.Type == TargetType.SharedCopy)
+				{
+					if (localCopyItems.ContainsKey(ti.Include))
+						ti.Type = TargetType.Copy;
 				}
 			}
 
 			xw.WriteStartElement("ProjectOutput");
 
-			if ((xw.Settings != null) && xw.Settings.Indent)
+			bool writeComments = (xw.Settings != null) && xw.Settings.Indent;
+			if (writeComments)
 				xw.WriteComment("Project Items");
 
-			foreach (KeyValuePair<string, string> v in localItems)
+			foreach (TargetItem ti in items.Values)
 			{
-				if (!sharedItems.ContainsKey(v.Key))
-					WriteProjectOutputItem(xw, "Item", v);
+				if (ti.Type == TargetType.Item)
+					WriteProjectOutputItem(xw, ti);
 			}
 
-			if ((xw.Settings != null) && xw.Settings.Indent)
+			if (writeComments)
 				xw.WriteComment("Project Copy Items");
 
-			foreach (KeyValuePair<string, string> v in localCopyItems)
+			foreach (TargetItem ti in items.Values)
 			{
-				if (!sharedItems.ContainsKey(v.Key) && !localItems.ContainsKey(v.Key))
-					WriteProjectOutputItem(xw, "Copy", v);
-			}			
-
-			if ((xw.Settings != null) && xw.Settings.Indent)
-				xw.WriteComment("Shared Items");
-
-			foreach (KeyValuePair<string, string> v in sharedItems)
-			{
-				WriteProjectOutputItem(xw, "Shared", v);
+				if (ti.Type == TargetType.Copy)
+				{
+					WriteProjectOutputItem(xw, ti);
+				}
 			}
 
-			if ((xw.Settings != null) && xw.Settings.Indent)
+			if (writeComments)
+				xw.WriteComment("Shared Items");
+
+			foreach (TargetItem ti in items.Values)
+			{
+				if (ti.Type == TargetType.Shared)
+					WriteProjectOutputItem(xw, ti);
+			}
+
+			if (writeComments)
 				xw.WriteComment("Shared Copy Items");
 
-			foreach (KeyValuePair<string, string> v in copyItems)
+			foreach (TargetItem ti in items.Values)
 			{
-				if (!sharedItems.ContainsKey(v.Key) && !localItems.ContainsKey(v.Key) && !localCopyItems.ContainsKey(v.Key))
-					WriteProjectOutputItem(xw, "SharedCopy", v);
+				if (ti.Type == TargetType.SharedCopy)
+					WriteProjectOutputItem(xw, ti);
 			}
 
 			xw.WriteEndElement();
 		}
 
-		static readonly string _dotDotUp = ".." + Path.DirectorySeparatorChar;
-		private static void WriteProjectOutputItem(XmlWriter xw, string itemName, KeyValuePair<string, string> v)
+		private static void WriteProjectOutputItem(XmlWriter xw, TargetItem ti)
 		{
-			xw.WriteStartElement(itemName, Ns);
-			xw.WriteAttributeString("src", v.Key);
-			xw.WriteAttributeString("fromSrc", v.Value);
+			xw.WriteStartElement(ti.Type.ToString(), Ns);
+			xw.WriteAttributeString("src", ti.Target);
+			xw.WriteAttributeString("fromSrc", ti.Include);
 
 			xw.WriteEndElement();
 		}
@@ -423,7 +463,7 @@ namespace QQn.TurtleMSBuild
 
 			foreach (string v in GetParameters(project, "ScriptItems", project.Parameters.ScriptItems, "Content;Compile;EmbeddedResource;None"))
 			{
-				if(!items.ContainsKey(v))
+				if (!items.ContainsKey(v))
 					items.Add(v, "Item");
 			}
 
@@ -434,10 +474,10 @@ namespace QQn.TurtleMSBuild
 				if (!ext.StartsWith("."))
 					ext = '.' + ext;
 
-				if(!extensions.ContainsKey(ext))
+				if (!extensions.ContainsKey(ext))
 					extensions.Add(ext, "Item");
 			}
-			
+
 			xw.WriteStartElement("Scripts");
 			foreach (ProjectItem i in project.BuildItems)
 			{
@@ -452,7 +492,7 @@ namespace QQn.TurtleMSBuild
 
 				string extensionAs;
 				if (!extensions.TryGetValue(extension, out extensionAs))
-					continue;				
+					continue;
 
 				added.Add(i.Include, name);
 
