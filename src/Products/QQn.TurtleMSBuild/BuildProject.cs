@@ -108,7 +108,18 @@ namespace QQn.TurtleMSBuild
 		string _outDir;
 		public string OutDir
 		{
-			get { return _outDir ?? (_outDir = GetProperty("OutDir")); }
+			get 
+			{
+				if (_outDir == null)
+				{
+					string outDir = GetProperty("OutDir");
+
+					if (outDir != null)
+						_outDir = outDir.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+				}
+
+				return _outDir; 
+			}
 		}
 
 		string _targetName;
