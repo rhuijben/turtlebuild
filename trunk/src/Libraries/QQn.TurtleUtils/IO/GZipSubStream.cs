@@ -4,7 +4,7 @@ using System.Text;
 using System.IO.Compression;
 using System.IO;
 
-namespace QQn.TurtleUtils.Streams
+namespace QQn.TurtleUtils.IO
 {
 	/// <summary>
 	/// GZip stream wrapper with <see cref="IServiceProvider"/> implementation to find parent streams

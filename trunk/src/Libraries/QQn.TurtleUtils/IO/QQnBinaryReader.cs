@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace QQn.TurtleUtils.Streams
+namespace QQn.TurtleUtils.IO
 {
 	class QQnBinaryReader : BinaryReader
 	{
@@ -22,5 +22,7 @@ namespace QQn.TurtleUtils.Streams
 			int length = ReadSmartInt();
 			return ReadBytes(length);
 		}
+
+
 	}
 }

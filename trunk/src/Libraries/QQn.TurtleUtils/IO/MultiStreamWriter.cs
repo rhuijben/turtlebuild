@@ -4,7 +4,7 @@ using System.Text;
 using System.IO;
 using System.IO.Compression;
 
-namespace QQn.TurtleUtils.Streams
+namespace QQn.TurtleUtils.IO
 {
 	/// <summary>
 	/// Allows writing multiple substreams to one parent stream. The individual substream can be read with a <see cref="MultiStreamReader"/>

@@ -39,23 +39,23 @@
   <ItemGroup>
     <Compile Include="Cryptography\HashType.cs" />
     <Compile Include="Cryptography\StrongNameKey.cs" />
-    <Compile Include="Streams\GZipSubStream.cs" />
-    <Compile Include="Streams\IVerifiableFile.cs" />
-    <Compile Include="Streams\MultiStreamArgs.cs" />
-    <Compile Include="Streams\MultiStreamCreateArgs.cs" />
-    <Compile Include="Streams\MultiStreamItemHeader.cs" />
-    <Compile Include="Streams\MultiStreamReader.cs" />
-    <Compile Include="Streams\MultiStreamWriter.cs" />
-    <Compile Include="Streams\MultiSubStreamWriter.cs" />
-    <Compile Include="Streams\MultiSubStreamReader.cs" />
-    <Compile Include="Streams\QQnBinaryReader.cs" />
-    <Compile Include="Streams\QQnBinaryWriter.cs" />
+    <Compile Include="IO\GZipSubStream.cs" />
+    <Compile Include="IO\VerifyUtils.cs" />
+    <Compile Include="IO\MultiStreamArgs.cs" />
+    <Compile Include="IO\MultiStreamCreateArgs.cs" />
+    <Compile Include="IO\MultiStreamItemHeader.cs" />
+    <Compile Include="IO\MultiStreamReader.cs" />
+    <Compile Include="IO\MultiStreamWriter.cs" />
+    <Compile Include="IO\MultiSubStreamWriter.cs" />
+    <Compile Include="IO\MultiSubStreamReader.cs" />
+    <Compile Include="IO\QQnBinaryReader.cs" />
+    <Compile Include="IO\QQnBinaryWriter.cs" />
     <Compile Include="Cryptography\QQnCryptoHelpers.cs" />
-    <Compile Include="Streams\AssuredStream.cs" />
-    <Compile Include="Streams\AssuredStreamCreateArgs.cs" />
-    <Compile Include="Streams\AssuredStreamHeader.cs" />
-    <Compile Include="Streams\AssuredSubStream.cs" />
-    <Compile Include="Streams\StreamProxy.cs" />
+    <Compile Include="IO\AssuredStream.cs" />
+    <Compile Include="IO\AssuredStreamCreateArgs.cs" />
+    <Compile Include="IO\AssuredStreamHeader.cs" />
+    <Compile Include="IO\AssuredSubStream.cs" />
+    <Compile Include="IO\StreamProxy.cs" />
     <Compile Include="ItemSets\ItemSetRoot.cs" />
     <Compile Include="ItemSets\ItemSetBase.cs" />
     <Compile Include="ItemSets\ItemSetItem.cs" />
@@ -65,7 +65,7 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Streams\WebFormWriter.cs" />
+    <Compile Include="IO\WebFormWriter.cs" />
     <Compile Include="Tokenizer\Definitions\IHasTokenizerDefiniton.cs" />
     <Compile Include="Tokenizer\FileExpandArgs.cs" />
     <Compile Include="Tokenizer\FileSystemInfoTypeConverters.cs" />

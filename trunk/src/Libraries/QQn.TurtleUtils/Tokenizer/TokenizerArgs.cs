@@ -12,7 +12,6 @@ namespace QQn.TurtleUtils.Tokenizer
 		static readonly char[] _defaultCommandLineChars = new char[] { '-', '/' };
 
 		IList<char> _commandLineChars;
-		bool _cacheDefinition;
 		bool _caseSensitive;
 		bool _noDirectArgs;
 		string _errorMessage;
@@ -20,6 +19,7 @@ namespace QQn.TurtleUtils.Tokenizer
 		bool _noPlusMinArguments;
 		bool _namedBetweenPlaced;
 		bool _allowResponseFile;
+		bool _skipUnknownNamedItems;
 		char _directValueSeparator;
 
 		/// <summary>
@@ -28,16 +28,6 @@ namespace QQn.TurtleUtils.Tokenizer
 		public TokenizerArgs()
 		{
 			_directValueSeparator = '=';
-		}
-
-		/// <summary>
-		/// Gets or sets a value indicating whether the definition should be cached for future usage
-		/// </summary>
-		/// <value><c>true</c> if [cache definition]; otherwise, <c>false</c>.</value>
-		public bool CacheDefinition
-		{
-			get { return _cacheDefinition; }
-			set { _cacheDefinition = value; }
 		}
 
 		/// <summary>
@@ -140,6 +130,18 @@ namespace QQn.TurtleUtils.Tokenizer
 		{
 			get { return _directValueSeparator; }
 			set { _directValueSeparator = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether to skip unknown named items (Valid on xml and Connection strings)
+		/// </summary>
+		/// <value>
+		/// 	<c>true</c> if [skip unknown named items]; otherwise, <c>false</c>.
+		/// </value>
+		public bool SkipUnknownNamedItems
+		{
+			get { return _skipUnknownNamedItems; }
+			set { _skipUnknownNamedItems = value; }
 		}
 	}
 }

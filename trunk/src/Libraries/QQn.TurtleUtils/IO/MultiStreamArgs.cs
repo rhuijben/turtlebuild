@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QQn.TurtleUtils.Streams
+namespace QQn.TurtleUtils.IO
 {
 	/// <summary>
 	/// Create argument of a substream within a MultiStream

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace QQn.TurtleUtils.Streams
+namespace QQn.TurtleUtils.IO
 {
 	/// <summary>
 	/// Allows reading multiple substreams from one parent stream. Reads back the streams created with a <see cref="MultiStreamWriter"/>

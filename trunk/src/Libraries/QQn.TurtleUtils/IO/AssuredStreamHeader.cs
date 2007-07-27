@@ -5,7 +5,7 @@ using System.IO;
 using System.Security.Cryptography;
 using QQn.TurtleUtils.Cryptography;
 
-namespace QQn.TurtleUtils.Streams
+namespace QQn.TurtleUtils.IO
 {
 	class AssuredStreamHeader
 	{

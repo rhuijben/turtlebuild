@@ -9,6 +9,9 @@ using System.Reflection;
 using System.Xml.XPath;
 using System.Xml;
 
+using Microsoft.Build.BuildEngine;
+using QQn.TurtleMSBuild;
+
 namespace TurtleTests
 {
 	[TestFixture]
@@ -116,7 +119,7 @@ namespace TurtleTests
 		}
 
 		[Test]
-		public void BuildOne()
+		public void BuildExternal()
 		{
 			ProcessStartInfo psi = new ProcessStartInfo(MSBuild, string.Format("/nologo \"{0}\" /v:q /p:Configuration={1} \"/logger:MSBuildLogger,{2};OutputDir={3};Indent=true\"", Solution, OtherConfiguration, Logger, LoggerPath));
 			psi.UseShellExecute = false;
@@ -145,6 +148,20 @@ namespace TurtleTests
 			nsMgr.AddNamespace("tb", "http://schemas.qqn.nl/2007/TurtleBuild/BuildResult");
 			Assert.That(nav.SelectSingleNode("//tb:Project", nsMgr).GetAttribute("outputDir", ""), Is.Not.EqualTo(""), "Outputdir is set");
 			//doc.CreateNavigator().SelectSingleNode("
+		}
+
+		[Test]
+		public void BuildInternal()
+		{
+			Engine engine = new Engine(Path.GetDirectoryName(new Uri(typeof(int).Assembly.CodeBase).LocalPath));
+			MSBuildLogger logger = new MSBuildLogger();
+			engine.GlobalProperties.SetProperty("Configuration", OtherConfiguration);
+			logger.Parameters = string.Format("OutputDir={0};Indent=true", LoggerPath);
+			engine.RegisterLogger(logger);
+
+			Project p = new Project(engine);
+			p.Load(Solution);
+			Assert.That(p.Build(), Is.True, "Build succeeded");
 		}
 	}
 }

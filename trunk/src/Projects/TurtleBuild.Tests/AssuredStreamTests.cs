@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using QQn.TurtleUtils.Streams;
 using NUnit.Framework.SyntaxHelpers;
 using System.IO;
+
+using QQn.TurtleUtils.IO;
 using QQn.TurtleUtils.Cryptography;
 
 namespace TurtleTests
