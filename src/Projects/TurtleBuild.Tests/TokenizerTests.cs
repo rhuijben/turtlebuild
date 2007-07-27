@@ -5,6 +5,7 @@ using QQn.TurtleUtils.Tokenizer;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using System.IO;
+using System.Xml;
 
 namespace TurtleTests
 {
@@ -39,6 +40,9 @@ namespace TurtleTests
 		{
 			[Token("File")]
 			public string[] Files;
+
+			[Token("?", "h", "help")]
+			public bool ShowHelp;
 		}
 
 		[Test]
@@ -126,6 +130,23 @@ namespace TurtleTests
 			Assert.That(scl.Files[0], Is.EqualTo(".a"));
 			Assert.That(scl.Files[1], Is.EqualTo(".b"));
 			Assert.That(scl.Files[2], Is.EqualTo(".c"));
+		}
+
+		[Test]
+		public void XmlTest()
+		{
+			MultiItem scl;
+
+			XmlDocument doc = new XmlDocument();
+
+			doc.LoadXml("<q File='banaan' h='true' />");
+
+			Assert.That(Tokenizer.TryParseXmlAttributes(doc.DocumentElement, out scl), Is.True, "Can parse xml");
+
+
+			Assert.That(scl.Files.Length, Is.EqualTo(1));
+			Assert.That(scl.Files[0], Is.EqualTo("banaan"));
+			Assert.That(scl.ShowHelp, Is.True);
 		}
 	}
 }

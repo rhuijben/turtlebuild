@@ -34,273 +34,25 @@ namespace QQn.TurtleUtils.ItemSets
 		where TList : ItemSetList<T, TList, TLeaf, TRoot>, new()
 		where TLeaf : NamedItemSetBase<TRoot>
 	{
-		readonly SortedList<string, T> _sortedList = new SortedList<string, T>();
-		readonly List<T> _innerList = new List<T>();
+		ItemSetCollection _innerList;
+
 
 		/// <summary>
-		/// Gets the inner list.
+		/// Adds an item with the specified name
 		/// </summary>
-		/// <value>The inner list.</value>
-		protected List<T> InnerList
-		{
-			get { return _innerList; }
-		}
-
-		/// <summary>
-		/// Gets the inner list.
-		/// </summary>
-		/// <value>The inner list.</value>
-		protected SortedList<string, T> InnerSortedList 
-		{
-			get { return _sortedList; }
-		}
-
-		#region IList<T> Members
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="item"></param>
+		/// <param name="name">The name.</param>
 		/// <returns></returns>
-		public int IndexOf(T item)
+		public T AddItem(string name)
 		{
-			return InnerList.IndexOf(item);
-		}
+			if (Items.Contains(name))
+				throw new ArgumentOutOfRangeException("name", name, "Name already exists in itemset");
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="index"></param>
-		/// <param name="item"></param>
-		public void Insert(int index, T item)
-		{
-			if (IsReadOnly)
-				throw new InvalidOperationException(ItemSetStrings.ReadOnly);
-			else if (item.Package != null)
-				throw new InvalidOperationException();
+			T t = new T();
+			t.Name = name;
 
-			using (new Inserter(this, item))
-			{
-				InnerSortedList.Add(item.Name, item);
-				InnerList.Insert(index, item);				
-			}
-		}
+			Items.Add(t);
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="index"></param>
-		public void RemoveAt(int index)
-		{
-			EnsureWritable();
-
-			T item = this[index];
-			InnerList.RemoveAt(index);
-			InnerSortedList.Remove(item.Name);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="index"></param>
-		/// <returns></returns>
-		public T this[int index]
-		{
-			get { return InnerList[index]; }			
-		}
-
-		/*T IList<T>.this[int index]
-		{
-			get { return this[index]; }
-			set { throw new InvalidOperationException(); }
-		}*/
-
-		#endregion
-
-		#region ICollection<T> Members
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="item"></param>
-		public void Add(T item)
-		{
-			if (IsReadOnly)
-				throw new InvalidOperationException(ItemSetStrings.ReadOnly);
-			else if (item == null)
-				throw new ArgumentNullException("item");
-			else if (item.Package != null)
-				throw new InvalidOperationException();
-
-			using (new Inserter(this, item))
-			{
-				InnerList.Add(item);
-			}
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public void Clear()
-		{
-			if (IsReadOnly)
-				throw new InvalidOperationException(ItemSetStrings.ReadOnly);
-
-			InnerList.Clear();
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="item"></param>
-		/// <returns></returns>
-		public bool Contains(T item)
-		{
-			return InnerList.Contains(item);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="array"></param>
-		/// <param name="arrayIndex"></param>
-		public void CopyTo(T[] array, int arrayIndex)
-		{
-			InnerList.CopyTo(array, arrayIndex);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		[XmlIgnore]
-		public int Count
-		{
-			get { return InnerList.Count; }
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="item"></param>
-		/// <returns></returns>
-		public bool Remove(T item)
-		{
-			if (IsReadOnly)
-				throw new InvalidOperationException(ItemSetStrings.ReadOnly);
-
-			return InnerList.Remove(item);
-		}
-
-		#endregion
-
-		#region IEnumerable<T> Members
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <returns></returns>
-		public IEnumerator<T> GetEnumerator()
-		{
-			return InnerList.GetEnumerator();
-		}
-
-		#endregion
-
-		#region IEnumerable Members
-
-		/*System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}*/
-
-		#endregion
-
-		#region IList Members
-
-		/*int System.Collections.IList.Add(object value)
-		{
-			T tValue = (T)value;
-
-			Add(tValue);
-			return IndexOf(tValue);
-		}
-
-		bool System.Collections.IList.Contains(object value)
-		{
-			return Contains((T)value);
-		}
-
-		int System.Collections.IList.IndexOf(object value)
-		{
-			return IndexOf((T)value);
-		}
-
-		void System.Collections.IList.Insert(int index, object value)
-		{
-			Insert(index, (T)value);
-		}
-
-		bool System.Collections.IList.IsFixedSize
-		{
-			get { return false; }
-		}
-
-		void System.Collections.IList.Remove(object value)
-		{
-			Remove((T)value);
-		}
-
-		object System.Collections.IList.this[int index]
-		{
-			get { return this[index]; }
-			set { throw new InvalidOperationException(); }
-		}
-
-		#endregion
-
-		#region ICollection Members
-
-		void System.Collections.ICollection.CopyTo(Array array, int index)
-		{
-			((System.Collections.ICollection)InnerList).CopyTo(array, index);
-		}
-
-		bool System.Collections.ICollection.IsSynchronized
-		{
-			get { return false; }
-		}
-
-		object System.Collections.ICollection.SyncRoot
-		{
-			get { return _innerList; }
-		}*/
-
-		#endregion
-
-		sealed class Inserter : IDisposable
-		{
-			readonly ItemSetList<T, TList, TLeaf, TRoot> _owner;
-			readonly T _item;
-			public Inserter(ItemSetList<T, TList, TLeaf, TRoot> owner, T item)
-			{
-				_owner = owner;
-				_item = item;
-
-				if(item.Package != null && (owner.Package != item.Package))
-					throw new ArgumentException(ItemSetStrings.CantMoveBetweenPackages);
-			}
-
-			#region IDisposable Members
-
-			public void Dispose()
-			{
-				if (_item.Package == null)
-					_item.Package = _owner.Package;
-				else if (_item.Package != _owner.Package)
-					throw new InvalidOperationException();
-			}
-
-			#endregion
+			return t;
 		}
 
 		/// <summary>
@@ -316,138 +68,12 @@ namespace QQn.TurtleUtils.ItemSets
 			set
 			{
 				base.Package = value;
-				foreach (T i in this)
+				foreach (T i in Items)
 				{
 					i.Package = value;
 				}
 			}
 		}
-
-		#region IDictionary<string,T> Members
-
-		/*void IDictionary<string, T>.Add(string key, T value)
-		{
-			if (ContainsKey(key) || value.Name != key)
-				throw new ArgumentException("Invalid key", "key");
-
-			Add(value);
-		}*/
-
-		/// <summary>
-		/// Determines whether the list contains key.
-		/// </summary>
-		/// <param name="key">The key.</param>
-		/// <returns>
-		/// 	<c>true</c> if the specified key contains key; otherwise, <c>false</c>.
-		/// </returns>
-		public bool ContainsKey(string key)
-		{
-			return InnerSortedList.ContainsKey(key);
-		}
-
-		/// <summary>
-		/// Gets an <see cref="T:System.Collections.Generic.ICollection`1"></see> containing the keys of the <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
-		/// </summary>
-		/// <value></value>
-		/// <returns>An <see cref="T:System.Collections.Generic.ICollection`1"></see> containing the keys of the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"></see>.</returns>
-		public ICollection<string> Keys
-		{
-			get { return InnerSortedList.Keys; }
-		}
-
-		/// <summary>
-		/// Removes the element with the specified key from the <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
-		/// </summary>
-		/// <param name="key">The key of the element to remove.</param>
-		/// <returns>
-		/// true if the element is successfully removed; otherwise, false.  This method also returns false if key was not found in the original <see cref="T:System.Collections.Generic.IDictionary`2"></see>.
-		/// </returns>
-		/// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IDictionary`2"></see> is read-only.</exception>
-		/// <exception cref="T:System.ArgumentNullException">key is null.</exception>
-		public bool Remove(string key)
-		{
-			T value;
-			if (InnerSortedList.TryGetValue((string)key, out value))
-			{
-				Remove(value);
-				return true;
-			}
-
-			return false;
-		}
-
-		/// <summary>
-		/// Tries the get value.
-		/// </summary>
-		/// <param name="key">The key.</param>
-		/// <param name="value">The value.</param>
-		/// <returns></returns>
-		public bool TryGetValue(string key, out T value)
-		{
-			return InnerSortedList.TryGetValue(key, out value);
-		}
-
-		/// <summary>
-		/// Gets the values.
-		/// </summary>
-		/// <value>The values.</value>
-		public ICollection<T> Values
-		{
-			get { return InnerList.AsReadOnly(); }
-		}
-
-		/// <summary>
-		/// Gets the item with the specified key.
-		/// </summary>
-		/// <value></value>
-		public T this[string key]
-		{
-			get { return InnerSortedList[key]; }
-		}
-
-		/*T IDictionary<string, T>.this[string key]
-		{
-			get { return this[key]; }			
-			set
-			{
-				throw new InvalidOperationException();
-			}
-		}*/
-
-		#endregion
-
-		#region ICollection<KeyValuePair<string,T>> Members
-
-		/*void ICollection<KeyValuePair<string, T>>.Add(KeyValuePair<string, T> item)
-		{
-			Add(item.Value);
-		}
-
-		bool ICollection<KeyValuePair<string, T>>.Contains(KeyValuePair<string, T> item)
-		{
-			return ((ICollection<KeyValuePair<string, T>>)InnerSortedList).Contains(item);
-		}
-
-		void ICollection<KeyValuePair<string, T>>.CopyTo(KeyValuePair<string, T>[] array, int arrayIndex)
-		{
-			((ICollection<KeyValuePair<string, T>>)InnerSortedList).CopyTo(array, arrayIndex);
-		}
-
-		bool ICollection<KeyValuePair<string, T>>.Remove(KeyValuePair<string, T> item)
-		{
-			return Remove(item.Value);
-		}*/
-
-		#endregion
-
-		#region IEnumerable<KeyValuePair<string,T>> Members
-
-		/*IEnumerator<KeyValuePair<string, T>> IEnumerable<KeyValuePair<string, T>>.GetEnumerator()
-		{
-			return InnerSortedList.GetEnumerator();
-		}*/
-
-		#endregion
 
 		/// <summary>
 		/// Gets a value indicating whether this instance is read only.
@@ -470,25 +96,7 @@ namespace QQn.TurtleUtils.ItemSets
 		{
 			get { return null; }
 			set { throw new InvalidOperationException(); }
-		}
-
-		/// <summary>
-		/// Adds the item.
-		/// </summary>
-		/// <param name="name">The name.</param>
-		/// <returns>The added item</returns>
-		/// <exception cref="ArgumentException">An item with the specified name exists</exception>
-		public T AddItem(string name)
-		{
-			if (ContainsKey(name))
-				throw new ArgumentException("Key exists", "key");
-
-			T item = new T();
-			item.InitializeAndSetName(name);
-
-			Add(item);
-			return item;
-		}
+		}		
 
 		/// <summary>
 		/// Gets all leaves.
@@ -498,7 +106,7 @@ namespace QQn.TurtleUtils.ItemSets
 		{
 			get
 			{
-				foreach (T item in this)
+				foreach (T item in Items)
 				{
 					TLeaf leaf = item as TLeaf;
 					if (leaf != null)
@@ -516,26 +124,156 @@ namespace QQn.TurtleUtils.ItemSets
 		}
 
 		/// <summary>
-		/// [Xml Serialization helper property]
+		/// The contained items
 		/// </summary>
-		[XmlElement("item"), Browsable(false)]
-		public Collection<T> Items
+		public ItemSetCollection Items
 		{
-			get 
-			{ 
-				return new Collection<T>(InnerList);
+			get
+			{
+				if (_innerList == null)
+					_innerList = new ItemSetCollection(this);
+
+				return _innerList;
 			}
 			set
 			{
 				EnsureWritable();
-				if (value != null)
+				if ((_innerList != null) || (value == null))
+					throw new InvalidOperationException();
+
+				Items.AddRange(value);
+			}
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public sealed class ItemSetCollection : Collection<T>
+		{
+			ItemSetList<T, TList, TLeaf, TRoot> _list;
+			readonly SortedList<string, T> _byName;
+
+			/// <summary>
+			/// Initializes a new instance of the <see cref="ItemSetList&lt;T, TList, TLeaf, TRoot&gt;.ItemSetCollection"/> class.
+			/// </summary>
+			public ItemSetCollection()
+			{
+				_byName = new SortedList<string, T>(StringComparer.InvariantCultureIgnoreCase);
+			}
+
+			internal ItemSetCollection(ItemSetList<T, TList, TLeaf, TRoot> list)
+				: this()
+			{
+				_list = list;
+			}
+
+			/// <summary>
+			/// Adds the range.
+			/// </summary>
+			/// <param name="items">The items.</param>
+			public void AddRange(IEnumerable<T> items)
+			{
+				if (items == null)
+					throw new ArgumentNullException("items");
+
+				foreach (T t in items)
 				{
-					InnerList.AddRange(value);
-					foreach (T item in value)
-					{
-						InnerSortedList.Add(item.Name, item);
-					}
+					Add(t);
 				}
+			}
+
+			/// <summary>
+			/// Inserts an element into the <see cref="T:System.Collections.ObjectModel.Collection`1"></see> at the specified index.
+			/// </summary>
+			/// <param name="index">The zero-based index at which item should be inserted.</param>
+			/// <param name="item">The object to insert. The value can be null for reference types.</param>
+			/// <exception cref="T:System.ArgumentOutOfRangeException">index is less than zero.-or-index is greater than <see cref="P:System.Collections.ObjectModel.Collection`1.Count"></see>.</exception>
+			protected override void InsertItem(int index, T item)
+			{
+				if((index < 0) || (index > Count))
+					throw new ArgumentOutOfRangeException("index", index, "Index out of range");
+
+				EnsureWritable();
+				_byName.Add(item.Name, item);
+				base.InsertItem(index, item);
+			}
+
+			/// <summary>
+			/// Removes the element at the specified index of the <see cref="T:System.Collections.ObjectModel.Collection`1"></see>.
+			/// </summary>
+			/// <param name="index">The zero-based index of the element to remove.</param>
+			/// <exception cref="T:System.ArgumentOutOfRangeException">index is less than zero.-or-index is equal to or greater than <see cref="P:System.Collections.ObjectModel.Collection`1.Count"></see>.</exception>
+			protected override void RemoveItem(int index)
+			{
+				if((index < 0) || (index >= Count))
+					throw new ArgumentOutOfRangeException("index", index, "Index out of range");
+
+				EnsureWritable();
+				_byName.Remove(this[index].Name);
+				base.RemoveItem(index);
+			}
+
+			/// <summary>
+			/// Removes all elements from the <see cref="T:System.Collections.ObjectModel.Collection`1"></see>.
+			/// </summary>
+			protected override void ClearItems()
+			{
+				EnsureWritable();
+				_byName.Clear();
+				base.ClearItems();
+			}
+
+			/// <summary>
+			/// Replaces the element at the specified index.
+			/// </summary>
+			/// <param name="index">The zero-based index of the element to replace.</param>
+			/// <param name="item">The new value for the element at the specified index. The value can be null for reference types.</param>
+			/// <exception cref="T:System.ArgumentOutOfRangeException">index is less than zero.-or-index is greater than <see cref="P:System.Collections.ObjectModel.Collection`1.Count"></see>.</exception>
+			protected override void SetItem(int index, T item)
+			{
+				throw new InvalidOperationException();
+				//base.SetItem(index, item);
+			}
+
+			/// <summary>
+			/// Ensures the writable.
+			/// </summary>
+			private void EnsureWritable()
+			{
+				if (_list != null)
+					_list.EnsureWritable();
+			}
+
+			/// <summary>
+			/// Gets the item with the specified name.
+			/// </summary>
+			/// <value></value>
+			public T this[string name]
+			{
+				get { return _byName[name]; }
+			}
+
+			/// <summary>
+			/// Tries to get the value with the specified name.
+			/// </summary>
+			/// <param name="name">The name.</param>
+			/// <param name="value">The value.</param>
+			/// <returns></returns>
+			public bool TryGetValue(string name, out T value)
+			{
+				return _byName.TryGetValue(name, out value);
+			}
+
+			/// <summary>
+			/// Determines whether the list contains an item with the specified name.
+			/// </summary>
+			/// <param name="name">The name.</param>
+			/// <returns>
+			/// 	<c>true</c> if [contains] [the specified name]; otherwise, <c>false</c>.
+			/// </returns>
+			public bool Contains(string name)
+			{
+				return _byName.ContainsKey(name);
 			}
 		}
 	}

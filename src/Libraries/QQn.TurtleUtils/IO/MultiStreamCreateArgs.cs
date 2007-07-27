@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QQn.TurtleUtils.Streams
+namespace QQn.TurtleUtils.IO
 {
 	/// <summary>
 	/// Argument for creating a <see cref="MultiStreamReader"/> or <see cref="MultiStreamWriter"/>

@@ -5,7 +5,7 @@ using System.IO;
 using System.Security.Cryptography;
 using QQn.TurtleUtils.Cryptography;
 
-namespace QQn.TurtleUtils.Streams
+namespace QQn.TurtleUtils.IO
 {
 	/// <summary>
 	/// Stream proxy which creates a hashed and optionally signed stream within a parent stream

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using QQn.TurtleUtils.Cryptography;
 
-namespace QQn.TurtleUtils.Streams
+namespace QQn.TurtleUtils.IO
 {
 	/// <summary>
 	/// Argument container for creating <see cref="AssuredStream"/> objects

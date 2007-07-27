@@ -33,5 +33,22 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 
 			Validate();
 		}
+
+
+		static StaticTokenizerDefinition<T> _definition;
+		/// <summary>
+		/// Gets the definition.
+		/// </summary>
+		/// <value>The definition.</value>
+		public static StaticTokenizerDefinition<T> Definition
+		{
+			get
+			{
+				if (_definition == null)
+					_definition = new StaticTokenizerDefinition<T>();
+
+				return _definition;
+			}
+		}
 	}
 }

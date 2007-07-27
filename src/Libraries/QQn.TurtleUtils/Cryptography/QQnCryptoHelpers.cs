@@ -102,8 +102,63 @@ namespace QQn.TurtleUtils.Cryptography
 			return sb.ToString();
 		}
 
+		/// <summary>
+		/// Normalizes the hash value to a comparable string
+		/// </summary>
+		/// <param name="hash">The hash.</param>
+		/// <param name="removeSize">if set to <c>true</c> [remove size].</param>
+		/// <returns></returns>
+		public static string NormalizeHashValue(string hash, bool removeSize)
+		{
+			if (hash == null)
+				throw new ArgumentNullException("hash");
+
+			HashType hashType;
+			long length;
+			string hashValue;
+
+			if (TryParsehash(hash, out hashType, out length, out hashValue))
+			{
+				StringBuilder sb = new StringBuilder();
+				sb.Append(hash.ToLowerInvariant()); // Lower case the hex string
+
+				sb.AppendFormat(CultureInfo.InvariantCulture, ",type={0}", hashType.ToString());
+
+				if ((length >= 0) && !removeSize)
+					sb.AppendFormat(",size={0}", length);
+
+				return sb.ToString();
+			}
+
+			return hash;
+		}
+
+		/// <summary>
+		/// Gets the size from the ash.
+		/// </summary>
+		/// <param name="hash">The hash.</param>
+		/// <returns>The size contained in the hash or -1 if no size is contained</returns>
+		public static long GetSizeFromHash(string hash)
+		{
+			if (hash == null)
+				throw new ArgumentNullException("hash");
+
+			HashType hashType;
+			long length;
+			string hashValue;
+
+			if (TryParsehash(hash, out hashType, out length, out hashValue))
+			{
+				return length;
+			}
+
+			return -1;
+		}
+
 		static bool TryParsehash(string hash, out HashType hashType, out long length, out string hashValue)
 		{
+			if (hash == null)
+				throw new ArgumentNullException("hash");
 			string[] parts = hash.Split(new char[] { ',' }, 3);
 			int len = parts[0].Length;
 
@@ -138,6 +193,7 @@ namespace QQn.TurtleUtils.Cryptography
 				else if (p.StartsWith("hash=", StringComparison.InvariantCultureIgnoreCase))
 				{
 					hashValue = p.Substring(5);
+					len = hashValue.Length;
 				}
 			}
 
@@ -161,6 +217,7 @@ namespace QQn.TurtleUtils.Cryptography
 						return false;
 				}
 			}
+
 			return true;
 		}
 

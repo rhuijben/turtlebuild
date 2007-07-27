@@ -2,19 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
+using System.ComponentModel;
 
 namespace QQn.TurtleUtils.Tokenizer.Definitions
 {
 	/// <summary>
-	/// 
+	/// Contains the parser state while tokanizing
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class TokenizerState<T> : Hashtable
+	public class TokenizerState<T> : Hashtable, IDisposable
 		where T : class, new()
 	{
 		readonly T _instance;
 		readonly TokenizerDefinition _definition;
-		readonly TokenizerArgs _args;		
+		readonly TokenizerArgs _args;
+		ISupportInitialize _initialize;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TokenizerState&lt;T&gt;"/> class.
@@ -22,6 +24,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		/// <param name="instance">The instance.</param>
 		/// <param name="definition">The definition.</param>
 		/// <param name="args">The args.</param>
+		/// <remarks>Calls <see cref="ISupportInitialize.BeginInit"/> if the instance implements <see cref="ISupportInitialize"/></remarks>
 		public TokenizerState(T instance, TokenizerDefinition definition, TokenizerArgs args)
 		{
 			if (instance == null)
@@ -34,6 +37,10 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			_instance = instance;
 			_definition = definition;
 			_args = args;
+			_initialize = instance as ISupportInitialize;
+
+			if (_initialize != null)
+				_initialize.BeginInit();
 		}
 
 		/// <summary>
@@ -77,6 +84,25 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		public TokenizerArgs TokenizerArgs
 		{
 			get { return _args; }
-		} 
+		}
+
+		#region IDisposable Members
+
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
+		/// <remarks>Calls <see cref="ISupportInitialize.EndInit"/> if the instance implements <see cref="ISupportInitialize"/></remarks>
+		public void Dispose()
+		{
+			ISupportInitialize init = _initialize;
+			if (init != null)
+			{
+				_initialize = null;
+
+				init.EndInit();
+			}
+		}
+
+		#endregion
 	}
 }

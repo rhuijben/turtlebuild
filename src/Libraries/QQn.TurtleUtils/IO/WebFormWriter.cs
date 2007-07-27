@@ -4,7 +4,7 @@ using System.Text;
 using System.Net;
 using System.IO;
 
-namespace QQn.TurtleUtils.Streams
+namespace QQn.TurtleUtils.IO
 {
 	/// <summary>
 	/// The encoding of the webrequest data

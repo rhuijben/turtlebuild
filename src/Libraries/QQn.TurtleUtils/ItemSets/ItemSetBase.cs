@@ -26,7 +26,7 @@ namespace QQn.TurtleUtils.ItemSets
 			{
 				if (value == _package)
 					return;
-				else if (_package != null)
+				else if ((_package != null) && (_package.Package != null))
 					throw new InvalidOperationException();
 				_package = value;
 			}

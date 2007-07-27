@@ -106,155 +106,157 @@ namespace QQn.TurtleUtils.Tokenizer
 			List<string> cArgs = new List<string>(commandLineArguments);
 
 			T items;
-			TokenizerState<T> state = NewState<T>(args, out items);
-			TokenizerDefinition definition = state.Definition;
-			to = null;
-
-			int i;
-
-			bool atEnd = false;
-			char[] checkChars = args.PlusMinSuffixArguments ? new char[] { args.ArgumentValueSeparator, '+', '-' } : new char[] { args.ArgumentValueSeparator };
-
-			int nPlaced = 0;
-			for (i = 0; i < cArgs.Count; i++)
+			using (TokenizerState<T> state = NewState<T>(args, out items))
 			{
-				string a = cArgs[i];
+				TokenizerDefinition definition = state.Definition;
+				to = null;
 
-				if (!atEnd && (a.Length > 1) && args.CommandLineChars.Contains(a[0]))
+				int i;
+
+				bool atEnd = false;
+				char[] checkChars = args.PlusMinSuffixArguments ? new char[] { args.ArgumentValueSeparator, '+', '-' } : new char[] { args.ArgumentValueSeparator };
+
+				int nPlaced = 0;
+				for (i = 0; i < cArgs.Count; i++)
 				{
-					bool twoStart = a[0] == a[1];
-					if (a.Length == 2 && twoStart)
+					string a = cArgs[i];
+
+					if (!atEnd && (a.Length > 1) && args.CommandLineChars.Contains(a[0]))
 					{
-						if (!definition.HasPlacedArguments)
+						bool twoStart = a[0] == a[1];
+						if (a.Length == 2 && twoStart)
 						{
-							args.ErrorMessage = TokenizerMessages.NoPlacedArgumentsDefined;
-							return false;
-						}
-
-						atEnd = true;
-					}
-					else
-					{
-						int aFrom = twoStart ? 2 : 1;
-						int aTo = args.AllowDirectArgs ? a.IndexOfAny(checkChars, aFrom) : -1;
-						char cTo = (aTo > 0) ? a[aTo] : '\0';
-
-						string item = (aTo > 0) ? a.Substring(aFrom, aTo - aFrom) : a.Substring(aFrom);
-
-						TokenItem token;
-						string value = null;
-
-						if (definition.TryGetToken(item, args.CaseSensitive, out token))
-						{
-							if (token.RequiresValue)
+							if (!definition.HasPlacedArguments)
 							{
-								if (i + 1 < cArgs.Count)
-									token.Evaluate(cArgs[++i], state);
-								else
-								{
-									args.ErrorMessage = TokenizerMessages.RequiredArgumentValueIsMissing;
-									return false;
-								}
+								args.ErrorMessage = TokenizerMessages.NoPlacedArgumentsDefined;
+								return false;
 							}
-							else
-								token.Evaluate(null, state);
+
+							atEnd = true;
 						}
 						else
 						{
-							// Look for a shorter argument
-							for (int ii = item.Length - 1; ii > 0; ii--)
+							int aFrom = twoStart ? 2 : 1;
+							int aTo = args.AllowDirectArgs ? a.IndexOfAny(checkChars, aFrom) : -1;
+							char cTo = (aTo > 0) ? a[aTo] : '\0';
+
+							string item = (aTo > 0) ? a.Substring(aFrom, aTo - aFrom) : a.Substring(aFrom);
+
+							TokenItem token;
+							string value = null;
+
+							if (definition.TryGetToken(item, args.CaseSensitive, out token))
 							{
-								if (definition.TryGetToken(item.Substring(0, ii), args.CaseSensitive, out token)
-									&& token.AllowDirectValue(item.Substring(ii), state))
+								if (token.RequiresValue)
 								{
-									token.EvaluateDirect(item.Substring(ii), state);
-									break;
+									if (i + 1 < cArgs.Count)
+										token.Evaluate(cArgs[++i], state);
+									else
+									{
+										args.ErrorMessage = TokenizerMessages.RequiredArgumentValueIsMissing;
+										return false;
+									}
 								}
 								else
-									token = null;
+									token.Evaluate(null, state);
 							}
-						}
-
-						if (token == null)
-						{
-							args.ErrorMessage = string.Format(TokenizerMessages.UnknownArgumentX, a);
-							return false;
-						}
-
-						if (token.RequiresValue && value == null)
-						{
-							if (i < commandLineArguments.Count - 1)
-								value = commandLineArguments[i++];
 							else
 							{
-								args.ErrorMessage = string.Format(TokenizerMessages.ValueExpectedForArgumentX, a);
+								// Look for a shorter argument
+								for (int ii = item.Length - 1; ii > 0; ii--)
+								{
+									if (definition.TryGetToken(item.Substring(0, ii), args.CaseSensitive, out token)
+										&& token.AllowDirectValue(item.Substring(ii), state))
+									{
+										token.EvaluateDirect(item.Substring(ii), state);
+										break;
+									}
+									else
+										token = null;
+								}
+							}
+
+							if (token == null)
+							{
+								args.ErrorMessage = string.Format(TokenizerMessages.UnknownArgumentX, a);
 								return false;
 							}
-						}
-						continue;
-					}
-				}
-				else if (!atEnd && args.AllowResponseFile && a.Length > 1 && a[0] == '@')
-				{
-					string file = a.Substring(1);
 
-					if (!File.Exists(file))
-					{
-						args.ErrorMessage = string.Format(TokenizerMessages.ResponseFileXNotFound, file);
-						return false;
-					}
-					using (StreamReader sr = File.OpenText(a.Substring(1)))
-					{
-						string line;
-						int n = i + 1;
-						while (null != (line = sr.ReadLine()))
-						{
-							line = line.TrimStart();
-
-							if (line.Length > 1)
+							if (token.RequiresValue && value == null)
 							{
-								if (line[0] != '#')
+								if (i < commandLineArguments.Count - 1)
+									value = commandLineArguments[i++];
+								else
 								{
-									foreach (string word in GetCommandlineTokens(line))
+									args.ErrorMessage = string.Format(TokenizerMessages.ValueExpectedForArgumentX, a);
+									return false;
+								}
+							}
+							continue;
+						}
+					}
+					else if (!atEnd && args.AllowResponseFile && a.Length > 1 && a[0] == '@')
+					{
+						string file = a.Substring(1);
+
+						if (!File.Exists(file))
+						{
+							args.ErrorMessage = string.Format(TokenizerMessages.ResponseFileXNotFound, file);
+							return false;
+						}
+						using (StreamReader sr = File.OpenText(a.Substring(1)))
+						{
+							string line;
+							int n = i + 1;
+							while (null != (line = sr.ReadLine()))
+							{
+								line = line.TrimStart();
+
+								if (line.Length > 1)
+								{
+									if (line[0] != '#')
 									{
-										cArgs.Insert(n++, word);
+										foreach (string word in GetCommandlineTokens(line))
+										{
+											cArgs.Insert(n++, word);
+										}
 									}
 								}
 							}
 						}
+
+						// TODO: Insert contents of response file in cArgs at position i+1
+
+						continue;
 					}
+					else if (!args.AllowNamedBetweenPlaced)
+						atEnd = true;
 
-					// TODO: Insert contents of response file in cArgs at position i+1
-
-					continue;
+					if (state.Definition.HasPlacedArguments)
+					{
+						if (nPlaced < state.Definition.PlacedItems.Count)
+						{
+							state.Definition.PlacedItems[nPlaced].Evaluate(cArgs[i], state);
+							nPlaced++;
+						}
+						else if (state.Definition.RestToken != null)
+						{
+							state.Definition.RestToken.Evaluate(cArgs[i], state);
+						}
+						else
+						{
+							args.ErrorMessage = string.Format(TokenizerMessages.UnknownArgumentX, cArgs[i]);
+							return false;
+						}
+					}
 				}
-				else if (!args.AllowNamedBetweenPlaced)
-					atEnd = true;
 
-				if (state.Definition.HasPlacedArguments)
-				{
-					if (nPlaced < state.Definition.PlacedItems.Count)
-					{
-						state.Definition.PlacedItems[nPlaced].Evaluate(cArgs[i], state);
-						nPlaced++;
-					}
-					else if (state.Definition.RestToken != null)
-					{
-						state.Definition.RestToken.Evaluate(cArgs[i], state);
-					}
-					else
-					{
-						args.ErrorMessage = string.Format(TokenizerMessages.UnknownArgumentX, cArgs[i]);
-						return false;
-					}
-				}
+				if (!state.IsComplete)
+					return false;
+
+				to = state.Instance;
+				return true;
 			}
-
-			if (!state.IsComplete)
-				return false;
-
-			to = state.Instance;
-			return true;
 		}
 
 		/// <summary>
@@ -307,37 +309,41 @@ namespace QQn.TurtleUtils.Tokenizer
 
 			to = null;
 			T items;
-			TokenizerState<T> state = NewState<T>(args, out items);
-
-			IList<string> groups = GetWords(connectionString, new string[] { "\"\"", "\'\'" }, '\0', EscapeMode.DoubleItem, ";".ToCharArray());
-
-			foreach (string group in groups)
+			using (TokenizerState<T> state = NewState<T>(args, out items))
 			{
-				IList<string> parts = GetWords(group, new string[] { "\"\"", "\'\'" }, '\0', EscapeMode.DoubleItem, "=".ToCharArray());
 
-				TokenItem token;
-				if ((parts.Count == 2) && state.Definition.TryGetToken(parts[0], args.CaseSensitive, out token))
+				IList<string> groups = GetWords(connectionString, new string[] { "\"\"", "\'\'" }, '\0', EscapeMode.DoubleItem, ";".ToCharArray());
+
+				foreach (string group in groups)
 				{
-					token.Evaluate(parts[1], state);
-				}
-				else
-					return false;
-			}
-			// TODO: Parse connectionstring using definition
+					IList<string> parts = GetWords(group, new string[] { "\"\"", "\'\'" }, '\0', EscapeMode.DoubleItem, "=".ToCharArray());
 
-			to = state.Instance;
-			return true;
+					TokenItem token;
+					if ((parts.Count == 2) && state.Definition.TryGetToken(parts[0], args.CaseSensitive, out token))
+					{
+						token.Evaluate(parts[1], state);
+					}
+					else if (args.SkipUnknownNamedItems)
+						continue;
+					else
+						return false;
+				}
+				// TODO: Parse connectionstring using definition
+
+				to = state.Instance;
+				return true;
+			}
 		}
 
 		/// <summary>
-		/// 
+		/// Tries to parse the name value collection.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		/// <param name="collection"></param>
-		/// <param name="args"></param>
-		/// <param name="to"></param>
+		/// <param name="collection">The collection.</param>
+		/// <param name="args">The args.</param>
+		/// <param name="to">To.</param>
 		/// <returns></returns>
-		public static bool TryParseConnectionString<T>(NameValueCollection collection, TokenizerArgs args, out T to)
+		public static bool TryParseNameValueCollection<T>(NameValueCollection collection, TokenizerArgs args, out T to)
 			where T : class, new()
 		{
 			if (collection == null)
@@ -345,13 +351,70 @@ namespace QQn.TurtleUtils.Tokenizer
 			else if (args == null)
 				throw new ArgumentNullException("args");
 
+			to = null;
 			T items;
-			TokenizerState<T> state = NewState<T>(args, out items);
+			using (TokenizerState<T> state = NewState<T>(args, out items))
+			{
 
-			// TODO: Parse connectionstring using definition
+				for (int i = 0; i < collection.Count; i++)
+				{
+					TokenItem ti;
+
+					if (!state.Definition.TryGetToken(collection.Keys[i], args.CaseSensitive, out ti))
+					{
+						if (args.SkipUnknownNamedItems)
+							continue;
+						else
+							return false;
+					}
+
+					ti.Evaluate(collection[i], state);
+				}
+
+				to = state.Instance;
+				return true;
+			}
+		}
+
+		/// <summary>
+		/// Tries to parse the name value collection.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="collection">The collection.</param>
+		/// <param name="args">The args.</param>
+		/// <param name="to">To.</param>
+		/// <returns></returns>
+		public static bool TryParseNameValueCollection<T>(IEnumerable<KeyValuePair<string,string>> collection, TokenizerArgs args, out T to)
+			where T : class, new()
+		{
+			if (collection == null)
+				throw new ArgumentNullException("collection");
+			else if (args == null)
+				throw new ArgumentNullException("args");
 
 			to = null;
-			return false;
+			T items;
+			using (TokenizerState<T> state = NewState<T>(args, out items))
+			{
+
+				foreach (KeyValuePair<string, string> kvp in collection)
+				{
+					TokenItem ti;
+
+					if (!state.Definition.TryGetToken(kvp.Key, args.CaseSensitive, out ti))
+					{
+						if (args.SkipUnknownNamedItems)
+							continue;
+						else
+							return false;
+					}
+
+					ti.Evaluate(kvp.Value, state);
+				}
+
+				to = state.Instance;
+				return true;
+			}
 		}
 
 		/// <summary>
@@ -398,55 +461,61 @@ namespace QQn.TurtleUtils.Tokenizer
 		}
 
 		/// <summary>
-		/// 
+		/// Tries to parse the XML attributes of an element to a T instance; Unkown attributes are ignored
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
-		/// <param name="element"></param>
-		/// <param name="args"></param>
-		/// <param name="to"></param>
+		/// <param name="element">The element.</param>
+		/// <param name="args">The args.</param>
+		/// <param name="to">To.</param>
 		/// <returns></returns>
 		public static bool TryParseXmlAttributes<T>(IXPathNavigable element, TokenizerArgs args, out T to)
 			where T : class, new()
 		{
+			if (element == null)
+				throw new ArgumentNullException("element");
 
-			T items;
-			TokenizerState<T> state = NewState<T>(args, out items);
-
-			// TODO: Parse xml element using definition
+			XPathNavigator nav = element.CreateNavigator();
 
 			to = null;
-			return false;
-		}
+			T items;
+			using (TokenizerState<T> state = NewState<T>(args, out items))
+			{
 
-		static Dictionary<Type, TokenizerDefinition> _definitions = new Dictionary<Type, TokenizerDefinition>();
+				if (nav.MoveToFirstAttribute())
+					do
+					{
+						TokenItem ti;
+
+						if (!state.Definition.TryGetToken(nav.LocalName, args.CaseSensitive, out ti))
+						{
+							if (args.SkipUnknownNamedItems)
+								continue;
+							else
+								return false;
+						}
+
+						ti.Evaluate(nav.Value, state);
+					}
+					while (nav.MoveToNextAttribute());
+
+				to = state.Instance;
+				return true;
+			}
+		}
 
 		static TokenizerState<T> NewState<T>(TokenizerArgs args, out T instance)
 			where T : class, new()
 		{
 			instance = new T();
-
-			TokenizerDefinition def = null;
-
+			
 			IHasTokenDefinition htd = instance as IHasTokenDefinition;
+			TokenizerDefinition def = null;
 
 			if (htd != null)
 				def = htd.GetTokenizerDefinition(args);
 
-			if (def != null)
-				return new TokenizerState<T>(instance, def, args);
-
-			lock (_definitions)
-			{
-				if (_definitions.TryGetValue(typeof(T), out def))
-					return new TokenizerState<T>(instance, def, args);
-			}
-
-			def = new StaticTokenizerDefinition<T>();
-			if (args.CacheDefinition)
-				lock (_definitions)
-				{
-					_definitions[typeof(T)] = def;
-				}
+			if (def == null)
+				def = StaticTokenizerDefinition<T>.Definition;
 
 			return new TokenizerState<T>(instance, def, args);
 		}

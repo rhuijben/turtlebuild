@@ -49,8 +49,6 @@ namespace QQn.TurtleMSBuild
 					WriteContent(xw, project);
 
 					WriteScripts(xw, project);
-
-					//WriteItem(xw, project, "ReferenceCopyLocalPaths");
 				}
 			}
 		}
@@ -278,7 +276,7 @@ namespace QQn.TurtleMSBuild
 					continue;
 
 				string include = pi.Include;
-				
+
 				string destinationSubDirectory;
 				string copyCondition;
 
@@ -301,7 +299,7 @@ namespace QQn.TurtleMSBuild
 					TargetType type = TargetType.None;
 					switch (pi.Name)
 					{
-							// TODO: Rewrite to a per-language infrastructure
+						// TODO: Rewrite to a per-language infrastructure
 						case "IntermediateAssembly":
 						case "AddModules":
 						case "DocFileItem":
