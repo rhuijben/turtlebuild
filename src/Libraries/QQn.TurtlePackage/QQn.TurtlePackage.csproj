@@ -35,7 +35,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FileHash.cs" />
     <Compile Include="PackContainer.cs" />
     <Compile Include="PackContainerList.cs" />
     <Compile Include="Pack.cs" />

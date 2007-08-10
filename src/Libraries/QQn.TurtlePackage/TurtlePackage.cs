@@ -10,8 +10,8 @@ namespace QQn.TurtlePackage
 {
 	public class TurtlePackage : Pack
 	{
-		readonly FileInfo _package;
-		readonly IXPathNavigable _manifest;
+		//readonly FileInfo _package;
+		//readonly IXPathNavigable _manifest;
 
 		public TurtlePackage()
 		{
