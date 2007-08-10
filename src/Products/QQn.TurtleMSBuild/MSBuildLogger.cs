@@ -50,6 +50,19 @@ namespace QQn.TurtleMSBuild
 
 			eventSource.ProjectStarted += new ProjectStartedEventHandler(ProjectBuildStarted);
 			eventSource.ProjectFinished += new ProjectFinishedEventHandler(ProjectBuildFinished);
+			eventSource.TaskFinished += new TaskFinishedEventHandler(ProjectTaskFinished);
+		}
+
+		void ProjectTaskFinished(object sender, TaskFinishedEventArgs e)
+		{
+			if (e.TaskName == "VCBuild")
+			{
+				BuildProject project;
+				if (building.TryGetValue(e.ProjectFile, out project))
+				{
+					project.UsedVCBuild = true;
+				}
+			}			
 		}
 
 		/// <summary>

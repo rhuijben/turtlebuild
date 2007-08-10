@@ -14,8 +14,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurtleBuild.Tests", "Projec
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QQn.TurtleMSBuild.Distributed", "Products\QQn.TurtleMSBuild.Distributed\QQn.TurtleMSBuild.Distributed.csproj", "{DC7915B6-6411-4628-A498-929003ED76BA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestResources", "TestResources\TestResources.csproj", "{72F8B2DC-008F-4093-9499-842FBF02B131}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QQn.TurtleBuildUtils", "Libraries\QQn.TurtleBuildUtils\QQn.TurtleBuildUtils.csproj", "{4FB6CAEF-DEF4-46FA-A118-DB35B373C397}"
 EndProject
 Global
@@ -47,10 +45,6 @@ Global
 		{DC7915B6-6411-4628-A498-929003ED76BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC7915B6-6411-4628-A498-929003ED76BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC7915B6-6411-4628-A498-929003ED76BA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{72F8B2DC-008F-4093-9499-842FBF02B131}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{72F8B2DC-008F-4093-9499-842FBF02B131}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{72F8B2DC-008F-4093-9499-842FBF02B131}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{72F8B2DC-008F-4093-9499-842FBF02B131}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4FB6CAEF-DEF4-46FA-A118-DB35B373C397}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4FB6CAEF-DEF4-46FA-A118-DB35B373C397}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4FB6CAEF-DEF4-46FA-A118-DB35B373C397}.Release|Any CPU.ActiveCfg = Release|Any CPU
