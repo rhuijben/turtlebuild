@@ -16,6 +16,7 @@ namespace QQn.TurtleMSBuild
 		readonly IEnumerable _properties;
 		readonly IEnumerable _items;
 		readonly BuildParameters _parameters;
+		bool _usedVcBuild;
 
 		public BuildProject(string projectFile, string targetNames, IEnumerable properties, IEnumerable items, BuildParameters parameters)
 		{
@@ -55,6 +56,12 @@ namespace QQn.TurtleMSBuild
 		internal IEnumerable ItemsEnumerable
 		{
 			get { return _items; }
+		}
+
+		internal bool UsedVCBuild
+		{
+			get { return _usedVcBuild; }
+			set { _usedVcBuild = value; }
 		}
 
 		SortedList<string, string> _buildProperties;

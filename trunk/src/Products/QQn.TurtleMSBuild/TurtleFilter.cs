@@ -19,6 +19,9 @@ namespace QQn.TurtleMSBuild
 			if (project == null)
 				throw new ArgumentNullException("project");
 
+			if (project.UsedVCBuild)
+				VCBuildHandler.HandleProject(project);
+
 			if (project.OutDir == null)
 				return;
 
