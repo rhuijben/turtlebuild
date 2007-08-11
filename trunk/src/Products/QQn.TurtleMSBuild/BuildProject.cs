@@ -5,24 +5,23 @@ using System.Collections;
 //using Microsoft.Build.BuildEngine;
 using System.IO;
 using Microsoft.Build.Framework;
-using QQn.TurtleLogger;
+using System.Xml;
+using System.Reflection;
 
 namespace QQn.TurtleMSBuild
 {
-	class BuildProject
+	class MSBuildProject : Project
 	{
-		readonly string _projectFile;
 		readonly string _targetNames;
 		readonly IEnumerable _properties;
 		readonly IEnumerable _items;
-		readonly BuildParameters _parameters;
+		readonly TurtleParameters _parameters;
 		bool _usedVcBuild;
 
-		public BuildProject(string projectFile, string targetNames, IEnumerable properties, IEnumerable items, BuildParameters parameters)
+		public MSBuildProject(string projectFile, string targetNames, IEnumerable properties, IEnumerable items, TurtleParameters parameters)
+			: base(projectFile, parameters)
 		{
-			if (string.IsNullOrEmpty(projectFile))
-				throw new ArgumentNullException("projectFile");
-			else if (targetNames == null)
+			if (targetNames == null)
 				throw new ArgumentNullException("targetNames");
 			else if (properties == null)
 				throw new ArgumentNullException("properties");
@@ -31,16 +30,10 @@ namespace QQn.TurtleMSBuild
 			else if (parameters == null)
 				throw new ArgumentNullException("parameters");
 
-			_projectFile = Path.GetFullPath(projectFile);
 			_targetNames = targetNames;
 			_properties = properties;
 			_items = items;
 			_parameters = parameters;
-		}
-
-		public string ProjectFile
-		{
-			get { return _projectFile; }
 		}
 
 		public string BuildTargetName
@@ -86,8 +79,11 @@ namespace QQn.TurtleMSBuild
 			_buildItems = buildItems;
 
 			// Clear properties
-			_outDir = null;
-			_configuration = null;
+			OutDir = GetProperty("OutDir");
+			Configuration = GetProperty("Configuration");
+
+			TargetName = GetProperty("TargetName");
+			TargetExt = GetProperty("TargetExt");
 		}
 
 		public SortedList<string, string> BuildProperties
@@ -100,58 +96,169 @@ namespace QQn.TurtleMSBuild
 			get { return _buildItems; }
 		}
 
-		string _projectPath;
-		public string ProjectPath
+		public override void ParseBuildResult(Project parentProject)
 		{
-			get { return _projectPath ?? (_projectPath = Path.GetDirectoryName(ProjectFile)); }
+			base.ParseBuildResult(parentProject);
+
+			Refresh();
+
+			if (OutDir == null)
+				return;
+
+			ParseProjectOutput();
 		}
 
-		string _projectName;
-		public string ProjectName
+		private void ParseProjectOutput()
 		{
-			get { return _projectName ?? (_projectName = Path.GetFileNameWithoutExtension(ProjectFile)); }
-		}
+			ProjectOutputList items = ProjectOutput;
+			SortedList<string, bool> localCopyItems = new SortedList<string, bool>(StringComparer.InvariantCultureIgnoreCase);
 
-		string _outDir;
-		public string OutDir
-		{
-			get 
+			SortedList<string, TargetType> keys = new SortedList<string, TargetType>();
+			SortedList<string, bool> copyKeys = new SortedList<string, bool>();
+
+			foreach (string v in GetParameters("SharedItems", Parameters.SharedItems, ""))
 			{
-				if (_outDir == null)
-				{
-					string outDir = GetProperty("OutDir");
+				if (!keys.ContainsKey(v))
+					keys.Add(v, TargetType.SharedItem);
+			}
 
-					if (outDir != null)
-						_outDir = outDir.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+			foreach (string v in GetParameters("LocalItems", Parameters.LocalItems, ""))
+			{
+				if (!keys.ContainsKey(v))
+					keys.Add(v, TargetType.Item);
+			}
+
+			foreach (string v in GetParameters("CopyItems", Parameters.LocalItems, "None;Compile;Content;EmbeddedResource"))
+			{
+				if (!copyKeys.ContainsKey(v))
+					copyKeys.Add(v, true);
+			}
+
+			string primaryTarget = Path.Combine(OutDir, TargetName + TargetExt);
+			string target = primaryTarget;
+			items.Add(new TargetItem(target, Path.Combine(IntermediateOutputPath, TargetName + TargetExt), TargetType.Item));
+
+			if (BuildProperties.ContainsKey("_SGenDllCreated") && GetProperty("_SGenDllCreated") == "true" && BuildProperties.ContainsKey("_SGenDllName"))
+			{
+				string dllName = GetProperty("_SGenDllName");
+				target = Path.Combine(OutDir, dllName);
+				items.Add(new TargetItem(target, Path.Combine(IntermediateOutputPath, dllName), TargetType.Item));
+			}
+
+			if (BuildProperties.ContainsKey("_DebugSymbolsProduced") && GetProperty("_DebugSymbolsProduced") == "true")
+			{
+				string pdbName = GetProperty("TargetName") + ".pdb";
+				target = Path.Combine(OutDir, pdbName);
+				items.Add(new TargetItem(target, Path.Combine(IntermediateOutputPath, pdbName), TargetType.Item));
+			}
+
+			foreach (ProjectItem pi in BuildItems)
+			{
+				if (string.IsNullOrEmpty(pi.Include))
+					continue;
+
+				string include = pi.Include;
+
+				string destinationSubDirectory;
+				string copyCondition;
+
+				if (pi.TryGetMetaData("TargetPath", out target))
+					target = Path.Combine(OutDir, target);
+				else if (pi.TryGetMetaData("DestinationSubDirectory", out destinationSubDirectory))
+					target = Path.Combine(Path.Combine(OutDir, destinationSubDirectory), pi.Filename);
+				else
+					target = Path.Combine(OutDir, pi.Filename);
+
+				if (Path.IsPathRooted(include) || include.Contains(_dotSlash))
+					include = MakeRelativePath(include);
+
+				if (Path.IsPathRooted(target) || target.Contains(_dotSlash))
+					target = MakeRelativePath(include);
+
+				if (!items.ContainsKey(target))
+				{
+					string condition;
+					string fusionName;
+					TargetType type = TargetType.None;
+					switch (pi.Name)
+					{
+						// TODO: Rewrite to a per-language infrastructure
+						case "IntermediateAssembly":
+						case "AddModules":
+						case "DocFileItem":
+						case "IntermediateSatelliteAssembliesWithTargetPath":
+							type = TargetType.Item;		
+
+							break;
+						case "ContentWithTargetPath":
+						case "AllItemsFullPathWithTargetPath":
+						case "ReferenceCopyLocal":
+							if (pi.TryGetMetaData("CopyToOutputDirectory", out condition))
+							{
+								switch (condition)
+								{
+									case "Always":
+									case "PreserveNewest":
+										type = TargetType.SharedCopy;
+										break;
+									default:
+										break;
+								}
+							}
+							if (type == TargetType.None)
+								goto default;
+							break;
+						case "ReferenceComWrappersToCopyLocal":
+						case "ResolvedIsolatedComModules":
+						case "_DeploymentLooseManifestFile":
+						case "ReferenceCopyLocalPaths":
+						case "NativeReferenceFile":
+							fusionName = pi.GetMetadata("FusionName");
+							if(!string.IsNullOrEmpty(fusionName))
+								References.Add(new AssemblyReference(fusionName, pi, null));
+
+							type = TargetType.SharedItem;
+							break;
+						default:
+							if (!keys.TryGetValue(pi.Name, out type))
+								type = TargetType.None;
+							break;
+					}
+
+					if (type != TargetType.None)
+						items.Add(new TargetItem(target, include, type, pi));
 				}
 
-				return _outDir; 
+				if (copyKeys.ContainsKey(pi.Name))
+				{
+					if (pi.TryGetMetaData("CopyToOutputDirectory", out copyCondition))
+						switch (copyCondition)
+						{
+							case "Always":
+							case "PreserveNewest":
+								{
+									localCopyItems[include] = true;
+								}
+								break;
+						}
+
+				}
 			}
-		}
 
-		string _targetName;
-		public string TargetName
-		{
-			get { return _targetName ?? (_targetName = GetProperty("TargetName")); }
-		}
-
-		string _targetExt;
-		public string TargetExt
-		{
-			get { return _targetExt ?? (_targetExt = GetProperty("TargetExt")); }
+			foreach (TargetItem ti in items.Values)
+			{
+				if (ti.Type == TargetType.SharedCopy)
+				{
+					if (localCopyItems.ContainsKey(ti.Include))
+						ti.Type = TargetType.Copy;
+				}
+			}
 		}
 
 		string _intermediateOutputPath;
 		public string IntermediateOutputPath
 		{
 			get { return _intermediateOutputPath ?? (_intermediateOutputPath = GetProperty("IntermediateOutputPath")); }
-		}
-		
-
-		string _configuration;
-		public string Configuration
-		{
-			get { return _configuration ?? (_configuration = BuildProperties["Configuration"]); }
 		}
 
 		public string GetProperty(string key)
@@ -170,18 +277,175 @@ namespace QQn.TurtleMSBuild
 				return null;
 		}
 
-		public BuildParameters Parameters
+		/// <summary>
+		/// Writes the project info.
+		/// </summary>
+		/// <param name="xw">The xw.</param>
+		/// <param name="forReadability">if set to <c>true</c> [for readability].</param>
+		protected override void WriteProjectInfo(XmlWriter xw, bool forReadability)
 		{
-			get { return _parameters; }
+			base.WriteProjectInfo(xw, forReadability);
+			
+			string keyFile;
+			if (BuildProperties.TryGetValue("AssemblyOriginatorKeyFile", out keyFile))
+			{
+				xw.WriteAttributeString("keyFile", keyFile);
+			}
 		}
 
-		internal string MakeRelativePath(string include)
+		protected override void WriteProjectReferences(XmlWriter xw, bool forReadability)
 		{
-			Uri includeUri = new Uri(Path.GetFullPath(include).Replace(Path.DirectorySeparatorChar, '/'));
-			Uri projectUri = new Uri(ProjectFile.Replace(Path.DirectorySeparatorChar, '/'));
-			Uri relUri = projectUri.MakeRelativeUri(includeUri);
+			base.WriteProjectReferences(xw, forReadability);
+			
+			foreach (ProjectItem i in BuildItems)
+			{
+				bool isProject = false;
+				if (i.Name == "Reference")
+				{
+					xw.WriteStartElement("Reference", Ns);
+				}
+				else if (i.Name == "ProjectReference")
+				{
+					xw.WriteStartElement("Project", Ns);
+					isProject = true;
+				}
+				else
+					continue;
 
-			return relUri.ToString().Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+				xw.WriteAttributeString(isProject ? "src" : "assembly", i.Include);
+				if (i.HasMetadata("Name"))
+					xw.WriteAttributeString("name", i.GetMetadata("Name"));
+				if (i.HasMetadata("HintPath"))
+					xw.WriteAttributeString("src", i.GetMetadata("HintPath"));
+
+				xw.WriteEndElement();
+			}			
 		}
+
+		static readonly string _dotSlash = "." + Path.DirectorySeparatorChar;
+
+		protected override void WriteProjectOutput(XmlWriter xw, bool forReadability)
+		{
+			base.WriteProjectOutput(xw, forReadability);
+		}
+
+		protected override void WriteContent(XmlWriter xw, bool forReadability)
+		{
+			SortedList<string, string> keys = new SortedList<string, string>();
+
+			foreach (string v in GetParameters("ContentItems", Parameters.ContentItems, "Content"))
+			{
+				keys.Add(v, "Item");
+			}
+
+			SortedList<string, string> added = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
+
+			xw.WriteStartElement("Content");
+			foreach (ProjectItem i in BuildItems)
+			{
+				if (i.Name.StartsWith("_"))
+					continue;
+
+				string name;
+				if (!keys.TryGetValue(i.Name, out name))
+					continue;
+
+				if (added.ContainsKey(i.Include))
+					continue;
+
+				added.Add(i.Include, name);
+
+				xw.WriteStartElement(name, Ns);
+				xw.WriteAttributeString("src", i.Include);
+
+				xw.WriteEndElement();
+			}
+			xw.WriteEndElement();
+		}
+
+		protected override void WriteScripts(XmlWriter xw, bool forReadability)
+		{
+			SortedList<string, string> items = new SortedList<string, string>();
+			SortedList<string, string> extensions = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
+			SortedList<string, string> added = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
+
+			foreach (string v in GetParameters("ScriptItems", Parameters.ScriptItems, "Content;Compile;EmbeddedResource;None"))
+			{
+				if (!items.ContainsKey(v))
+					items.Add(v, "Item");
+			}
+
+			foreach (string v in GetParameters("ScriptExtensions", Parameters.ScriptExtensions, null))
+			{
+				string ext = v;
+
+				if (!ext.StartsWith("."))
+					ext = '.' + ext;
+
+				if (!extensions.ContainsKey(ext))
+					extensions.Add(ext, "Item");
+			}
+
+			xw.WriteStartElement("Scripts");
+			foreach (ProjectItem i in BuildItems)
+			{
+				string name;
+				if (!items.TryGetValue(i.Name, out name))
+					continue;
+
+				if (added.ContainsKey(i.Include))
+					continue;
+
+				string extension = Path.GetExtension(i.Include);
+
+				string extensionAs;
+				if (!extensions.TryGetValue(extension, out extensionAs))
+					continue;
+
+				added.Add(i.Include, name);
+
+				xw.WriteStartElement(extensionAs, Ns);
+				xw.WriteAttributeString("src", i.Include);
+
+				xw.WriteEndElement();
+			}
+			xw.WriteEndElement();
+		}
+
+		#region /// Helper methods
+		IEnumerable<string> GetParameters(string name, IEnumerable<string> furtherItems, string alternateValue)
+		{
+			Dictionary<string, string> used = new Dictionary<string, string>();
+
+			if (furtherItems != null)
+				foreach (string i in furtherItems)
+				{
+					if (!used.ContainsKey(i))
+					{
+						used.Add(i, i);
+						yield return i;
+					}
+				}
+
+			string propertyValue;
+			if (!BuildProperties.TryGetValue("TurtleMSBuild_" + name, out propertyValue))
+				propertyValue = alternateValue;
+
+			if (propertyValue != null)
+			{
+				foreach (string i in propertyValue.Split(';'))
+				{
+					if (string.IsNullOrEmpty(i))
+						continue;
+
+					if (!used.ContainsKey(i))
+					{
+						used.Add(i, i);
+						yield return i;
+					}
+				}
+			}
+		}
+		#endregion		
 	}
 }

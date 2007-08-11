@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Text;
 using QQn.TurtleUtils.Tokenizer;
 
-namespace QQn.TurtleLogger
+namespace QQn.TurtleMSBuild
 {
 	/// <summary>
-	/// Build parameter container; Used by the tokenizer in TurtleUtils to parse the 
+	/// Build parameter container; Used by the tokenizer in TurtleUtils to parse the
 	/// value of the <see cref="Microsoft.Build.Framework.ILogger.Parameters"/> property
 	/// </summary>
-	public class BuildParameters
+	public class TurtleParameters
 	{
 		/// <summary>
 		/// The directory to write the tbLog's to
@@ -58,5 +58,11 @@ namespace QQn.TurtleLogger
 		/// </summary>
 		[Token("ContentItem")]
 		public string[] ContentItems;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		[Token("BuildManifest")]
+		public string BuildManifest;
 	}
 }

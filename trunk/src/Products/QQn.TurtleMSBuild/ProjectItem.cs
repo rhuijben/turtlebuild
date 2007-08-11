@@ -10,9 +10,9 @@ namespace QQn.TurtleMSBuild
 	class ProjectItem : ITaskItem
 	{
 		readonly Dictionary<string, string> _metaData;
-		readonly BuildProject _project;
+		readonly MSBuildProject _project;
 
-		internal BuildProject Project
+		internal MSBuildProject Project
 		{
 			get { return _project; }
 		} 
@@ -20,7 +20,7 @@ namespace QQn.TurtleMSBuild
 		readonly string _name;
 		readonly string _include;
 
-		public ProjectItem(BuildProject project, string itemName, ITaskItem taskItem)
+		public ProjectItem(MSBuildProject project, string itemName, ITaskItem taskItem)
 		{
 			if (project == null)
 				throw new ArgumentNullException("project");
@@ -170,7 +170,9 @@ namespace QQn.TurtleMSBuild
 			string result;
 
 			if (!TryGetMetaData(metaDataName, out result))
-				throw new ArgumentOutOfRangeException("metaDataName", metaDataName, "Meta data not available");
+			{
+				return null;
+			}
 
 			return result;
 		}

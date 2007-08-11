@@ -6,7 +6,6 @@ using System.IO;
 using System.Xml;
 using System.Collections;
 using QQn.TurtleUtils.Tokenizer;
-using QQn.TurtleLogger;
 
 namespace QQn.TurtleMSBuild
 {
@@ -15,10 +14,10 @@ namespace QQn.TurtleMSBuild
 	/// </summary>
 	public class MSBuildLogger : ILogger
 	{
-		readonly SortedList<string, BuildProject> completed = new SortedList<string, BuildProject>();
-		readonly SortedList<string, BuildProject> building = new SortedList<string, BuildProject>();
+		readonly SortedList<string, Project> completed = new SortedList<string, Project>(StringComparer.InvariantCultureIgnoreCase);
+		readonly SortedList<string, Project> building = new SortedList<string, Project>(StringComparer.InvariantCultureIgnoreCase);
 		string _parameters;
-		BuildParameters _settings = new BuildParameters();
+		TurtleParameters _settings = new TurtleParameters();
 		int _nodeId;
 
 		/// <summary>
@@ -33,9 +32,9 @@ namespace QQn.TurtleMSBuild
 		/// Gets the parsed build parameters.
 		/// </summary>
 		/// <value>The build parameters.</value>
-		protected BuildParameters BuildParameters
+		protected TurtleParameters BuildParameters
 		{
-			get { return _settings ?? (_settings = new BuildParameters()); }
+			get { return _settings ?? (_settings = new TurtleParameters()); }
 		}
 
 		#region ILogger Members
@@ -51,16 +50,50 @@ namespace QQn.TurtleMSBuild
 			eventSource.ProjectStarted += new ProjectStartedEventHandler(ProjectBuildStarted);
 			eventSource.ProjectFinished += new ProjectFinishedEventHandler(ProjectBuildFinished);
 			eventSource.TaskFinished += new TaskFinishedEventHandler(ProjectTaskFinished);
+			eventSource.CustomEventRaised += new CustomBuildEventHandler(eventSource_CustomEventRaised);
+		}
+
+		void eventSource_CustomEventRaised(object sender, CustomBuildEventArgs e)
+		{
+			ExternalProjectStartedEventArgs projectStarted = e as ExternalProjectStartedEventArgs;
+
+			if (projectStarted != null)
+			{
+				OnExternalProjectStarted(sender, projectStarted);
+				return;
+			}
+
+			ExternalProjectFinishedEventArgs projectFinished = e as ExternalProjectFinishedEventArgs;
+
+			if (projectFinished != null)
+			{
+				OnExternalProjectFinished(sender, projectFinished);
+			}
+		}
+
+		private void OnExternalProjectFinished(object sender, ExternalProjectFinishedEventArgs projectFinished)
+		{
+			GC.KeepAlive(projectFinished);
+		}
+
+		private void OnExternalProjectStarted(object sender, ExternalProjectStartedEventArgs projectStarted)
+		{
+			GC.KeepAlive(projectStarted);
 		}
 
 		void ProjectTaskFinished(object sender, TaskFinishedEventArgs e)
 		{
 			if (e.TaskName == "VCBuild")
 			{
-				BuildProject project;
+				Project project;
 				if (building.TryGetValue(e.ProjectFile, out project))
 				{
-					project.UsedVCBuild = true;
+					Solution solution = project as Solution;
+
+					if (solution != null)
+					{
+						solution.UsedVCBuild = true;
+					}
 				}
 			}			
 		}
@@ -77,8 +110,20 @@ namespace QQn.TurtleMSBuild
 
 			if (e.Properties != null)
 			{
+				Project project;
 				// e.Properties = null if the project is build parallel (.Net v3.5+); Use the distributed logger instead
-				building.Add(e.ProjectFile, new BuildProject(e.ProjectFile, e.TargetNames, e.Properties, e.Items, _settings));
+				switch(Path.GetExtension(e.ProjectFile).ToUpperInvariant())
+				{
+					case ".SLN":
+						project = new Solution(e.ProjectFile, e.TargetNames, e.Properties, e.Items, _settings);
+						break;
+					default:
+						project = new MSBuildProject(e.ProjectFile, e.TargetNames, e.Properties, e.Items, _settings);						
+						break;
+				}
+
+				project.BuildEngineTargets = e.TargetNames;
+				building.Add(e.ProjectFile, project);
 			}
 		}
 
@@ -92,12 +137,11 @@ namespace QQn.TurtleMSBuild
 			if (!building.ContainsKey(e.ProjectFile))
 				return; // Can't finish if not building; probably reference project
 
-			BuildProject bp = building[e.ProjectFile];
+			Project project = building[e.ProjectFile];
 			building.Remove(e.ProjectFile);
 
 			bool isBuild = false;
-
-			foreach (string target in bp.BuildTargetName.Split(';'))
+			foreach (string target in project.BuildEngineTargets.Split(';'))
 			{
 				if (string.IsNullOrEmpty(target))
 					isBuild = true;
@@ -110,10 +154,10 @@ namespace QQn.TurtleMSBuild
 
 			if (isBuild && !completed.ContainsKey(e.ProjectFile))
 			{
-				bp.Refresh();
-				completed.Add(e.ProjectFile, bp);
+				completed.Add(e.ProjectFile, project);
 
-				TurtleFilter.Execute(bp);
+				project.ParseBuildResult(null);
+				project.WriteTBLog();			
 			}
 		}
 
@@ -129,7 +173,7 @@ namespace QQn.TurtleMSBuild
 			get { return _parameters; }
 			set 
 			{
-				BuildParameters settings;
+				TurtleParameters settings;
 				if (!Tokenizer.TryParseConnectionString(value, out settings))
 					throw new ArgumentException("Invalid setting string");
 				_parameters = value;
