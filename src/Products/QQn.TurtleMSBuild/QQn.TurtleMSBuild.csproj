@@ -38,11 +38,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExternalProjects\ExternalProject.cs" />
+    <Compile Include="ExternalProjects\VCBuildProject.cs" />
     <Compile Include="MSBuildParameters.cs" />
+    <Compile Include="Project.cs" />
     <Compile Include="ProjectItem.cs" />
     <Compile Include="MSBuildLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BuildProject.cs" />
+    <Compile Include="ReferenceItem.cs" />
+    <Compile Include="SimpleBuildEngine.cs" />
+    <Compile Include="SimpleTaskItem.cs" />
+    <Compile Include="Solution.cs" />
+    <Compile Include="TargetItem.cs" />
     <Compile Include="TurtleFilter.cs" />
     <Compile Include="VCBuildHandler.cs" />
   </ItemGroup>

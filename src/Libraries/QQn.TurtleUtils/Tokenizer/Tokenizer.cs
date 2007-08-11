@@ -529,13 +529,13 @@ namespace QQn.TurtleUtils.Tokenizer
 		}
 
 		/// <summary>
-		/// 
+		/// Gets the words.
 		/// </summary>
-		/// <param name="input"></param>
-		/// <param name="groups"></param>
-		/// <param name="escapeCharacter"></param>
-		/// <param name="mode"></param>
-		/// <param name="wordSeparators"></param>
+		/// <param name="input">The input.</param>
+		/// <param name="groups">The groups.</param>
+		/// <param name="escapeCharacter">The escape character.</param>
+		/// <param name="mode">The mode.</param>
+		/// <param name="wordSeparators">The word separators.</param>
 		/// <returns></returns>
 		public static IList<string> GetWords(string input, string[] groups, char escapeCharacter, EscapeMode mode, char[] wordSeparators)
 		{
