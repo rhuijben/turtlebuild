@@ -50,7 +50,7 @@ namespace QQn.TurtleMSBuild
 			eventSource.ProjectStarted += new ProjectStartedEventHandler(ProjectBuildStarted);
 			eventSource.ProjectFinished += new ProjectFinishedEventHandler(ProjectBuildFinished);
 			eventSource.TaskFinished += new TaskFinishedEventHandler(ProjectTaskFinished);
-			eventSource.CustomEventRaised += new CustomBuildEventHandler(eventSource_CustomEventRaised);
+			//eventSource.CustomEventRaised += new CustomBuildEventHandler(eventSource_CustomEventRaised);
 		}
 
 		void eventSource_CustomEventRaised(object sender, CustomBuildEventArgs e)

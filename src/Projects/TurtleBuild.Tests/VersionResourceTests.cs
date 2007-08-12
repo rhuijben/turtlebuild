@@ -20,7 +20,7 @@ namespace TurtleTests
 			string tmpFile = Path.Combine(Path.GetTempPath(), Path.GetFileName(file));
 
 			File.Copy(file, tmpFile, true);
-			Assert.That(VersionInfo.RefreshVersionInfoFromAttributes(tmpFile, Path.GetFullPath("..\\..\\..\\..\\Libraries\\QQn.TurtleBuildUtils\\QQn.TurtleBuildUtils.snk")));
+			Assert.That(VersionInfo.RefreshVersionInfoFromAttributes(tmpFile, Path.GetFullPath("..\\..\\..\\..\\Libraries\\QQn.TurtleBuildUtils\\QQn.TurtleBuildUtils.snk"), null));
 		}
 	}
 }

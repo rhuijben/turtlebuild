@@ -145,5 +145,15 @@ namespace QQn.TurtleBuildUtils
 				return p.ExitCode == 0;
 			}
 		}
+
+		internal static bool ReSignAssemblyWithFileOrContainer(string assembly, string keyFile, string keyContainer)
+		{
+			if (!string.IsNullOrEmpty(keyFile))
+				return ReSignAssemblyWithFile(assembly, keyFile);
+			else if (!string.IsNullOrEmpty(keyContainer))
+				return ReSignAssemblyWithContainer(assembly, keyContainer);
+			else
+				throw new ArgumentException("keyFile or keyContainer must be non-null");			
+		}
 	}
 }

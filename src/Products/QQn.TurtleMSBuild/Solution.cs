@@ -8,9 +8,17 @@ namespace QQn.TurtleMSBuild
 {
 	class Solution : MSBuildProject
 	{
+		bool _usedVcBuild;
+
 		public Solution(string projectFile, string targetNames, IEnumerable properties, IEnumerable items, TurtleParameters parameters)
 			: base(projectFile, targetNames, properties, items, parameters)
 		{
+		}
+
+		internal bool UsedVCBuild
+		{
+			get { return _usedVcBuild; }
+			set { _usedVcBuild = value; }
 		}
 
 		public override bool IsSolution
@@ -22,7 +30,8 @@ namespace QQn.TurtleMSBuild
 		{
 			Refresh();
 
-			VCBuildHandler.HandleProject(this);
+			if(UsedVCBuild)
+				VCBuildHandler.HandleProject(this);
 		}
 	}
 }

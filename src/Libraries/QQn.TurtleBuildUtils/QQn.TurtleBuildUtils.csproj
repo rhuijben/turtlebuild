@@ -36,6 +36,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BuildTools.cs" />
+    <Compile Include="FileList.cs" />
     <Compile Include="VersionInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
