@@ -64,5 +64,11 @@ namespace QQn.TurtleMSBuild
 		/// </summary>
 		[Token("BuildManifest")]
 		public string BuildManifest;
+
+		/// <summary>
+		/// 
+		/// </summary>
+		[Token("VC-UpdateVersionInformation")]
+		public bool UpdateVCVersionInfo;
 	}
 }

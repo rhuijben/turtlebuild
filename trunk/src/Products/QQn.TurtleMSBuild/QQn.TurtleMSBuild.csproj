@@ -45,19 +45,22 @@
     <Compile Include="ProjectItem.cs" />
     <Compile Include="MSBuildLogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BuildProject.cs" />
+    <Compile Include="MSBuildProject.cs" />
     <Compile Include="ReferenceItem.cs" />
     <Compile Include="SimpleBuildEngine.cs" />
     <Compile Include="SimpleTaskItem.cs" />
     <Compile Include="Solution.cs" />
     <Compile Include="TargetItem.cs" />
-    <Compile Include="TurtleFilter.cs" />
     <Compile Include="VCBuildHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="QQn.TurtleMSBuild.snk" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\QQn.TurtleBuildUtils\QQn.TurtleBuildUtils.csproj">
+      <Project>{4FB6CAEF-DEF4-46FA-A118-DB35B373C397}</Project>
+      <Name>QQn.TurtleBuildUtils</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Libraries\QQn.TurtleUtils\QQn.TurtleUtils.csproj">
       <Project>{BB47C9BD-2E01-4EEC-9128-BDDCF80300B1}</Project>
       <Name>QQn.TurtleUtils</Name>

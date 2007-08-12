@@ -16,7 +16,6 @@ namespace QQn.TurtleMSBuild
 		readonly IEnumerable _properties;
 		readonly IEnumerable _items;
 		readonly TurtleParameters _parameters;
-		bool _usedVcBuild;
 
 		public MSBuildProject(string projectFile, string targetNames, IEnumerable properties, IEnumerable items, TurtleParameters parameters)
 			: base(projectFile, parameters)
@@ -49,12 +48,6 @@ namespace QQn.TurtleMSBuild
 		internal IEnumerable ItemsEnumerable
 		{
 			get { return _items; }
-		}
-
-		internal bool UsedVCBuild
-		{
-			get { return _usedVcBuild; }
-			set { _usedVcBuild = value; }
 		}
 
 		SortedList<string, string> _buildProperties;
@@ -277,6 +270,22 @@ namespace QQn.TurtleMSBuild
 				return null;
 		}
 
+		protected override void WriteAssemblyInfo(XmlWriter xw, bool forReadability)
+		{
+			if (TargetAssembly == null)
+			{
+				try
+				{
+					AssemblyName name = AssemblyName.GetAssemblyName(Path.Combine(ProjectPath, TargetPath));
+					if (name != null)
+						this.TargetAssembly = new AssemblyReference(name.FullName, null, this);
+				}
+				catch
+				{ }
+			}
+			base.WriteAssemblyInfo(xw, forReadability);
+		}
+
 		/// <summary>
 		/// Writes the project info.
 		/// </summary>
@@ -329,7 +338,7 @@ namespace QQn.TurtleMSBuild
 			base.WriteProjectOutput(xw, forReadability);
 		}
 
-		protected override void WriteContent(XmlWriter xw, bool forReadability)
+		void UpdateContent()
 		{
 			SortedList<string, string> keys = new SortedList<string, string>();
 
@@ -340,7 +349,7 @@ namespace QQn.TurtleMSBuild
 
 			SortedList<string, string> added = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
 
-			xw.WriteStartElement("Content");
+			
 			foreach (ProjectItem i in BuildItems)
 			{
 				if (i.Name.StartsWith("_"))
@@ -355,15 +364,17 @@ namespace QQn.TurtleMSBuild
 
 				added.Add(i.Include, name);
 
-				xw.WriteStartElement(name, Ns);
-				xw.WriteAttributeString("src", i.Include);
-
-				xw.WriteEndElement();
+				ContentFiles.Add(MakeRelativePath(i.Include));
 			}
-			xw.WriteEndElement();
 		}
 
-		protected override void WriteScripts(XmlWriter xw, bool forReadability)
+		protected override void WriteContent(XmlWriter xw, bool forReadability)
+		{			
+			UpdateContent();
+			base.WriteContent(xw, forReadability);
+		}
+
+		void UpdateScripts()
 		{
 			SortedList<string, string> items = new SortedList<string, string>();
 			SortedList<string, string> extensions = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
@@ -385,8 +396,7 @@ namespace QQn.TurtleMSBuild
 				if (!extensions.ContainsKey(ext))
 					extensions.Add(ext, "Item");
 			}
-
-			xw.WriteStartElement("Scripts");
+			
 			foreach (ProjectItem i in BuildItems)
 			{
 				string name;
@@ -404,12 +414,15 @@ namespace QQn.TurtleMSBuild
 
 				added.Add(i.Include, name);
 
-				xw.WriteStartElement(extensionAs, Ns);
-				xw.WriteAttributeString("src", i.Include);
-
-				xw.WriteEndElement();
+				ScriptFiles.Add(MakeRelativePath(i.Include));
 			}
-			xw.WriteEndElement();
+		}
+
+		protected override void WriteScripts(XmlWriter xw, bool forReadability)
+		{
+			UpdateScripts();
+
+			base.WriteScripts(xw, forReadability);
 		}
 
 		#region /// Helper methods

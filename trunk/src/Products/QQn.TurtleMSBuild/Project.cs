@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Xml;
 using System.Reflection;
+using QQn.TurtleBuildUtils;
 
 namespace QQn.TurtleMSBuild
 {
@@ -142,6 +143,26 @@ namespace QQn.TurtleMSBuild
 			protected set { _targetExt = value; }
 		}
 
+
+		/// <summary>
+		/// Gets the target path.
+		/// </summary>
+		/// <value>The target path.</value>
+		public string TargetPath
+		{
+			get 
+			{
+				if (OutDir == null)
+					return null;
+				else if (TargetName == null)
+					return null;
+				else if (TargetExt == null)
+					return null;
+ 
+				return Path.Combine(OutDir, TargetName + TargetExt);
+			}
+		}
+
 		AssemblyReference _assembly;
 		public AssemblyReference TargetAssembly
 		{
@@ -154,6 +175,33 @@ namespace QQn.TurtleMSBuild
 		{
 			get { return _references; }
 		}
+
+		readonly FileList _contentFiles = new FileList();
+		protected FileList ContentFiles
+		{
+			get { return _contentFiles; }
+		}
+		readonly FileList _scriptFiles = new FileList();
+		protected FileList ScriptFiles
+		{
+			get { return _scriptFiles; }
+		}
+
+		string _keyFile;
+		string _keyContainer;
+
+		public string KeyFile
+		{
+			get { return _keyFile; }
+			set { _keyFile = value; }
+		}
+
+		public string KeyContainer
+		{
+			get { return _keyContainer; }
+			set { _keyContainer = value; }
+		}
+
 
 		/// <summary>
 		/// Parses the result.
@@ -250,7 +298,7 @@ namespace QQn.TurtleMSBuild
 
 		protected void WriteGenerator(XmlWriter xw, bool forReadability)
 		{
-			xw.WriteStartElement("Generator", Ns);
+			xw.WriteStartElement("Generator");
 			Assembly assembly = System.Reflection.Assembly.GetExecutingAssembly();
 
 			string product = GetAttribute<AssemblyProductAttribute>(assembly).Product;
@@ -336,6 +384,15 @@ namespace QQn.TurtleMSBuild
 		/// <param name="forReadability">if set to <c>true</c> [for readability].</param>
 		protected virtual void WriteContent(XmlWriter xw, bool forReadability)
 		{
+			xw.WriteStartElement("Content");
+			foreach (string file in ContentFiles)
+			{
+				xw.WriteStartElement("Item");
+				xw.WriteAttributeString("src", file);
+
+				xw.WriteEndElement();
+			}
+			xw.WriteEndElement();
 		}
 
 		/// <summary>
@@ -345,6 +402,15 @@ namespace QQn.TurtleMSBuild
 		/// <param name="forReadability">if set to <c>true</c> [for readability].</param>
 		protected virtual void WriteScripts(XmlWriter xw, bool forReadability)
 		{
+			xw.WriteStartElement("Scripts");
+			foreach (string file in ScriptFiles)
+			{
+				xw.WriteStartElement("Item");
+				xw.WriteAttributeString("src", file);
+
+				xw.WriteEndElement();
+			}
+			xw.WriteEndElement();
 		}
 
 

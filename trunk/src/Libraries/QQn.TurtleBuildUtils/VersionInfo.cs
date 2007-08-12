@@ -37,7 +37,7 @@ namespace QQn.TurtleBuildUtils
 		/// </summary>
 		/// <param name="file">The file.</param>
 		/// <param name="strongNameKey">The strong name key.</param>
-		public static bool RefreshVersionInfoFromAttributes(string file, string strongNameKey)
+		public static bool RefreshVersionInfoFromAttributes(string file, string keyFile, string keyContainer)
 		{
 			if (!File.Exists(file))
 				throw new FileNotFoundException("File to update not found", file);			
@@ -51,7 +51,7 @@ namespace QQn.TurtleBuildUtils
 				if (tmpAssembly == null)
 					return false;
 
-				return CopyFileVersionInfo(tmpAssembly, file, strongNameKey);
+				return CopyFileVersionInfo(tmpAssembly, file, keyFile, keyContainer);
 			}
 			finally
 			{
@@ -65,7 +65,10 @@ namespace QQn.TurtleBuildUtils
 		/// </summary>
 		/// <param name="fromFile">Source file.</param>
 		/// <param name="toFile">Destination file.</param>
-		public static bool CopyFileVersionInfo(string fromFile, string toFile, string strongNameKey)
+		/// <param name="keyFile">The key file.</param>
+		/// <param name="keyContainer">The key container.</param>
+		/// <returns></returns>
+		public static bool CopyFileVersionInfo(string fromFile, string toFile, string keyFile, string keyContainer)
 		{
 			if (string.IsNullOrEmpty(fromFile))
 				throw new ArgumentNullException("fromFile");
@@ -76,7 +79,7 @@ namespace QQn.TurtleBuildUtils
 			else if (!File.Exists(toFile))
 				throw new FileNotFoundException("File not found", toFile);
 
-			bool signFile = strongNameKey != null;
+			bool signFile = !string.IsNullOrEmpty(keyFile) || !string.IsNullOrEmpty(keyContainer);
 
 			int handle;
 			int size = NativeMethods.GetFileVersionInfoSize(fromFile, out handle);
@@ -118,7 +121,7 @@ namespace QQn.TurtleBuildUtils
 					ok = NativeMethods.EndUpdateResource(resHandle, false) && ok;
 
 					if(ok && signFile)
-						ok = BuildTools.ReSignAssemblyWithFile(toFile, strongNameKey);
+						ok = BuildTools.ReSignAssemblyWithFileOrContainer(toFile, keyFile, keyContainer);
 
 					return ok;
 				}

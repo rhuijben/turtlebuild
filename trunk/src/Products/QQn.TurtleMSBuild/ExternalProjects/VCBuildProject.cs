@@ -4,6 +4,8 @@ using System.Text;
 using Microsoft.Build.Framework;
 using System.IO;
 using System.Xml;
+using System.Xml.XPath;
+using QQn.TurtleBuildUtils;
 
 namespace QQn.TurtleMSBuild.ExternalProjects
 {
@@ -65,10 +67,61 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 			ResolveToOutput(output);
 
-			XmlTextWriter xw = new XmlTextWriter(Console.Out);
-			xw.Formatting = Formatting.Indented;
+			ParseProjectFile();
 
-			ProjectOutput.WriteProjectOutput(xw, true);
+			if (Parameters.UpdateVCVersionInfo)
+			{
+				VersionInfo.RefreshVersionInfoFromAttributes(targetFile, KeyFile, KeyContainer);
+			}
+		}		
+
+		private void ParseProjectFile()
+		{
+			using (StreamReader sr = File.OpenText(ProjectFile))
+			{
+				XPathDocument doc = new XPathDocument(sr);
+
+				SortedList<string, string> extensions = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
+
+				if(Parameters.ScriptExtensions != null)
+				foreach (string extension in Parameters.ScriptExtensions)
+				{
+					string ext = extension;
+
+					if (!ext.StartsWith("."))
+						ext = '.' + ext;
+
+					if (!extensions.ContainsKey(ext))
+						extensions.Add(ext, "Item");
+				}
+
+				foreach (XPathNavigator nav in doc.CreateNavigator().Select("//File[@RelativePath]"))
+				{
+					string file = MakeRelativePath(Path.Combine(ProjectPath, nav.GetAttribute("RelativePath", "")));
+					bool deploymentContent = ("true" == nav.GetAttribute("DeploymentContent", ""));
+
+					if (deploymentContent && !ContentFiles.Contains(file))
+						ContentFiles.Add(file);
+
+					if (extensions.ContainsKey(Path.GetExtension(file)) && !ScriptFiles.Contains(file))
+						ScriptFiles.Add(file);
+				}
+
+				XPathNavigator n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + Configuration + "'] and @Name='VCLinkerTool' and @KeyFile!='']");
+
+				if(n != null)
+				{
+					KeyFile = MakeRelativePath(Path.Combine(ProjectPath, n.GetAttribute("KeyFile", "")));
+				}
+
+				n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + Configuration + "'] and @Name='VCLinkerTool' and @KeyContainer!='']");
+
+				if (n != null)
+				{
+					KeyContainer = n.GetAttribute("KeyContainer", "");
+				}
+				
+			}
 		}		
 		
 		private ITaskItem[] GetProjectOutput(string solutionFile)
