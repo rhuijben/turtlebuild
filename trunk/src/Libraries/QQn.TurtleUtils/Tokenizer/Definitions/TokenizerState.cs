@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 using System.ComponentModel;
+using System.Globalization;
 
 namespace QQn.TurtleUtils.Tokenizer.Definitions
 {
@@ -10,7 +11,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 	/// Contains the parser state while tokanizing
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class TokenizerState<T> : Hashtable, IDisposable
+	public class TokenizerState<T> : Hashtable, IDisposable, ITypeDescriptorContext
 		where T : class, new()
 	{
 		readonly T _instance;
@@ -104,5 +105,78 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		}
 
 		#endregion
+
+		#region ITypeDescriptorContext Members
+
+		/// <summary>
+		/// Gets the container representing this <see cref="T:System.ComponentModel.TypeDescriptor"/> request.
+		/// </summary>
+		/// <value></value>
+		/// <returns>An <see cref="T:System.ComponentModel.IContainer"/> with the set of objects for this <see cref="T:System.ComponentModel.TypeDescriptor"/>; otherwise, null if there is no container or if the <see cref="T:System.ComponentModel.TypeDescriptor"/> does not use outside objects.</returns>
+		IContainer ITypeDescriptorContext.Container
+		{
+			get { return null; }
+		}
+
+		/// <summary>
+		/// Gets the object that is connected with this type descriptor request.
+		/// </summary>
+		/// <value></value>
+		/// <returns>The object that invokes the method on the <see cref="T:System.ComponentModel.TypeDescriptor"/>; otherwise, null if there is no object responsible for the call.</returns>
+		object ITypeDescriptorContext.Instance
+		{
+			get { return Instance; }
+		}
+
+		/// <summary>
+		/// Raises the <see cref="E:System.ComponentModel.Design.IComponentChangeService.ComponentChanged"/> event.
+		/// </summary>
+		void ITypeDescriptorContext.OnComponentChanged()
+		{			
+		}
+
+		/// <summary>
+		/// Raises the <see cref="E:System.ComponentModel.Design.IComponentChangeService.ComponentChanging"/> event.
+		/// </summary>
+		/// <returns>
+		/// true if this object can be changed; otherwise, false.
+		/// </returns>
+		bool ITypeDescriptorContext.OnComponentChanging()
+		{
+			return false;
+		}
+
+		/// <summary>
+		/// Gets the <see cref="T:System.ComponentModel.PropertyDescriptor"/> that is associated with the given context item.
+		/// </summary>
+		/// <value></value>
+		/// <returns>The <see cref="T:System.ComponentModel.PropertyDescriptor"/> that describes the given context item; otherwise, null if there is no <see cref="T:System.ComponentModel.PropertyDescriptor"/> responsible for the call.</returns>
+		PropertyDescriptor ITypeDescriptorContext.PropertyDescriptor
+		{
+			get { return null; }
+		}
+
+		#endregion
+
+		#region IServiceProvider Members
+
+		/// <summary>
+		/// Gets the service object of the specified type.
+		/// </summary>
+		/// <param name="serviceType">An object that specifies the type of service object to get.</param>
+		/// <returns>
+		/// A service object of type <paramref name="serviceType"/>.-or- null if there is no service object of type <paramref name="serviceType"/>.
+		/// </returns>
+		object IServiceProvider.GetService(Type serviceType)
+		{
+			return null;
+		}
+
+		#endregion
+
+		public CultureInfo CultureInfo
+		{
+			get { return _args.CultureInfo; }
+		}
 	}
 }

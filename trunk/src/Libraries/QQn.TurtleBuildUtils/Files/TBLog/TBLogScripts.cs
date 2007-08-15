@@ -8,6 +8,6 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	public class TBLogScripts
 	{
 		[TokenGroup("Item")]
-		List<TBLogItem> Items;
+		public readonly List<TBLogItem> Items = new List<TBLogItem>();
 	}
 }

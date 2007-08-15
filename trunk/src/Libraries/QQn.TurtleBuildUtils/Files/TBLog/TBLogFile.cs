@@ -27,7 +27,6 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		[TokenGroup("Scripts")]
 		public TBLogScripts Scripts = new TBLogScripts();
 
-
 		public static TBLogFile Load(string path)
 		{
 			using (XmlReader xr = XmlReader.Create(path))

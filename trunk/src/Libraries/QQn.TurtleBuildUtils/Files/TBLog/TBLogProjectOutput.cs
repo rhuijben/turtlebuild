@@ -11,6 +11,6 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		[TokenGroup("SharedItem", typeof(TBLogSharedItem))]
 		[TokenGroup("CopyItem", typeof(TBLogCopyItem))]
 		[TokenGroup("SharedCopyItem", typeof(TBLogSharedCopyItem))]
-		public List<TBLogReferenceItem> Items = new List<TBLogReferenceItem>();
+		public readonly List<TBLogReferenceItem> Items = new List<TBLogReferenceItem>();
 	}
 }

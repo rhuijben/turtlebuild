@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using QQn.TurtleUtils.Tokenizer.Tokenizers;
+using System.Xml;
 
 namespace QQn.TurtleUtils.Tokenizer.Definitions
 {
@@ -13,10 +14,11 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 	{
 		readonly string _name;
 		readonly Type _groupType;
+		readonly Type _valueType;
 		readonly TokenMember _member;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TokenGroupItem"/> class.
+		/// Initializes a new instance of the <see cref="TokenGroup"/> class.
 		/// </summary>
 		/// <param name="name">The name.</param>
 		/// <param name="memberType">Type of the member.</param>
@@ -29,6 +31,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 				throw new ArgumentNullException("member");
 
 			_name = name;
+			_valueType = memberType;
 			_groupType = memberType ?? member.DataType;
 			_member = member;
 
@@ -52,11 +55,21 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 
 			object[] arguments = new object[] { nav, args, null };
 
-			bool ok = (bool)xmlTokenizer.InvokeMember("TryParse", BindingFlags.Static | BindingFlags.InvokeMethod | BindingFlags.NonPublic, null, null, arguments);
+			bool ok = (bool)xmlTokenizer.InvokeMember("TryParse", BindingFlags.Static | BindingFlags.InvokeMethod |BindingFlags.NonPublic, null, null, arguments);
 
 			value = arguments[2];
 
 			return ok;
+		}
+
+		internal bool TryWriteXml(XmlWriter writer, TokenizerArgs args, object value)
+		{
+			Type xmlTokenizer = typeof(XmlTokenizer<>).MakeGenericType(_groupType);
+
+			MethodInfo[] mi = xmlTokenizer.GetMethods(BindingFlags.Static | BindingFlags.InvokeMethod | BindingFlags.NonPublic);
+			object[] arguments = new object[] { writer, value, args };
+
+			return (bool)xmlTokenizer.InvokeMember("TryWrite", BindingFlags.Static | BindingFlags.InvokeMethod | BindingFlags.NonPublic, null, null, arguments);
 		}
 
 		/// <summary>
@@ -67,5 +80,23 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		{
 			get { return _member; }
 		}
+
+		/// <summary>
+		/// Gets the type of the value.
+		/// </summary>
+		/// <value>The type of the value.</value>
+		public Type ValueType
+		{
+			get { return _valueType; }
+		}
+
+		/// <summary>
+		/// Gets the name.
+		/// </summary>
+		/// <value>The name.</value>
+		public string Name
+		{
+			get { return _name; }
+		} 
 	}
 }

@@ -15,13 +15,14 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		readonly string _name;
 		readonly IList<string> _aliases;
 		readonly Type _typeConverter;
+		readonly Type _valueType;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TokenItem"/> class.
 		/// </summary>
 		/// <param name="member">The member.</param>
 		/// <param name="attr">The attr.</param>
-		public TokenItem(TokenMember member, TokenAttribute attr)
+		public TokenItem(TokenMember member, TokenAttribute attr, Type valueType)
 		{
 			if (member == null)
 				throw new ArgumentNullException("member");
@@ -29,8 +30,11 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			_name = attr.Name;
 			_aliases = attr.Aliases;
 
-			_member = member;						
+			_member = member;
 			_typeConverter = attr.TypeConverter ?? member.DefaultTypeConverter;
+
+			if (valueType != null && !_member.DataType.IsAssignableFrom(valueType))
+				throw new ArgumentException("valueType must be assignable to datatype of member", "valueType");
 		}
 
 		/// <summary>
@@ -40,6 +44,15 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		public TokenMember Member
 		{
 			get { return _member; }
+		}
+
+		/// <summary>
+		/// Gets the type of the value.
+		/// </summary>
+		/// <value>The type of the value.</value>
+		public Type ValueType
+		{
+			get { return _valueType; }
 		}
 
 		/// <summary>
@@ -111,7 +124,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		/// <value>The type of the data.</value>
 		public Type DataType
 		{
-			get { return Member.DataType; }
+			get { return ValueType ?? Member.DataType; }
 		}
 
 		TypeConverter _typeConverterInstance;
@@ -147,7 +160,8 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		/// </summary>
 		/// <param name="value">The value.</param>
 		/// <returns></returns>
-		public virtual object ConvertValue(string value)
+		public virtual object ConvertValue<T>(string value, TokenizerState<T> state)
+			where T : class, new()
 		{
 			if(typeof(string) == DataType)
 				return value;
@@ -169,6 +183,22 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			throw new InvalidOperationException(string.Format("The typeconverter of type {0} (A {1} instance) can't convert a string into a {0}", DataType.FullName, tc.GetType().FullName, DataType.Name));
 		}
 
+		internal string GetStringValue<T>(object value, TokenizerState<T> state)
+			where T : class, new()
+		{
+			string val = value as string;
+
+			if (val != null)
+				return val;
+
+			TypeConverter tc = TypeConverter;
+
+			if (tc == null)
+				tc = TypeDescriptor.GetConverter(DataType);
+
+			return tc.ConvertToString(state, state.CultureInfo, value);
+		}
+
 		/// <summary>
 		/// Evaluates the specified value.
 		/// </summary>
@@ -185,7 +215,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			else if (value == null)
 				value = bool.TrueString;
 
-			object RawValue = ConvertValue(value);
+			object RawValue = ConvertValue(value, state);
 
 			ExpandableTokenValue expandable = RawValue as ExpandableTokenValue;
 
