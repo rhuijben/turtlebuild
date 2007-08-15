@@ -110,6 +110,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="QQn.TurtleUtils.snk" />
+    <Compile Include="Tokenizer\Converters\UtcDateTimeConverter.cs" />
     <Compile Include="Tokenizer\Converters\VersionConverter.cs" />
     <Compile Include="Tokenizer\Tokenizer.ConnectionString.cs" />
     <Compile Include="Tokenizer\Tokenizer.Xml.cs" />

@@ -97,7 +97,7 @@ namespace QQn.TurtleUtils.Tokenizer
 			if (def == null)
 				def = StaticTokenizerDefinition<T>.Definition;
 
-			return new TokenizerState<T>(instance, def, args);
+			return new TokenizerState<T>(instance, def, args, false);
 		}
 
 		internal static TokenizerState<T> NewState<T>(TokenizerArgs args)
@@ -114,7 +114,7 @@ namespace QQn.TurtleUtils.Tokenizer
 			if (def == null)
 				def = StaticTokenizerDefinition<T>.Definition;
 
-			return new TokenizerState<T>(instance, def, args);
+			return new TokenizerState<T>(instance, def, args, true);
 		}
 
 		static bool IsSeparator(char c, char[] wordSeparators)
