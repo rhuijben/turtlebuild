@@ -3,26 +3,31 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using System.Collections;
+using System.ComponentModel;
 
 namespace QQn.TurtleUtils.Tokenizer.Definitions
 {
 	/// <summary>
-	/// 
+	/// Specifies the way the tokenizer uses a member
 	/// </summary>
 	public enum TokenMemberMode
 	{
 		/// <summary>
-		/// 
+		/// Sets value
 		/// </summary>
 		Default,
 		/// <summary>
-		/// 
+		/// Extends an array
 		/// </summary>
 		Array,
 		/// <summary>
-		/// 
+		/// Appends to an <see cref="System.Collections.IList"/>
 		/// </summary>
-		List
+		List,
+		/// <summary>
+		/// Appends to an <see cref="System.Collections.Generic.IList&lt;T&gt;"/>
+		/// </summary>
+		GenericList
 	}
 
 	/// <summary>
@@ -33,7 +38,12 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		readonly MemberInfo _member;
 		readonly string _name;
 		readonly IList<TokenItem> _tokens;
+		readonly IList<TokenGroupItem> _groups;
 		readonly bool _isProperty;
+		readonly Type _defaultTypeConverter;
+
+		static readonly IList<TokenItem> _EmptyTokensList = new TokenItem[0];
+		static readonly IList<TokenGroupItem> _EmptyGroupList = new TokenGroupItem[0];
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TokenMember"/> class.
@@ -48,20 +58,41 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			_name = member.Name;
 			_isProperty = member is PropertyInfo;
 
+			TypeConverterAttribute tca = GetFirstAttribute<TypeConverterAttribute>(member);
+			if(tca != null)
+				_defaultTypeConverter = Type.GetType(tca.ConverterTypeName, false);
+
 			List<TokenItem> tokens = null;
 			foreach (TokenAttribute a in member.GetCustomAttributes(typeof(TokenAttribute), true))
 			{
 				if (a.Name == null)
 					continue; // Position token
-				if(tokens == null)
+				if (tokens == null)
 					tokens = new List<TokenItem>();
-				
+
 				tokens.Add(a.CreateToken(this));
 			}
+
+			List<TokenGroupItem> groups = null;
+			foreach (TokenGroupAttribute a in member.GetCustomAttributes(typeof(TokenGroupAttribute), true))
+			{
+				if (a.Name == null)
+					continue; // Position token
+				if (groups == null)
+					groups = new List<TokenGroupItem>();
+
+				groups.Add(a.CreateGroup(this));
+			}
+
 			if (tokens != null)
 				_tokens = tokens.AsReadOnly();
 			else
-				_tokens = new TokenItem[0];
+				_tokens = _EmptyTokensList;
+
+			if (groups != null)
+				_groups = groups.AsReadOnly();
+			else
+				_groups = _EmptyGroupList;
 		}
 
 		/// <summary>
@@ -82,6 +113,15 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			get { return _tokens; }
 		}
 
+		/// <summary>
+		/// Gets the tokens.
+		/// </summary>
+		/// <value>The tokens.</value>
+		public IList<TokenGroupItem> Groups
+		{
+			get { return _groups; }
+		}
+
 		Type _fieldType;
 		/// <summary>
 		/// Gets the type of the field.
@@ -89,8 +129,8 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		/// <value>The type of the field.</value>
 		public Type FieldType
 		{
-			get 
-			{ 
+			get
+			{
 				if (_fieldType == null)
 				{
 					FieldInfo field = _member as FieldInfo;
@@ -107,6 +147,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		}
 
 		Type _dataType;
+		Type _listType;
 		TokenMemberMode _tokenMemberMode;
 		/// <summary>
 		/// Gets the type of the data.
@@ -126,21 +167,41 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 						fieldType = fieldType.GetElementType();
 						_tokenMemberMode = TokenMemberMode.Array;
 					}
-					else if (typeof(IList).IsAssignableFrom(fieldType))
-					{
-						MethodInfo m = fieldType.GetMethod("Add", BindingFlags.Public | BindingFlags.Instance);
-
-						if (m != null)
+					else 
+						foreach (Type iff in fieldType.GetInterfaces())
 						{
-							ParameterInfo[] pi = m.GetParameters();
-
-							if (pi.Length == 1)
+							if (iff == typeof(IList))
 							{
-								fieldType = pi[0].ParameterType;
-								_tokenMemberMode = TokenMemberMode.List;
+								MethodInfo m = fieldType.GetMethod("Add", BindingFlags.Public | BindingFlags.Instance);
+
+								if (m != null)
+								{
+									ParameterInfo[] pi = m.GetParameters();
+
+									if (pi.Length == 1)
+									{
+										fieldType = pi[0].ParameterType;
+										_tokenMemberMode = TokenMemberMode.List;
+										_listType = typeof(ICollection);
+										break;
+									}
+								}
+							}
+							else if (iff.IsGenericType)
+							{
+								Type genericType = iff.GetGenericTypeDefinition();
+
+								if (genericType == typeof(ICollection<>))
+								{
+									fieldType = iff.GetGenericArguments()[0];
+									_tokenMemberMode = TokenMemberMode.GenericList;
+									_listType = iff;
+									break;
+								}
 							}
 						}
-					}
+
+
 					_dataType = fieldType;
 				}
 				return _dataType;
@@ -171,7 +232,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		public void SetValue<T>(TokenizerState<T> state, object value)
 			where T : class, new()
 		{
-			if(value != null && !DataType.IsAssignableFrom(value.GetType()))
+			if (value != null && !DataType.IsAssignableFrom(value.GetType()))
 				throw new ArgumentException("Invalid value", "value");
 
 			switch (TokenMemberMode)
@@ -199,22 +260,41 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 						break;
 					}
 				case TokenMemberMode.List:
+				case TokenMemberMode.GenericList:
 					{
-						IList l = (IList)typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.GetProperty : BindingFlags.GetField, null, state.Instance, null);
+						object l = (IList)typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.GetProperty : BindingFlags.GetField, null, state.Instance, null);
 
 						if (l == null)
 						{
-							l = (IList)Activator.CreateInstance(FieldType);
+							l = Activator.CreateInstance(FieldType);
 
 							typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.SetProperty : BindingFlags.SetField, null, state.Instance, new object[] { l });
 						}
 
-						l.Add(value);
+						if (TokenMemberMode == TokenMemberMode.List)
+						{
+							IList list = (IList)l;
+
+							list.Add(value);
+						}
+						else
+						{
+							_listType.InvokeMember("Add", BindingFlags.InvokeMethod, null, l, new object[] { value });
+						}
 						break;
 					}
 				default:
 					throw new InvalidOperationException();
-			}			
+			}
+		}
+
+		/// <summary>
+		/// Gets the default type converter.
+		/// </summary>
+		/// <value>The default type converter.</value>
+		public Type DefaultTypeConverter
+		{
+			get { return _defaultTypeConverter; }
 		}
 	}
 }

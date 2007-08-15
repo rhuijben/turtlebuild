@@ -12,6 +12,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		internal readonly Dictionary<string, TokenMember> _tokens = new Dictionary<string, TokenMember>();
 		readonly Dictionary<string, TokenItem> _csNames = new Dictionary<string, TokenItem>(StringComparer.InvariantCultureIgnoreCase);
 		readonly Dictionary<string, TokenItem> _ciNames = new Dictionary<string, TokenItem>(StringComparer.InvariantCultureIgnoreCase);
+		readonly Dictionary<string, TokenGroupItem> _csGroups = new Dictionary<string, TokenGroupItem>(StringComparer.InvariantCultureIgnoreCase);
+		readonly Dictionary<string, TokenGroupItem> _ciGroups = new Dictionary<string, TokenGroupItem>(StringComparer.InvariantCultureIgnoreCase);
+
 		private readonly List<TokenItem> _placedItems = new List<TokenItem>();
 
 		TokenItem _rest;
@@ -128,6 +131,38 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			return (caseSensitive ? _csNames : _ciNames).TryGetValue(name, out token);
 		}
 
+		internal bool TryGetGroup(string name, bool caseSensitive, out TokenGroupItem group)
+		{
+			if (_csGroups.Count == 0)
+			{
+				foreach (TokenMember tm in _tokens.Values)
+				{
+					foreach (TokenGroupItem tg in tm.Groups)
+					{
+						if (tg.Aliases != null)
+						{
+							foreach (string alias in tg.Aliases)
+							{
+								_csGroups.Add(alias, tg);
+							}
+						}
+					}
+				}
+			}
+			if (!caseSensitive)
+			{
+				if (_ciGroups.Count != _csGroups.Count)
+				{
+					_ciGroups.Clear();
+
+					foreach (KeyValuePair<string, TokenGroupItem> tk in _csGroups)
+						_ciGroups.Add(tk.Key, tk.Value);
+				}
+			}
+
+			return (caseSensitive ? _csGroups : _ciGroups).TryGetValue(name, out group);
+		}
+
 		internal IList<TokenItem> PlacedItems
 		{
 			get { return _placedItems; }
@@ -141,6 +176,5 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		{
 			get { return _rest; }
 		}
-
 	}
 }

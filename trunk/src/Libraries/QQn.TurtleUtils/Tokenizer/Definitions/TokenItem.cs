@@ -30,7 +30,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			_aliases = attr.Aliases;
 
 			_member = member;						
-			_typeConverter = attr.TypeConverter;
+			_typeConverter = attr.TypeConverter ?? member.DefaultTypeConverter;
 		}
 
 		/// <summary>
@@ -134,8 +134,8 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 						else if (DataType.IsAssignableFrom(typeof(FileInfo)))
 							_typeConverterInstance = new FileInfoTypeConverter();
 						else if (DataType.IsAssignableFrom(typeof(DirectoryInfo)))
-							_typeConverterInstance = new DirectoryInfoTypeConverter();
-					}
+							_typeConverterInstance = new DirectoryInfoTypeConverter();						
+					}					
 				}
 
 				return _typeConverterInstance;

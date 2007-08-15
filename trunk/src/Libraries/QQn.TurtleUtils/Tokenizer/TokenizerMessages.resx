@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="CantUseTypeXAsTokenGroupBecauseItHasNoPublicParameterlessConstructor" xml:space="preserve">
+    <value>Can't use type {0} as TokenGroup because it has no public parameterless constructor</value>
+  </data>
   <data name="NoPlacedArgumentsDefined" xml:space="preserve">
     <value>There are no placed arguments defined</value>
   </data>
@@ -134,5 +137,8 @@
   </data>
   <data name="ValueExpectedForArgumentX" xml:space="preserve">
     <value>Value expected for argument '{0}'</value>
+  </data>
+  <data name="XInYIsNull" xml:space="preserve">
+    <value>One or more {0} members in {1} are null</value>
   </data>
 </root>

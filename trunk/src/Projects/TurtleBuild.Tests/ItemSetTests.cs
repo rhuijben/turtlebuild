@@ -5,6 +5,7 @@ using NUnit.Framework;
 using QQn.TurtleUtils.ItemSets;
 using System.Xml;
 using System.Xml.Serialization;
+using QQn.TurtleUtils.Tokenizer;
 
 namespace TurtleTests
 {
