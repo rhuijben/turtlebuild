@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Globalization;
 
 namespace QQn.TurtleUtils.Tokenizer
 {
@@ -21,6 +22,7 @@ namespace QQn.TurtleUtils.Tokenizer
 		bool _allowResponseFile;
 		bool _skipUnknownNamedItems;
 		char _directValueSeparator;
+		CultureInfo _cultureInfo;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TokenizerArgs"/> class.
@@ -142,6 +144,16 @@ namespace QQn.TurtleUtils.Tokenizer
 		{
 			get { return _skipUnknownNamedItems; }
 			set { _skipUnknownNamedItems = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the culture info.
+		/// </summary>
+		/// <value>The culture info.</value>
+		public CultureInfo CultureInfo
+		{
+			get { return _cultureInfo ?? (_cultureInfo = CultureInfo.CurrentCulture); }
+			set { _cultureInfo = value; }
 		}
 	}
 }

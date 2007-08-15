@@ -80,7 +80,25 @@ namespace QQn.TurtleUtils.Tokenizer
 				throw new ArgumentNullException("args");
 
 			return "";
-		}		
+		}
+
+		internal static TokenizerState<T> NewState<T>(TokenizerArgs args, T instance)
+			where T : class, new()
+		{
+			if (instance == null)
+				throw new ArgumentNullException("instance");
+
+			IHasTokenDefinition htd = instance as IHasTokenDefinition;
+			TokenizerDefinition def = null;
+
+			if (htd != null)
+				def = htd.GetTokenizerDefinition(args);
+
+			if (def == null)
+				def = StaticTokenizerDefinition<T>.Definition;
+
+			return new TokenizerState<T>(instance, def, args);
+		}
 
 		internal static TokenizerState<T> NewState<T>(TokenizerArgs args)
 			where T : class, new()

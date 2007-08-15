@@ -205,7 +205,17 @@ namespace TurtleTests
 			Assert.That(p.Group.Items[0].Name, Is.EqualTo("Item1"));
 			Assert.That(p.Group.Items[1].Id, Is.EqualTo("item2Id"));
 			Assert.That(p.Group.Items[1].Name, Is.EqualTo("Item2"));
-		}
 
+
+			XmlDocument doc2 = new XmlDocument();
+			using (XmlWriter xw = doc2.CreateNavigator().AppendChild())
+			{
+				xw.WriteStartElement("Pack");
+				Tokenizer.TryWriteXml(xw, p);
+				xw.WriteEndDocument();
+			}
+
+			Assert.That(doc2.DocumentElement.OuterXml, Is.EqualTo("<Pack Id=\"packId\"><Group Id=\"groupId\"><Item Id=\"item1Id\" name=\"Item1\" /><Item Id=\"item2Id\" name=\"Item2\" /></Group></Pack>"));
+		}
 	}
 }

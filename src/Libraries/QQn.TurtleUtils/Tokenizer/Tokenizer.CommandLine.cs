@@ -89,6 +89,6 @@ namespace QQn.TurtleUtils.Tokenizer
 		public static IList<string> GetCommandlineWords(string commandLine)
 		{
 			return GetWords(commandLine, new string[] { "\"\"" }, '\\', EscapeMode.EscapeGroupOnly, null);
-		}
+		}		
 	}
 }

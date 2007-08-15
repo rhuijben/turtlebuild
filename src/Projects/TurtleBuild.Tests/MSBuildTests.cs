@@ -153,6 +153,21 @@ namespace TurtleTests
 			TBLogFile file = TBLogFile.Load(Path.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog"));
 
 			Assert.That(file, Is.Not.Null);
+
+			using (StringWriter sw = new StringWriter())
+			{
+				using (XmlWriter xw = new XmlTextWriter(sw))
+				{
+					xw.WriteStartDocument();
+					xw.WriteStartElement("TurtleBuild", "q:q");
+					QQn.TurtleUtils.Tokenizer.Tokenizer.TryWriteXml(new XmlTextWriter(sw), file);
+
+					xw.WriteEndDocument();
+				}
+
+				string text = sw.ToString();
+				Assert.That(text.Length, Is.GreaterThan(100));
+			}
 		}
 
 		[Test]

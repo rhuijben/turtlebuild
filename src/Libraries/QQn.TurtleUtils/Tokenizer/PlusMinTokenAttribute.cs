@@ -27,13 +27,13 @@ namespace QQn.TurtleUtils.Tokenizer
 		/// <returns></returns>
 		public override QQn.TurtleUtils.Tokenizer.Definitions.TokenItem CreateToken(QQn.TurtleUtils.Tokenizer.Definitions.TokenMember tokenMember)
 		{
-			return new PlusMinToken(tokenMember, this);
+			return new PlusMinToken(tokenMember, this, ValueType);
 		}
 
 		class PlusMinToken : TokenItem
 		{
-			public PlusMinToken(TokenMember member, TokenAttribute attr)
-				: base(member, attr)
+			public PlusMinToken(TokenMember member, TokenAttribute attr, Type valueType)
+				: base(member, attr, valueType)
 			{
 			}
 		}

@@ -176,5 +176,14 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		{
 			get { return _rest; }
 		}
+
+		/// <summary>
+		/// Gets all tokens used in the definition
+		/// </summary>
+		/// <value>All tokens.</value>
+		public ICollection<TokenMember> AllTokenMembers
+		{
+			get { return _tokens.Values; }
+		}
 	}
 }

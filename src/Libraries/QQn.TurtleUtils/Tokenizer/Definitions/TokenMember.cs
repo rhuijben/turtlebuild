@@ -76,8 +76,6 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			List<TokenGroupItem> groups = null;
 			foreach (TokenGroupAttribute a in member.GetCustomAttributes(typeof(TokenGroupAttribute), true))
 			{
-				if (a.Name == null)
-					continue; // Position token
 				if (groups == null)
 					groups = new List<TokenGroupItem>();
 
@@ -283,6 +281,37 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 						}
 						break;
 					}
+				default:
+					throw new InvalidOperationException();
+			}
+		}
+
+		/// <summary>
+		/// Gets a list with the values of this field
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="state">The state.</param>
+		/// <returns></returns>
+		public object[] GetValues<T>(TokenizerState<T> state)
+			where T : class, new()
+		{
+			object result = typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.GetProperty : BindingFlags.GetField, null, state.Instance, null);
+
+			switch (TokenMemberMode)
+			{
+				case TokenMemberMode.Default:
+					return new object[] { result };
+				case TokenMemberMode.Array:
+				case TokenMemberMode.List:
+				case TokenMemberMode.GenericList:
+					
+					List<object> items = new List<object>();
+					if(result != null)
+						foreach (object i in (IEnumerable)result)
+						{
+							items.Add(i);
+						}
+					return items.ToArray();
 				default:
 					throw new InvalidOperationException();
 			}

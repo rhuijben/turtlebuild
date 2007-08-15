@@ -15,6 +15,7 @@ namespace QQn.TurtleUtils.Tokenizer
 		readonly string _name;
 		IList<string> _aliases;
 		Type _typeConverter;
+		Type _valueType;
 		bool _required;
 
 		/// <summary>
@@ -150,13 +151,23 @@ namespace QQn.TurtleUtils.Tokenizer
 		}
 
 		/// <summary>
+		/// Gets or sets the type of the value.
+		/// </summary>
+		/// <value>The type of the value.</value>
+		public Type ValueType
+		{
+			get { return _valueType; }
+			set { _valueType = value; }
+		}
+
+		/// <summary>
 		/// Creates a <see cref="TokenItem"/> instance.
 		/// </summary>
 		/// <param name="tokenMember">The token member.</param>
 		/// <returns></returns>
 		public virtual TokenItem CreateToken(TokenMember tokenMember)
 		{
-			return new TokenItem(tokenMember, this);
+			return new TokenItem(tokenMember, this, ValueType);
 		}
 
 		/// <summary>
