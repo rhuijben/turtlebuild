@@ -141,12 +141,71 @@ namespace TurtleTests
 
 			doc.LoadXml("<q File='banaan' h='true' />");
 
-			Assert.That(Tokenizer.TryParseXmlAttributes(doc.DocumentElement, out scl), Is.True, "Can parse xml");
+			Assert.That(Tokenizer.TryParseXml(doc.DocumentElement, out scl), Is.True, "Can parse xml");
 
 
 			Assert.That(scl.Files.Length, Is.EqualTo(1));
 			Assert.That(scl.Files[0], Is.EqualTo("banaan"));
 			Assert.That(scl.ShowHelp, Is.True);
 		}
+
+		public class Item
+		{
+			[Token("Id")]
+			public string Id;
+
+			[Token("name")]
+			public string Name;
+
+		}
+
+		public class Group
+		{
+			[Token("Id")]
+			public string Id;
+
+			[TokenGroup("Item")]
+			public List<Item> Items = new List<Item>();
+		}
+
+		public class Pack
+		{
+			[Token("Id")]
+			public string Id;
+
+			[TokenGroup("Group")]
+			public Group Group;
+		}
+
+		[Test]
+		public void XmlGroupText()
+		{
+			string xml = @"
+				<Pack Id='packId'>
+					<Group Id='groupId'>
+						<Item Id='item1Id' name='Item1' />
+						<Item Id='item2Id' name='Item2' />
+					</Group>
+				</Pack>";
+
+			XmlDocument doc = new XmlDocument();
+			doc.LoadXml(xml);
+
+			Pack p;
+
+			Assert.That(Tokenizer.TryParseXml(doc.DocumentElement, out p));
+
+			Assert.That(p, Is.Not.Null);
+			Assert.That(p.Id, Is.EqualTo("packId"));
+			Assert.That(p.Group, Is.Not.Null);
+			Assert.That(p.Group.Id, Is.EqualTo("groupId"));
+			Assert.That(p.Group.Items, Is.Not.Null);
+			Assert.That(p.Group.Items.Count, Is.EqualTo(2));
+			Assert.That(p.Group.Items[0].Id, Is.EqualTo("item1Id"));
+			Assert.That(p.Group.Items[0].Name, Is.EqualTo("Item1"));
+			Assert.That(p.Group.Items[1].Id, Is.EqualTo("item2Id"));
+			Assert.That(p.Group.Items[1].Name, Is.EqualTo("Item2"));
+		}
+
 	}
 }
