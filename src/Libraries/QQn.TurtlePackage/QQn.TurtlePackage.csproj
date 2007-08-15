@@ -35,13 +35,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PackCollection.cs" />
     <Compile Include="PackContainer.cs" />
     <Compile Include="PackContainerList.cs" />
     <Compile Include="Pack.cs" />
     <Compile Include="PackFile.cs" />
-    <Compile Include="TurtleContainer.cs" />
+    <Compile Include="PackFileCollection.cs" />
+    <Compile Include="PackItem.cs" />
     <Compile Include="TurtleExtractArgs.cs" />
-    <Compile Include="TurtleFileItem.cs" />
     <Compile Include="TurtlePackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

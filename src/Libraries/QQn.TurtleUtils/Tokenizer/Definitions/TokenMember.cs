@@ -236,11 +236,11 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			switch (TokenMemberMode)
 			{
 				case TokenMemberMode.Default:
-					typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.SetProperty : BindingFlags.SetField, null, state.Instance, new object[] { value });
+					SetMemberValue(state, value);
 					break;
 				case TokenMemberMode.Array:
 					{
-						Array a = (Array)typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.GetProperty : BindingFlags.GetField, null, state.Instance, null);
+						Array a = (Array)GetMemberValue(state);
 						Array aNew;
 
 						if (a != null)
@@ -254,19 +254,19 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 
 						aNew.SetValue(value, aNew.Length - 1);
 
-						typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.SetProperty : BindingFlags.SetField, null, state.Instance, new object[] { aNew });
+						SetMemberValue(state,aNew);
 						break;
 					}
 				case TokenMemberMode.List:
 				case TokenMemberMode.GenericList:
 					{
-						object l = (IList)typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.GetProperty : BindingFlags.GetField, null, state.Instance, null);
+						object l = GetMemberValue(state);
 
 						if (l == null)
 						{
 							l = Activator.CreateInstance(FieldType);
 
-							typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.SetProperty : BindingFlags.SetField, null, state.Instance, new object[] { l });
+							SetMemberValue(state, l);
 						}
 
 						if (TokenMemberMode == TokenMemberMode.List)
@@ -286,8 +286,20 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			}
 		}
 
+		object GetMemberValue<T>(TokenizerState<T> state)
+			where T : class, new()
+		{
+			return typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.GetProperty : BindingFlags.GetField, null, state.Instance, null);
+		}
+
+		void SetMemberValue<T>(TokenizerState<T> state, object value)
+			where T : class, new()
+		{
+			typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.SetProperty : BindingFlags.SetField, null, state.Instance, new object[] { value });
+		}
+
 		/// <summary>
-		/// Gets a list with the values of this field
+		/// Gets a list with the values of this field or <c>null</c> if the value has the value specified in the <see cref="DefaultValue"/> attribute
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="state">The state.</param>
@@ -295,11 +307,16 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		public object[] GetValues<T>(TokenizerState<T> state)
 			where T : class, new()
 		{
-			object result = typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.GetProperty : BindingFlags.GetField, null, state.Instance, null);
+			object result = GetMemberValue(state);
 
 			switch (TokenMemberMode)
 			{
 				case TokenMemberMode.Default:
+					DefaultValueAttribute dva = GetFirstAttribute<DefaultValueAttribute>(_member);
+
+					if (dva != null && dva.Value != null && dva.Value.Equals(result))
+						return null;
+
 					return new object[] { result };
 				case TokenMemberMode.Array:
 				case TokenMemberMode.List:

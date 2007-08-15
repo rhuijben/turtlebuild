@@ -46,20 +46,23 @@ namespace QQn.TurtleUtils.Tokenizer.Tokenizers
 							string name = nav.LocalName;
 
 							TokenGroupItem group;
+							TokenItem ti;
 							if (state.Definition.TryGetGroup(name, args.CaseSensitive, out group))
 							{
 								object value;
 
 								if (!group.TryParseXml(nav, args, out value))
-								{
-									if (args.SkipUnknownNamedItems)
-										continue;
-									else
-										return false;
-								}
+									return false;
 
 								group.Member.SetValue(state, value);
 							}
+							else if (state.Definition.TryGetToken(name, args.CaseSensitive, out ti))
+							{
+								// Allow tokens as element
+								ti.Evaluate(nav.Value, state);
+							}
+							else if (!args.SkipUnknownNamedItems)
+								return false;
 						}
 						while (nav.MoveToNext(XPathNodeType.Element));
 				}
@@ -82,14 +85,15 @@ namespace QQn.TurtleUtils.Tokenizer.Tokenizers
 
 			using (TokenizerState<T> state = Tokenizer.NewState<T>(args, instance))
 			{
+				// Step 1: Try to write tokens as attributes
 				foreach (TokenMember member in state.Definition.AllTokenMembers)
 				{
 					object[] values = member.GetValues(state);
 
-					if(member.Tokens.Count > 0 && member.Groups.Count > 0)
-						throw new NotImplementedException(string.Format("{0} Requires delayed writing, which is not implemented yet", member.Name));
+					if (member.Tokens.Count > 0 && member.Groups.Count > 0)
+						continue; // Write the members as element
 
-					if((values == null) || (values.Length == 0))
+					if((values == null) || (values.Length == 0) || values.Length > 1)
 						continue;
 					else if(member.Tokens.Count <= 0)
 						continue;
@@ -118,14 +122,15 @@ namespace QQn.TurtleUtils.Tokenizer.Tokenizers
 					}
 				}
 
+				// Step 2: Write tokengroups and members with multiple values
 				foreach (TokenMember member in state.Definition.AllTokenMembers)
 				{
+					if (written.Contains(member))
+						continue;
+
 					object[] values = member.GetValues(state);
 
 					if ((values == null) || (values.Length == 0))
-						continue;
-
-					if(written.Contains(member))
 						continue;
 
 					foreach (object value in values)
@@ -134,6 +139,8 @@ namespace QQn.TurtleUtils.Tokenizer.Tokenizers
 							continue;
 
 						Type type = value.GetType();
+
+						bool writtenItem = false;
 
 						foreach (TokenGroupItem tg in member.Groups)
 						{
@@ -147,8 +154,23 @@ namespace QQn.TurtleUtils.Tokenizer.Tokenizers
 								return false;							
 
 							writer.WriteEndElement();
+							writtenItem = true;
 							break;
 						}
+
+						if (!writtenItem)
+							foreach (TokenItem ti in member.Tokens)
+							{
+								if (ti.Name == null)
+									continue;
+
+								if (ti.ValueType != null && !ti.ValueType.IsAssignableFrom(type))
+									continue;
+
+								// Will throw if multiple times written -> Definition bug, resolve there
+								writer.WriteElementString(ti.Name, ti.GetStringValue(value, state));
+								break;
+							}
 					}
 				}
 			}

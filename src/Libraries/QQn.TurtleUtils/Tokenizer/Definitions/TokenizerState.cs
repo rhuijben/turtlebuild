@@ -25,8 +25,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		/// <param name="instance">The instance.</param>
 		/// <param name="definition">The definition.</param>
 		/// <param name="args">The args.</param>
+		/// <param name="forCreate">if set to <c>true</c> [for create].</param>
 		/// <remarks>Calls <see cref="ISupportInitialize.BeginInit"/> if the instance implements <see cref="ISupportInitialize"/></remarks>
-		public TokenizerState(T instance, TokenizerDefinition definition, TokenizerArgs args)
+		public TokenizerState(T instance, TokenizerDefinition definition, TokenizerArgs args, bool forCreate)
 		{
 			if (instance == null)
 				throw new ArgumentNullException("instance");
@@ -38,7 +39,8 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			_instance = instance;
 			_definition = definition;
 			_args = args;
-			_initialize = instance as ISupportInitialize;
+			if(forCreate)
+				_initialize = instance as ISupportInitialize;
 
 			if (_initialize != null)
 				_initialize.BeginInit();
