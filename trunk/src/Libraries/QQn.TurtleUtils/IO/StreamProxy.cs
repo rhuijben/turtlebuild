@@ -13,19 +13,41 @@ namespace QQn.TurtleUtils.IO
 	{
 		readonly Stream _parentStream;
 		readonly bool _closeParent;
+		bool _closed;
+		readonly bool _proxyAsyncRequests;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="StreamProxy"/> class.
 		/// </summary>
 		/// <param name="parentStream">The parent stream.</param>
 		/// <param name="closeParent">if set to <c>true</c> close parent when closing this stream.</param>
-		public StreamProxy(Stream parentStream, bool closeParent)
+		/// <param name="proxyAsyncRequest">if set to <c>true</c> [proxy async request].</param>
+		public StreamProxy(Stream parentStream, bool closeParent, bool proxyAsyncRequest)
 		{
 			if (parentStream == null)
 				throw new ArgumentNullException("parentStream");
 
 			_parentStream = parentStream;
 			_closeParent = closeParent;
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="StreamProxy"/> class.
+		/// </summary>
+		/// <param name="parentStream">The parent stream.</param>
+		/// <param name="closeParent">if set to <c>true</c> [close parent].</param>
+		public StreamProxy(Stream parentStream, bool closeParent)
+			: this(parentStream, closeParent, false)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="StreamProxy"/> class.
+		/// </summary>
+		/// <param name="parentStream">The parent stream.</param>
+		public StreamProxy(Stream parentStream)
+			: this(parentStream, true, false)
+		{
 		}
 
 		/// <summary>
@@ -91,6 +113,9 @@ namespace QQn.TurtleUtils.IO
 		/// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
 		public override void Flush()
 		{
+			if (_closed)
+				throw new InvalidOperationException();
+
 			BaseStream.Flush();
 		}
 
@@ -105,7 +130,13 @@ namespace QQn.TurtleUtils.IO
 		public override long Position
 		{
 			get { return PositionToSubStream(BaseStream.Position); }
-			set { BaseStream.Position = PositionToParent(value); }
+			set 
+			{
+				if (_closed)
+					throw new InvalidOperationException();
+				
+				BaseStream.Position = PositionToParent(value);
+			}
 		}
 
 		/// <summary>
@@ -153,6 +184,102 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		/// <summary>
+		/// Begins an asynchronous read operation.
+		/// </summary>
+		/// <param name="buffer">The buffer to read the data into.</param>
+		/// <param name="offset">The byte offset in <paramref name="buffer"/> at which to begin writing data read from the stream.</param>
+		/// <param name="count">The maximum number of bytes to read.</param>
+		/// <param name="callback">An optional asynchronous callback, to be called when the read is complete.</param>
+		/// <param name="state">A user-provided object that distinguishes this particular asynchronous read request from other requests.</param>
+		/// <returns>
+		/// An <see cref="T:System.IAsyncResult"/> that represents the asynchronous read, which could still be pending.
+		/// </returns>
+		/// <exception cref="T:System.IO.IOException">Attempted an asynchronous read past the end of the stream, or a disk error occurs. </exception>
+		/// <exception cref="T:System.ArgumentException">One or more of the arguments is invalid. </exception>
+		/// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
+		/// <exception cref="T:System.NotSupportedException">The current Stream implementation does not support the read operation. </exception>
+		public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+		{
+			if (_proxyAsyncRequests)
+			{
+				if (CanSeek)
+				{
+					if (count + Position > Length)
+					{
+						count = (int)Math.Max(0, Length - Position);
+					}
+				}
+				return BaseStream.BeginRead(buffer, offset, count, callback, state);
+			}
+			else
+				return base.BeginRead(buffer, offset, count, callback, state);
+		}
+
+		/// <summary>
+		/// Waits for the pending asynchronous read to complete.
+		/// </summary>
+		/// <param name="asyncResult">The reference to the pending asynchronous request to finish.</param>
+		/// <returns>
+		/// The number of bytes read from the stream, between zero (0) and the number of bytes you requested. Streams return zero (0) only at the end of the stream, otherwise, they should block until at least one byte is available.
+		/// </returns>
+		/// <exception cref="T:System.ArgumentNullException">
+		/// 	<paramref name="asyncResult"/> is null. </exception>
+		/// <exception cref="T:System.ArgumentException">
+		/// 	<paramref name="asyncResult"/> did not originate from a <see cref="M:System.IO.Stream.BeginRead(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)"/> method on the current stream. </exception>
+		/// <exception cref="T:System.IO.IOException">The stream is closed or an internal error has occurred.</exception>
+		public override int EndRead(IAsyncResult asyncResult)
+		{
+			if (_proxyAsyncRequests)
+				return BaseStream.EndRead(asyncResult);
+			else
+				return base.EndRead(asyncResult);
+		}
+
+		/// <summary>
+		/// Begins an asynchronous write operation.
+		/// </summary>
+		/// <param name="buffer">The buffer to write data from.</param>
+		/// <param name="offset">The byte offset in <paramref name="buffer"/> from which to begin writing.</param>
+		/// <param name="count">The maximum number of bytes to write.</param>
+		/// <param name="callback">An optional asynchronous callback, to be called when the write is complete.</param>
+		/// <param name="state">A user-provided object that distinguishes this particular asynchronous write request from other requests.</param>
+		/// <returns>
+		/// An IAsyncResult that represents the asynchronous write, which could still be pending.
+		/// </returns>
+		/// <exception cref="T:System.IO.IOException">Attempted an asynchronous write past the end of the stream, or a disk error occurs. </exception>
+		/// <exception cref="T:System.ArgumentException">One or more of the arguments is invalid. </exception>
+		/// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
+		/// <exception cref="T:System.NotSupportedException">The current Stream implementation does not support the write operation. </exception>
+		public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+		{
+			if (_proxyAsyncRequests)
+				return BaseStream.BeginWrite(buffer, offset, count, callback, state);
+			else
+				return base.BeginWrite(buffer, offset, count, callback, state);
+		}
+
+		/// <summary>
+		/// Ends an asynchronous write operation.
+		/// </summary>
+		/// <param name="asyncResult">A reference to the outstanding asynchronous I/O request.</param>
+		/// <exception cref="T:System.ArgumentNullException">
+		/// 	<paramref name="asyncResult"/> is null. </exception>
+		/// <exception cref="T:System.ArgumentException">
+		/// 	<paramref name="asyncResult"/> did not originate from a <see cref="M:System.IO.Stream.BeginWrite(System.Byte[],System.Int32,System.Int32,System.AsyncCallback,System.Object)"/> method on the current stream. </exception>
+		/// <exception cref="T:System.IO.IOException">The stream is closed or an internal error has occurred.</exception>
+		public override void EndWrite(IAsyncResult asyncResult)
+		{
+			if (_proxyAsyncRequests)
+				BaseStream.EndWrite(asyncResult);
+			else
+				base.EndWrite(asyncResult);
+		}
+
+		
+
+		
+
+		/// <summary>
 		/// Sets the position within the current stream.
 		/// </summary>
 		/// <param name="offset">A byte offset relative to the origin parameter.</param>
@@ -165,7 +292,7 @@ namespace QQn.TurtleUtils.IO
 		/// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
 		public override long Seek(long offset, SeekOrigin origin)
 		{
-			if (!CanSeek)
+			if (!CanSeek || _closed)
 				throw new NotSupportedException();
 
 			long toPosition;
@@ -212,7 +339,7 @@ namespace QQn.TurtleUtils.IO
 		/// <exception cref="T:System.ArgumentOutOfRangeException">offset or count is negative. </exception>
 		public override void Write(byte[] buffer, int offset, int count)
 		{
-			if (!CanWrite)
+			if (!CanWrite || _closed)
 				throw new NotSupportedException();
 
 			BaseStream.Write(buffer, offset, count);
@@ -254,6 +381,7 @@ namespace QQn.TurtleUtils.IO
 			base.Close();
 			if(_closeParent)
 				BaseStream.Close();
+			_closed = true;
 		}
 
 		/// <summary>
@@ -301,7 +429,7 @@ namespace QQn.TurtleUtils.IO
 		/// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
 		public override void SetLength(long value)
 		{
-			if (!CanWrite)
+			if (!CanWrite || _closed)
 				throw new NotSupportedException();
 
 			BaseStream.SetLength(PositionToParent(value));

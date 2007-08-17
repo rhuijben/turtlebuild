@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QQn.TurtleUtils.Tokenizer.Definitions
+namespace QQn.TurtleUtils.Tokens.Definitions
 {
 	/// <summary>
 	/// 
@@ -18,6 +18,14 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		private readonly List<TokenItem> _placedItems = new List<TokenItem>();
 
 		TokenItem _rest;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TokenizerDefinition"/> class.
+		/// </summary>
+		protected TokenizerDefinition()
+			: base(null)
+		{
+		}
 
 		/// <summary>
 		/// Adds the token.

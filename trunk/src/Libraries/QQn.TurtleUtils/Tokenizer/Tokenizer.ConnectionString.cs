@@ -2,9 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections.Specialized;
-using QQn.TurtleUtils.Tokenizer.Definitions;
+using QQn.TurtleUtils.Tokens;
+using QQn.TurtleUtils.Tokens.Definitions;
 
-namespace QQn.TurtleUtils.Tokenizer
+namespace QQn.TurtleUtils.Tokens
 {
 	public static partial class Tokenizer
 	{

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 
 namespace QQn.TurtleUtils.IO
 {
@@ -9,7 +10,7 @@ namespace QQn.TurtleUtils.IO
 	{
 		long _offset;
 		long _length;
-		short _itemType;
+		int _itemType;
 
 		public MultiStreamItemHeader(Stream stream)
 			: this(new QQnBinaryReader(stream))
@@ -20,7 +21,7 @@ namespace QQn.TurtleUtils.IO
 		{
 		}
 
-		public const int ItemSize = (1 + 8 + 4 + 2) + 1; // 1 more than length of fields
+		public const int ItemSize = (1 + 8 + 4 + 4) + 1; // 1 more than length of fields
 
 		internal MultiStreamItemHeader(QQnBinaryReader reader)
 		{
@@ -30,7 +31,7 @@ namespace QQn.TurtleUtils.IO
 			{
 				_offset = reader.ReadInt64();
 				_length = reader.ReadUInt32(); // As uint
-				_itemType = reader.ReadInt16();
+				_itemType = reader.ReadInt32();
 			}
 			else if (version == 2)
 			{
@@ -40,7 +41,7 @@ namespace QQn.TurtleUtils.IO
 
 				_offset = reader.ReadInt64();
 				_length = reader.ReadInt64(); // As long
-				_itemType = reader.ReadInt16();
+				_itemType = reader.ReadInt32();
 			}
 			else
 				throw new InvalidOperationException();
@@ -75,24 +76,30 @@ namespace QQn.TurtleUtils.IO
 		public long Offset
 		{
 			get { return _offset; }
-			set { _offset = value; }
+			set 
+			{
+				Debug.Assert(value >= 0);
+				_offset = value;
+			}
 		}
 
 		public long Length
 		{
 			get { return _length; }
-			set { _length = value; }
+			set 
+			{ 
+				Debug.Assert(value >= 0);
+				_length = value; 
+			}
 		}
 		
-		public short ItemType
+		public int ItemType
 		{
 			get { return _itemType; }
 			set { _itemType = value; }
 		}
 
-		public const short TypeMask = 0xFFF;
-		public const short GZippedFlag = 0x1000;
-		public const short AssuredFlag = 0x2000;
-
+		public const short ZippedFlag = 0x01;
+		public const short AssuredFlag = 0x02;
 	}
 }

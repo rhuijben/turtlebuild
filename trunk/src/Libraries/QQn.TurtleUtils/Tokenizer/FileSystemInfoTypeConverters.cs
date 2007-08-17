@@ -4,7 +4,7 @@ using System.Text;
 using System.ComponentModel;
 using System.IO;
 
-namespace QQn.TurtleUtils.Tokenizer
+namespace QQn.TurtleUtils.Tokens
 {
 	/// <summary>
 	/// TypeConverter which can only convert a string in a FileSystemInfo instance

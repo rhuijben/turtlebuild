@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
 
-namespace QQn.TurtleUtils.Tokenizer.Converters
+namespace QQn.TurtleUtils.Tokens.Converters
 {
 	/// <summary>
 	/// TypeConverter for <see cref="System.Version"/>

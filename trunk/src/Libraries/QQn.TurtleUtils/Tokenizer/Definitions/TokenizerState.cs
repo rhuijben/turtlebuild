@@ -5,7 +5,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
 
-namespace QQn.TurtleUtils.Tokenizer.Definitions
+namespace QQn.TurtleUtils.Tokens.Definitions
 {
 	/// <summary>
 	/// Contains the parser state while tokanizing
@@ -17,7 +17,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		readonly T _instance;
 		readonly TokenizerDefinition _definition;
 		readonly TokenizerArgs _args;
-		ISupportInitialize _initialize;
+		ITokenizerInitialize _init;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TokenizerState&lt;T&gt;"/> class.
@@ -40,10 +40,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			_definition = definition;
 			_args = args;
 			if(forCreate)
-				_initialize = instance as ISupportInitialize;
-
-			if (_initialize != null)
-				_initialize.BeginInit();
+				_init = instance as ITokenizerInitialize;
 		}
 
 		/// <summary>
@@ -97,10 +94,10 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		/// <remarks>Calls <see cref="ISupportInitialize.EndInit"/> if the instance implements <see cref="ISupportInitialize"/></remarks>
 		public void Dispose()
 		{
-			ISupportInitialize init = _initialize;
+			ITokenizerInitialize init = _init;
 			if (init != null)
 			{
-				_initialize = null;
+				_init = null;
 
 				init.EndInit();
 			}
@@ -176,6 +173,10 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 
 		#endregion
 
+		/// <summary>
+		/// Gets the culture info.
+		/// </summary>
+		/// <value>The culture info.</value>
 		public CultureInfo CultureInfo
 		{
 			get { return _args.CultureInfo; }

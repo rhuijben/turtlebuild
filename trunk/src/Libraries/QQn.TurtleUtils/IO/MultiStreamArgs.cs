@@ -11,7 +11,7 @@ namespace QQn.TurtleUtils.IO
 	{
 		bool _assured;
 		bool _zipped;
-		short _itemType;
+		int _itemType;
 		long _fixedLength;
 
 		/// <summary>
@@ -23,16 +23,16 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		/// <summary>
-		/// Free short for marking substreams; Allowed values are 0-4095
+		/// Free short for marking substreams; Allowed values are 0-16777215
 		/// </summary>
 		/// <value>The type of the stream.</value>
-		public short StreamType
+		public int StreamType
 		{
 			get { return _itemType; }
 			set
 			{
-				if ((value < 0) || (value > MultiStreamItemHeader.TypeMask))
-					throw new ArgumentOutOfRangeException("value", value, "Value must be between 0 and 4096");
+				if ((value < 0) || (value > 0xFFFFFF))
+					throw new ArgumentOutOfRangeException("value", value, "Value must be between 0 and 16777216");
 				_itemType = value;
 			}
 		}

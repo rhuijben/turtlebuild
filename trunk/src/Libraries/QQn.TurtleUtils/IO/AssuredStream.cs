@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using QQn.TurtleUtils.Cryptography;
+using System.Diagnostics;
 
 namespace QQn.TurtleUtils.IO
 {
@@ -181,7 +182,7 @@ namespace QQn.TurtleUtils.IO
 			if (!_creating)
 				throw new InvalidOperationException();
 
-			BaseStream.SetLength(PositionToParent(value));
+			base.SetLength(value);
 		}
 
 		/// <summary>

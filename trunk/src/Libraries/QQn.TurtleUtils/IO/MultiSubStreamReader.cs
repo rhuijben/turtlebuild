@@ -54,7 +54,7 @@ namespace QQn.TurtleUtils.IO
 
 		protected override long PositionToParent(long subStreamPosition)
 		{
-			return _header.Offset - _header.Offset;
+			return subStreamPosition + _header.Offset;
 		}
 	}
 }

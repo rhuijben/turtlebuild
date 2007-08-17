@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace QQn.TurtleUtils.Tokenizer.Definitions
+namespace QQn.TurtleUtils.Tokens.Definitions
 {
 	/// <summary>
 	/// 
