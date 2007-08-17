@@ -42,7 +42,6 @@
     <Compile Include="PackTests.cs" />
     <Compile Include="VersionResourceTests.cs" />
     <Compile Include="CryptoTests.cs" />
-    <Compile Include="ItemSetTests.cs" />
     <Compile Include="MSBuildTests.cs" />
     <Compile Include="StreamTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

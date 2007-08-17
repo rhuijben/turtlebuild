@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
-using QQn.TurtleUtils.Tokenizer;
+using QQn.TurtleUtils.Tokens;
 using QQn.TurtleMSBuild.ExternalProjects;
 using Microsoft.Build.Framework;
 using System.Xml;

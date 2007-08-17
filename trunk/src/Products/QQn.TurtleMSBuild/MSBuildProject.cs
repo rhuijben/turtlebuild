@@ -293,13 +293,17 @@ namespace QQn.TurtleMSBuild
 		/// <param name="forReadability">if set to <c>true</c> [for readability].</param>
 		protected override void WriteProjectInfo(XmlWriter xw, bool forReadability)
 		{
-			base.WriteProjectInfo(xw, forReadability);
-			
-			string keyFile;
-			if (BuildProperties.TryGetValue("AssemblyOriginatorKeyFile", out keyFile))
+			string key;
+			if (BuildProperties.TryGetValue("AssemblyOriginatorKeyFile", out key))
 			{
-				xw.WriteAttributeString("keyFile", keyFile);
+				KeyFile = key;
 			}
+			if (BuildProperties.TryGetValue("AssemblyKeyContainerName", out key))
+			{
+				KeyContainer = key;
+			}
+
+			base.WriteProjectInfo(xw, forReadability);
 		}
 
 		protected override void WriteProjectReferences(XmlWriter xw, bool forReadability)

@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using QQn.TurtleUtils.Tokenizer;
+using QQn.TurtleUtils.Tokens;
+using System.Collections.ObjectModel;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
 	public class TBLogContent
 	{
 		[TokenGroup("Item")]
-		public readonly List<TBLogItem> Items;
+		public readonly Collection<TBLogItem> Items = new Collection<TBLogItem>();
 	}
 }

@@ -39,6 +39,7 @@ namespace QQn.TurtlePackage
 			EnsureWritable();
 			base.InsertItem(index, item);
 			item.Pack = Pack;
+			item.Parent = Parent;
 		}
 
 		protected override void ClearItems()
@@ -47,6 +48,7 @@ namespace QQn.TurtlePackage
 			foreach (T item in this)
 			{
 				item.Pack = null;
+				item.Parent = null;
 			}
 			base.ClearItems();
 		}
@@ -54,7 +56,11 @@ namespace QQn.TurtlePackage
 		protected override void RemoveItem(int index)
 		{
 			EnsureWritable();
-			this[index].Pack = null;
+
+			T item = this[index];
+			item.Pack = null;
+			item.Parent = null;
+
 			base.RemoveItem(index);
 		}
 
@@ -64,9 +70,12 @@ namespace QQn.TurtlePackage
 				throw new ArgumentNullException("item");
 
 			EnsureWritable();
-			this[index].Pack = null;
+			T oldItem = this[index];
+			oldItem.Pack = null;
+			oldItem.Parent = null;
 			base.SetItem(index, item);
-			this[index].Pack = Pack;
+			item.Pack = Pack;
+			item.Parent = Parent;
 		}
 
 		protected void EnsureWritable()
@@ -78,6 +87,11 @@ namespace QQn.TurtlePackage
 		public Pack Pack
 		{
 			get { return (_parent != null) ? _parent.Pack : null; }
+		}
+
+		public PackItem Parent
+		{
+			get { return _parent; }
 		}
 
 		protected override string GetKeyForItem(T item)

@@ -57,38 +57,38 @@
     <Compile Include="IO\AssuredSubStream.cs" />
     <Compile Include="IO\StreamProxy.cs" />
     <Compile Include="IO\WebFormWriter.cs" />
-    <Compile Include="Tokenizer\Definitions\IHasTokenizerDefiniton.cs" />
-    <Compile Include="Tokenizer\Definitions\TokenGroupItem.cs" />
-    <Compile Include="Tokenizer\FileExpandArgs.cs" />
-    <Compile Include="Tokenizer\FileSystemInfoTypeConverters.cs" />
-    <Compile Include="Tokenizer\PlusMinTokenAttribute.cs" />
-    <Compile Include="Tokenizer\Definitions\TokenItem.cs" />
-    <Compile Include="Tokenizer\Definitions\TokenizerState.cs" />
-    <Compile Include="Tokenizer\Definitions\TokenMember.cs" />
-    <Compile Include="Tokenizer\Definitions\TokenItemBase.cs" />
-    <Compile Include="Tokenizer\PositionTokenAttribute.cs" />
-    <Compile Include="Tokenizer\RestTokenAttribute.cs" />
-    <Compile Include="Tokenizer\Definitions\StaticTokenizerDefinition.cs" />
-    <Compile Include="Tokenizer\TokenGroupAttribute.cs" />
-    <Compile Include="Tokenizer\Tokenizer.CommandLine.cs" />
-    <Compile Include="Tokenizer\TokenizerArgs.cs" />
-    <Compile Include="Tokenizer\Definitions\TokenizerDefinition.cs" />
-    <Compile Include="Tokenizer\TokenizerMessages.Designer.cs">
+    <Compile Include="Tokens\Definitions\IHasTokenizerDefiniton.cs" />
+    <Compile Include="Tokens\Definitions\TokenGroupItem.cs" />
+    <Compile Include="Tokens\FileExpandArgs.cs" />
+    <Compile Include="Tokens\FileSystemInfoTypeConverters.cs" />
+    <Compile Include="Tokens\PlusMinTokenAttribute.cs" />
+    <Compile Include="Tokens\Definitions\TokenItem.cs" />
+    <Compile Include="Tokens\Definitions\TokenizerState.cs" />
+    <Compile Include="Tokens\Definitions\TokenMember.cs" />
+    <Compile Include="Tokens\Definitions\TokenItemBase.cs" />
+    <Compile Include="Tokens\PositionTokenAttribute.cs" />
+    <Compile Include="Tokens\RestTokenAttribute.cs" />
+    <Compile Include="Tokens\Definitions\StaticTokenizerDefinition.cs" />
+    <Compile Include="Tokens\TokenGroupAttribute.cs" />
+    <Compile Include="Tokens\Tokenizer.CommandLine.cs" />
+    <Compile Include="Tokens\TokenizerArgs.cs" />
+    <Compile Include="Tokens\Definitions\TokenizerDefinition.cs" />
+    <Compile Include="Tokens\TokenizerMessages.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>TokenizerMessages.resx</DependentUpon>
     </Compile>
-    <Compile Include="Tokenizer\OptionalTokenAttribute.cs" />
-    <Compile Include="Tokenizer\TokenAttribute.cs" />
-    <Compile Include="Tokenizer\TokenAttributeBase.cs" />
+    <Compile Include="Tokens\OptionalTokenAttribute.cs" />
+    <Compile Include="Tokens\TokenAttribute.cs" />
+    <Compile Include="Tokens\TokenAttributeBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tokenizer\TokenDescriptionAttribute.cs" />
-    <Compile Include="Tokenizer\Tokenizer.cs" />
-    <Compile Include="Tokenizer\Tokenizers\CommandLineTokenizer.cs" />
-    <Compile Include="Tokenizer\Tokenizers\XmlTokenizer.cs" />
+    <Compile Include="Tokens\TokenDescriptionAttribute.cs" />
+    <Compile Include="Tokens\Tokenizer.cs" />
+    <Compile Include="Tokens\Tokenizers\CommandLineTokenizer.cs" />
+    <Compile Include="Tokens\Tokenizers\XmlTokenizer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Tokenizer\TokenizerMessages.resx">
+    <EmbeddedResource Include="Tokens\TokenizerMessages.resx">
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>TokenizerMessages.Designer.cs</LastGenOutput>
@@ -102,11 +102,11 @@
     <Compile Include="IO\QQnPath.cs" />
     <Compile Include="IO\SeekableStream.cs" />
     <Compile Include="IO\TempStream.cs" />
-    <Compile Include="Tokenizer\Converters\UtcDateTimeConverter.cs" />
-    <Compile Include="Tokenizer\Converters\VersionConverter.cs" />
-    <Compile Include="Tokenizer\Definitions\ITokenizerInitialize.cs" />
-    <Compile Include="Tokenizer\Tokenizer.ConnectionString.cs" />
-    <Compile Include="Tokenizer\Tokenizer.Xml.cs" />
+    <Compile Include="Tokens\Converters\UtcDateTimeConverter.cs" />
+    <Compile Include="Tokens\Converters\VersionConverter.cs" />
+    <Compile Include="Tokens\Definitions\ITokenizerInitialize.cs" />
+    <Compile Include="Tokens\Tokenizer.ConnectionString.cs" />
+    <Compile Include="Tokens\Tokenizer.Xml.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />

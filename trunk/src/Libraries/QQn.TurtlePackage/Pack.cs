@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using QQn.TurtleUtils.ItemSets;
-using QQn.TurtleUtils.Tokenizer;
+using QQn.TurtleUtils.Tokens;
 using System.ComponentModel;
+using QQn.TurtleUtils.Cryptography;
+using QQn.TurtleUtils.Tokens.Definitions;
 
 
 namespace QQn.TurtlePackage
 {
-	public class Pack : PackItem, ISupportInitialize
+	public class Pack : PackItem, ITokenizerInitialize
 	{
 		public const string Namespace = "http://schemas.qqn.nl/2007/TurtlePackage";
 		bool _readOnly;
@@ -71,6 +72,17 @@ namespace QQn.TurtlePackage
 		public bool IsReadOnly
 		{
 			get { return _readOnly; }
+		}
+
+		StrongNameKey _strongNameKey;
+		public StrongNameKey StrongNameKey
+		{
+			get { return _strongNameKey; }
+			set
+			{
+				EnsureWritable();
+				_strongNameKey = value;
+			}
 		}
 	}
 }

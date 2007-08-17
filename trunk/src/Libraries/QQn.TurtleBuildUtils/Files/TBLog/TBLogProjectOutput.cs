@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using QQn.TurtleUtils.Tokenizer;
+using QQn.TurtleUtils.Tokens;
+using System.Collections.ObjectModel;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
@@ -11,6 +12,6 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		[TokenGroup("SharedItem", typeof(TBLogSharedItem))]
 		[TokenGroup("CopyItem", typeof(TBLogCopyItem))]
 		[TokenGroup("SharedCopyItem", typeof(TBLogSharedCopyItem))]
-		public readonly List<TBLogReferenceItem> Items = new List<TBLogReferenceItem>();
+		public readonly Collection<TBLogReferenceItem> Items = new Collection<TBLogReferenceItem>();
 	}
 }

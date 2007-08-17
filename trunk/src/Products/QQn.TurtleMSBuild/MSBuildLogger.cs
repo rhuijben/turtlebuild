@@ -5,7 +5,7 @@ using Microsoft.Build.Framework;
 using System.IO;
 using System.Xml;
 using System.Collections;
-using QQn.TurtleUtils.Tokenizer;
+using QQn.TurtleUtils.Tokens;
 
 namespace QQn.TurtleMSBuild
 {

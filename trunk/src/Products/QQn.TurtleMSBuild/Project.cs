@@ -321,6 +321,11 @@ namespace QQn.TurtleMSBuild
 			xw.WriteAttributeString("targetName", TargetName);
 			xw.WriteAttributeString("targetExt", TargetExt);
 			xw.WriteAttributeString("file", MakeRelativePath(ProjectFile));
+
+			if (!string.IsNullOrEmpty(KeyFile))
+				xw.WriteAttributeString("keyFile", KeyFile);
+			else if (!string.IsNullOrEmpty(KeyContainer))
+				xw.WriteElementString("keyContainer", KeyContainer);
 		}
 
 		protected virtual void WriteManifest(XmlWriter xw, bool forReadability)
