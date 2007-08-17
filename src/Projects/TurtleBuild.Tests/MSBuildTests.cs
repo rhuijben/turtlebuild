@@ -12,6 +12,7 @@ using System.Xml;
 using Microsoft.Build.BuildEngine;
 using QQn.TurtleMSBuild;
 using QQn.TurtleBuildUtils.Files.TBLog;
+using QQn.TurtlePackage;
 
 namespace TurtleTests
 {
@@ -60,6 +61,10 @@ namespace TurtleTests
 			if (Directory.Exists(LoggerPath))
 				Directory.Delete(LoggerPath, true);
 
+			if (Directory.Exists(PackagePath))
+				Directory.Delete(PackagePath, true);
+
+			Directory.CreateDirectory(PackagePath);
 			Directory.CreateDirectory(LoggerPath);
 		}
 
@@ -107,6 +112,18 @@ namespace TurtleTests
 					_loggerPath = Path.Combine(Path.GetTempPath(), "BuildLogger");
 
 				return _loggerPath;
+			}
+		}
+
+		string _packagePath;
+		public string PackagePath
+		{
+			get
+			{
+				if (_packagePath == null)
+					_packagePath = Path.Combine(Path.GetTempPath(), "TBPackages");
+
+				return _packagePath;
 			}
 		}
 
@@ -160,7 +177,7 @@ namespace TurtleTests
 				{
 					xw.WriteStartDocument();
 					xw.WriteStartElement("TurtleBuild", "q:q");
-					QQn.TurtleUtils.Tokenizer.Tokenizer.TryWriteXml(new XmlTextWriter(sw), file);
+					QQn.TurtleUtils.Tokens.Tokenizer.TryWriteXml(new XmlTextWriter(sw), file);
 
 					xw.WriteEndDocument();
 				}
@@ -170,8 +187,7 @@ namespace TurtleTests
 			}
 		}
 
-		[Test]
-		public void BuildInternal()
+		void BuildInternal()
 		{
 			Engine engine = new Engine(Path.GetDirectoryName(new Uri(typeof(int).Assembly.CodeBase).LocalPath));
 			MSBuildLogger logger = new MSBuildLogger();
@@ -182,6 +198,28 @@ namespace TurtleTests
 			Project p = new Project(engine);
 			p.Load(Solution);
 			Assert.That(p.Build(), Is.True, "Build succeeded");
+		}
+
+		[Test]
+		public void BuildInternalSucceeded()
+		{
+			BuildInternal();			
+		}
+
+		[Test]
+		public void MakePackage()
+		{
+			string logFile = Path.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog");
+			if(!File.Exists(logFile))
+				BuildInternal();
+
+			TBLogFile log = TBLogFile.Load(logFile);
+
+			Pack pack = null;
+
+			Assert.That(PackUtils.TryCreatePack(log, out pack));
+
+			TurtlePackage.Create(Path.Combine(PackagePath, "QQn.TurtleMSBuild.tbPkg"), pack, log.Project.Path);
 		}
 	}
 }

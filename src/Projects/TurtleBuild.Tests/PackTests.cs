@@ -4,7 +4,7 @@ using System.Text;
 using NUnit.Framework;
 using QQn.TurtlePackage;
 using System.Xml;
-using QQn.TurtleUtils.Tokenizer;
+using QQn.TurtleUtils.Tokens;
 using NUnit.Framework.SyntaxHelpers;
 using System.Diagnostics;
 
@@ -41,8 +41,6 @@ namespace TurtleTests
 
 			Assert.That(doc.SelectSingleNode("/*"), Is.Not.Null);
 			Assert.That(doc.SelectNodes("//Item").Count, Is.EqualTo(6));
-
-			Trace.WriteLine(doc.OuterXml);
 
 			Pack pack2;
 

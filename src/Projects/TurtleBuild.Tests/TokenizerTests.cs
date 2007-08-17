@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using QQn.TurtleUtils.Tokenizer;
+using QQn.TurtleUtils.Tokens;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using System.IO;
 using System.Xml;
+using QQn.TurtleUtils.Tokens.Converters;
 
 namespace TurtleTests
 {
@@ -156,7 +157,6 @@ namespace TurtleTests
 
 			[Token("name")]
 			public string Name;
-
 		}
 
 		public class Group
@@ -216,6 +216,23 @@ namespace TurtleTests
 			}
 
 			Assert.That(doc2.DocumentElement.OuterXml, Is.EqualTo("<Pack Id=\"packId\"><Group Id=\"groupId\"><Item Id=\"item1Id\" name=\"Item1\" /><Item Id=\"item2Id\" name=\"Item2\" /></Group></Pack>"));
+		}
+
+		class TestItemWithNullable
+		{
+			[Token("date"), Token("dateX", TypeConverter=typeof(TicksDateTimeConverter))]
+			public DateTime? date;
+		}
+
+		[Test]
+		public void TestNullable()
+		{
+			TestItemWithNullable item;
+			Assert.That(Tokenizer.TryParseCommandLine("-date 2007-08-17", out item), Is.True);
+
+
+			Assert.That(Tokenizer.TryParseCommandLine("-dateX U20070817", out item), Is.True);
+			
 		}
 	}
 }

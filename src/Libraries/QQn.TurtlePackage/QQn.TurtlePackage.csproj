@@ -42,6 +42,7 @@
     <Compile Include="PackFile.cs" />
     <Compile Include="PackFileCollection.cs" />
     <Compile Include="PackItem.cs" />
+    <Compile Include="PackUtils.cs" />
     <Compile Include="TurtleExtractArgs.cs" />
     <Compile Include="TurtlePackage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -50,6 +51,10 @@
     <None Include="QQn.TurtlePackage.snk" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\QQn.TurtleBuildUtils\QQn.TurtleBuildUtils.csproj">
+      <Project>{4FB6CAEF-DEF4-46FA-A118-DB35B373C397}</Project>
+      <Name>QQn.TurtleBuildUtils</Name>
+    </ProjectReference>
     <ProjectReference Include="..\QQn.TurtleUtils\QQn.TurtleUtils.csproj">
       <Project>{BB47C9BD-2E01-4EEC-9128-BDDCF80300B1}</Project>
       <Name>QQn.TurtleUtils</Name>

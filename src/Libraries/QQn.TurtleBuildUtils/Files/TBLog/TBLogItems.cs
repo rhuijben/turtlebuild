@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using QQn.TurtleUtils.Tokenizer;
+using QQn.TurtleUtils.Tokens;
 using System.Diagnostics;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
@@ -38,7 +38,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 			get { return false; }
 		}
 	}
-	public class TBLogSharedItem : TBLogReferenceItem
+	public class TBLogSharedItem : TBLogItem
 	{
 		public override bool IsShared
 		{
@@ -51,7 +51,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		}
 	}
 
-	public class TBLogCopyItem : TBLogReferenceItem
+	public class TBLogCopyItem : TBLogItem
 	{
 		public override bool IsShared
 		{
@@ -64,7 +64,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		}
 	}
 
-	public class TBLogSharedCopyItem : TBLogReferenceItem
+	public class TBLogSharedCopyItem : TBLogItem
 	{
 		public override bool IsShared
 		{

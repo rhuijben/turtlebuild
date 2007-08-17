@@ -33,6 +33,20 @@ namespace TurtleTests
 						}
 					}
 				}
+
+				using (MultiStreamWriter subWriter = new MultiStreamWriter(writer.CreateStream()))
+				{
+					for (int i = 0; i < 10; i++)
+					{
+						using (Stream s = subWriter.CreateStream())
+						{
+							using (StreamWriter sw = new StreamWriter(s))
+							{
+								sw.WriteLine("This is stream x-{0}", fileName);
+							}
+						}
+					}
+				}
 			}
 
 			using (FileStream fs = File.OpenRead(fileName))
