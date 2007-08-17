@@ -4,7 +4,7 @@ using System.Text;
 using System.ComponentModel;
 using System.Reflection;
 
-namespace QQn.TurtleUtils.Tokenizer.Definitions
+namespace QQn.TurtleUtils.Tokens.Definitions
 {
 	sealed class StaticTokenizerDefinition<T> : TokenizerDefinition
 		where T : class, new()

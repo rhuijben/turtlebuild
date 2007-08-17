@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace QQn.TurtleUtils.Tokenizer {
+namespace QQn.TurtleUtils.Tokens {
     using System;
     
     

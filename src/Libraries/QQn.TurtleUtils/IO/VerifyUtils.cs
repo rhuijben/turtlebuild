@@ -4,7 +4,7 @@ using System.Text;
 using System.IO;
 using QQn.TurtleUtils.Cryptography;
 
-namespace QQn.TurtleUtils.Streams
+namespace QQn.TurtleUtils.IO
 {
 	/// <summary>
 	/// Represents a file which can be compared with a physical file (on disk) or an other <see cref="IVerifiableFile"/>
@@ -34,6 +34,20 @@ namespace QQn.TurtleUtils.Streams
 		/// </summary>
 		/// <value>The last written time in UTC.</value>
 		DateTime? LastWriteTimeUtc { get; }
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	public interface IUpdatableVerifiableFile : IVerifiableFile
+	{
+		/// <summary>
+		/// Updates the verify data.
+		/// </summary>
+		/// <param name="fileHash">The file hash.</param>
+		/// <param name="size">The size.</param>
+		/// <param name="lastWriteTimeUtc">The last write time UTC.</param>
+		void UpdateVerifyData(string fileHash, long? size, DateTime? lastWriteTimeUtc);
 	}
 
 
@@ -148,6 +162,29 @@ namespace QQn.TurtleUtils.Streams
 				return false;
 
 			return true;
+		}
+
+		/// <summary>
+		/// Updates the file.
+		/// </summary>
+		/// <param name="baseDirectory">The base directory.</param>
+		/// <param name="verifyData">The verify data.</param>
+		public static void UpdateFile(string baseDirectory, IUpdatableVerifiableFile verifyData)
+		{
+			if (string.IsNullOrEmpty(baseDirectory))
+				throw new ArgumentNullException("baseDirectory");
+			else if (verifyData == null)
+				throw new ArgumentNullException("verifyData");
+
+			FileInfo fif = new FileInfo(Path.Combine(baseDirectory, verifyData.Filename));
+			if (!fif.Exists)
+				return;
+
+			long size = fif.Length;
+			string hash = QQnCryptoHelpers.CalculateFileHash(fif.FullName, HashType.SHA1);
+			DateTime dt = fif.LastWriteTimeUtc;
+
+			verifyData.UpdateVerifyData(hash, size, dt);
 		}
 	}
 }

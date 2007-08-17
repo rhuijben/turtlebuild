@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using QQn.TurtleUtils.Tokenizer.Definitions;
 using System.IO;
+using QQn.TurtleUtils.Tokens.Definitions;
 
-namespace QQn.TurtleUtils.Tokenizer.Tokenizers
+namespace QQn.TurtleUtils.Tokens.Tokenizers
 {
 	static class CommandLineTokenizer<T>
 		where T : class, new()
@@ -71,6 +71,8 @@ namespace QQn.TurtleUtils.Tokenizer.Tokenizers
 								}
 								else
 									token.Evaluate(null, state);
+
+								continue;
 							}
 							else
 							{

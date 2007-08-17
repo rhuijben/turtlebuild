@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Globalization;
 
-namespace QQn.TurtleUtils.Tokenizer
+namespace QQn.TurtleUtils.Tokens
 {
 	/// <summary>
 	/// 

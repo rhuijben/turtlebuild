@@ -3,13 +3,24 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 
-namespace QQn.TurtleUtils.Tokenizer.Definitions
+namespace QQn.TurtleUtils.Tokens.Definitions
 {
 	/// <summary>
 	/// 
 	/// </summary>
 	public abstract class TokenItemBase
 	{
+		readonly Type _valueType;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TokenItemBase"/> class.
+		/// </summary>
+		/// <param name="valueType">Type of the value.</param>
+		protected TokenItemBase(Type valueType)
+		{
+			_valueType = valueType;
+		}
+
 		internal static T GetFirstAttribute<T>(ICustomAttributeProvider attributeProvider)
 			where T : Attribute
 		{
@@ -22,6 +33,36 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 			}
 
 			return null;
+		}
+
+		int _typeLevel;
+		internal int TypeLevel
+		{
+			get
+			{
+				if (_typeLevel == 0)
+				{
+					_typeLevel = 1 + GetTypeLevel(ValueType);
+				}
+
+				return _typeLevel - 1;
+			}
+		}
+		static int GetTypeLevel(Type type)
+		{
+			if (type == null)
+				return 0;
+
+			return 1 + GetTypeLevel(type.BaseType);
+		}
+
+		/// <summary>
+		/// Gets the type of the value.
+		/// </summary>
+		/// <value>The type of the value.</value>
+		public Type ValueType
+		{
+			get { return _valueType; }
 		}
 	}
 }

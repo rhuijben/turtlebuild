@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using QQn.TurtleUtils.Tokenizer.Definitions;
+using QQn.TurtleUtils.Tokens.Definitions;
 
-namespace QQn.TurtleUtils.Tokenizer
+namespace QQn.TurtleUtils.Tokens
 {
 	/// <summary>
 	/// 
@@ -25,7 +25,7 @@ namespace QQn.TurtleUtils.Tokenizer
 		/// </summary>
 		/// <param name="tokenMember">The token member.</param>
 		/// <returns></returns>
-		public override QQn.TurtleUtils.Tokenizer.Definitions.TokenItem CreateToken(QQn.TurtleUtils.Tokenizer.Definitions.TokenMember tokenMember)
+		public override QQn.TurtleUtils.Tokens.Definitions.TokenItem CreateToken(QQn.TurtleUtils.Tokens.Definitions.TokenMember tokenMember)
 		{
 			return new PlusMinToken(tokenMember, this, ValueType);
 		}

@@ -56,15 +56,6 @@
     <Compile Include="IO\AssuredStreamHeader.cs" />
     <Compile Include="IO\AssuredSubStream.cs" />
     <Compile Include="IO\StreamProxy.cs" />
-    <Compile Include="ItemSets\ItemSetRoot.cs" />
-    <Compile Include="ItemSets\ItemSetBase.cs" />
-    <Compile Include="ItemSets\ItemSetItem.cs" />
-    <Compile Include="ItemSets\ItemSetList.cs" />
-    <Compile Include="ItemSets\ItemSetStrings.Designer.cs">
-      <DependentUpon>ItemSetStrings.resx</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <Compile Include="IO\WebFormWriter.cs" />
     <Compile Include="Tokenizer\Definitions\IHasTokenizerDefiniton.cs" />
     <Compile Include="Tokenizer\Definitions\TokenGroupItem.cs" />
@@ -97,11 +88,6 @@
     <Compile Include="Tokenizer\Tokenizers\XmlTokenizer.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ItemSets\ItemSetStrings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>ItemSetStrings.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Tokenizer\TokenizerMessages.resx">
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
@@ -110,8 +96,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="QQn.TurtleUtils.snk" />
+    <Compile Include="IO\DirectoryMap.cs" />
+    <Compile Include="IO\DirectoryMapFile.cs" />
+    <Compile Include="IO\ZLibSubStream.cs" />
+    <Compile Include="IO\QQnPath.cs" />
+    <Compile Include="IO\SeekableStream.cs" />
+    <Compile Include="IO\TempStream.cs" />
     <Compile Include="Tokenizer\Converters\UtcDateTimeConverter.cs" />
     <Compile Include="Tokenizer\Converters\VersionConverter.cs" />
+    <Compile Include="Tokenizer\Definitions\ITokenizerInitialize.cs" />
     <Compile Include="Tokenizer\Tokenizer.ConnectionString.cs" />
     <Compile Include="Tokenizer\Tokenizer.Xml.cs" />
   </ItemGroup>

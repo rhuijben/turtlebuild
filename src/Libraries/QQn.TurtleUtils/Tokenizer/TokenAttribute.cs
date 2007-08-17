@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
-using QQn.TurtleUtils.Tokenizer.Definitions;
+using QQn.TurtleUtils.Tokens.Definitions;
 
-namespace QQn.TurtleUtils.Tokenizer
+namespace QQn.TurtleUtils.Tokens
 {
 	/// <summary>
 	/// 

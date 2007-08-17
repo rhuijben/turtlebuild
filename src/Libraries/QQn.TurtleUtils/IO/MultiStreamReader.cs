@@ -96,11 +96,49 @@ namespace QQn.TurtleUtils.IO
 			if(0 != (header.ItemType & MultiStreamItemHeader.AssuredFlag))
 				s = new AssuredSubStream(s, _verificationMode);
 
-			if (0 != (header.ItemType & MultiStreamItemHeader.GZippedFlag))
-				s = new GZipSubStream(s, System.IO.Compression.CompressionMode.Decompress);
+			if (0 != (header.ItemType & MultiStreamItemHeader.ZippedFlag))
+				s = new ZLibSubStream(s, System.IO.Compression.CompressionMode.Decompress);
 
 			_openReader = reader;
 			return s;
+		}
+
+		/// <summary>
+		/// Gets the next stream of the specified type
+		/// </summary>
+		/// <param name="type">The type.</param>
+		/// <returns></returns>
+		public Stream GetNextStream(int type)
+		{
+			if (_openReader != null)
+				throw new InvalidOperationException();
+
+			int next = _next;
+			while (next < _items.Count)
+			{
+				if ((_items[next].ItemType >> 4) == type)
+				{
+					_next = next;
+					return GetNextStream();
+				}
+				next++;
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Resets this instance.
+		/// </summary>
+		/// <returns></returns>
+		public bool Reset()
+		{
+			if (_openReader != null)
+				throw new InvalidOperationException();
+
+			_next = 0;
+
+			return true;
 		}
 
 		internal void CloseStream(MultiSubStreamReader multiSubStreamReader)

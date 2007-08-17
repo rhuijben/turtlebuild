@@ -4,7 +4,7 @@ using System.Text;
 using System.ComponentModel;
 using System.IO;
 
-namespace QQn.TurtleUtils.Tokenizer.Definitions
+namespace QQn.TurtleUtils.Tokens.Definitions
 {
 	/// <summary>
 	/// 
@@ -15,14 +15,15 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		readonly string _name;
 		readonly IList<string> _aliases;
 		readonly Type _typeConverter;
-		readonly Type _valueType;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TokenItem"/> class.
 		/// </summary>
 		/// <param name="member">The member.</param>
 		/// <param name="attr">The attr.</param>
+		/// <param name="valueType">Type of the value.</param>
 		public TokenItem(TokenMember member, TokenAttribute attr, Type valueType)
+			: base(valueType)
 		{
 			if (member == null)
 				throw new ArgumentNullException("member");
@@ -44,15 +45,6 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		public TokenMember Member
 		{
 			get { return _member; }
-		}
-
-		/// <summary>
-		/// Gets the type of the value.
-		/// </summary>
-		/// <value>The type of the value.</value>
-		public Type ValueType
-		{
-			get { return _valueType; }
 		}
 
 		/// <summary>
@@ -158,7 +150,9 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		/// <summary>
 		/// Converts value to the <see cref="DataType"/> Type
 		/// </summary>
+		/// <typeparam name="T"></typeparam>
 		/// <param name="value">The value.</param>
+		/// <param name="state">The state.</param>
 		/// <returns></returns>
 		public virtual object ConvertValue<T>(string value, TokenizerState<T> state)
 			where T : class, new()

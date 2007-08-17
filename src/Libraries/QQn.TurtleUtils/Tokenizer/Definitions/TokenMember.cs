@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Collections;
 using System.ComponentModel;
 
-namespace QQn.TurtleUtils.Tokenizer.Definitions
+namespace QQn.TurtleUtils.Tokens.Definitions
 {
 	/// <summary>
 	/// Specifies the way the tokenizer uses a member
@@ -50,6 +50,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		/// </summary>
 		/// <param name="member">The member.</param>
 		public TokenMember(MemberInfo member)
+			: base(null)
 		{
 			if (member == null)
 				throw new ArgumentNullException("member");
@@ -80,6 +81,15 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 					groups = new List<TokenGroupItem>();
 
 				groups.Add(a.CreateGroup(this));
+			}
+
+			if (groups != null)
+			{
+				// Reverse sort the items on typelevel
+				groups.Sort(delegate(TokenGroupItem x, TokenGroupItem y)
+				{
+					return x.TypeLevel - y.TypeLevel;
+				});
 			}
 
 			if (tokens != null)
@@ -159,6 +169,11 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 				{
 					Type fieldType = FieldType;
 					_tokenMemberMode = TokenMemberMode.Default;
+
+					if(typeof(Nullable<>).IsAssignableFrom(fieldType))
+					{
+						GC.KeepAlive(fieldType);
+					}
 
 					if (typeof(Array).IsAssignableFrom(fieldType))
 					{
@@ -299,7 +314,7 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		}
 
 		/// <summary>
-		/// Gets a list with the values of this field or <c>null</c> if the value has the value specified in the <see cref="DefaultValue"/> attribute
+		/// Gets a list with the values of this field or <c>null</c> if the value has the value specified in the <see cref="DefaultValueAttribute"/> attribute
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="state">The state.</param>

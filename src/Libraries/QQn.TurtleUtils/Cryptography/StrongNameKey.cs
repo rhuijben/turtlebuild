@@ -4,12 +4,14 @@ using System.Text;
 using System.IO;
 using System.Security.Cryptography;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace QQn.TurtleUtils.Cryptography
 {
 	/// <summary>
 	/// An in-memory wrapper of a StrongKeyName (aka Snk file)
 	/// </summary>
+	[DebuggerDisplay("PublicKeyToken={PublicKeyToken}, PublicOnly={PublicOnly}")]
 	public sealed class StrongNameKey
 	{
 		/// <summary>

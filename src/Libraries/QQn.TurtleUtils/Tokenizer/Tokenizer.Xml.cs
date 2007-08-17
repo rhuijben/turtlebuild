@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.XPath;
-using QQn.TurtleUtils.Tokenizer.Tokenizers;
+using QQn.TurtleUtils.Tokens.Tokenizers;
 using System.Xml;
 
-namespace QQn.TurtleUtils.Tokenizer
+namespace QQn.TurtleUtils.Tokens
 {
 	public static partial class Tokenizer
 	{

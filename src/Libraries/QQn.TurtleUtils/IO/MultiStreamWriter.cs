@@ -96,10 +96,10 @@ namespace QQn.TurtleUtils.IO
 		/// </summary>
 		/// <param name="type">The type.</param>
 		/// <returns></returns>
-		public Stream CreateStream(short type)
+		public Stream CreateStream(int type)
 		{
-			if (type != (type & MultiStreamItemHeader.TypeMask))
-				throw new ArgumentOutOfRangeException("type", type, "Type must be between 0 and 4096");
+			if ((type < 0) || (type > 0xFFFFFF))
+				throw new ArgumentOutOfRangeException("type", type, "Value must be between 0 and 16777216");
 
 			MultiStreamArgs args = new MultiStreamArgs();
 			args.StreamType = type;
@@ -124,8 +124,8 @@ namespace QQn.TurtleUtils.IO
 				throw new InvalidOperationException("Can't create any more substreams");
 			}
 			MultiStreamItemHeader header = new MultiStreamItemHeader();
-			header.Offset = BaseStream.Position;
-			header.ItemType = args.StreamType;
+			header.Offset = BaseStream.Position = BaseStream.Length;
+			header.ItemType = args.StreamType << 4;
 			_updated = true;
 
 			MultiSubStreamWriter innerStream = new MultiSubStreamWriter(this, BaseStream, header);
@@ -139,8 +139,8 @@ namespace QQn.TurtleUtils.IO
 
 			if (args.GZipped)
 			{
-				result = new GZipSubStream(result, CompressionMode.Compress);
-				header.ItemType |= MultiStreamItemHeader.GZippedFlag;
+				result = new ZLibSubStream(result, CompressionMode.Compress);
+				header.ItemType |= MultiStreamItemHeader.ZippedFlag;
 			}
 
 			_openStream = innerStream;

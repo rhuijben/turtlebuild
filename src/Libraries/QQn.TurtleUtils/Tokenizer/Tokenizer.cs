@@ -2,14 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.XPath;
-using QQn.TurtleUtils.Tokenizer.Definitions;
 using System.IO;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
 using System.Collections;
-using QQn.TurtleUtils.Tokenizer.Tokenizers;
+using QQn.TurtleUtils.Tokens.Definitions;
+using QQn.TurtleUtils.Tokens.Tokenizers;
 
-namespace QQn.TurtleUtils.Tokenizer
+namespace QQn.TurtleUtils.Tokens
 {
 	/// <summary>
 	/// 

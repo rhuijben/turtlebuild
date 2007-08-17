@@ -9,7 +9,7 @@ namespace QQn.TurtleUtils.IO
 {
 	class AssuredStreamHeader
 	{
-		const uint FileSignature = 0xBADCAB;
+		const uint FileSignature = 0xABDCBA;
 		readonly string _fileType;
 		byte[] _fileHash;
 		byte[] _hashSignature;

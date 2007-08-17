@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
-using QQn.TurtleUtils.Tokenizer.Tokenizers;
 using System.Xml;
+using QQn.TurtleUtils.Tokens.Tokenizers;
 
-namespace QQn.TurtleUtils.Tokenizer.Definitions
+namespace QQn.TurtleUtils.Tokens.Definitions
 {
 	/// <summary>
 	/// 
@@ -14,16 +14,16 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 	{
 		readonly string _name;
 		readonly Type _groupType;
-		readonly Type _valueType;
 		readonly TokenMember _member;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TokenGroup"/> class.
+		/// Initializes a new instance of the <see cref="TokenGroupItem"/> class
 		/// </summary>
 		/// <param name="name">The name.</param>
-		/// <param name="memberType">Type of the member.</param>
 		/// <param name="member">The member.</param>
-		public TokenGroupItem(string name, Type memberType, TokenMember member)
+		/// <param name="valueType">Type of the value.</param>
+		public TokenGroupItem(string name, TokenMember member, Type valueType)
+			: base(valueType)
 		{
 			if (string.IsNullOrEmpty(name))
 				throw new ArgumentNullException("name");
@@ -31,13 +31,15 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 				throw new ArgumentNullException("member");
 
 			_name = name;
-			_valueType = memberType;
-			_groupType = memberType ?? member.DataType;
+			_groupType = valueType ?? member.DataType;
 			_member = member;
 
 			ConstructorInfo ci = _groupType.GetConstructor(Type.EmptyTypes);
 			if (ci == null || !ci.IsPublic || _groupType.IsAbstract)
-				throw new ArgumentException(string.Format(TokenizerMessages.CantUseTypeXAsTokenGroupBecauseItHasNoPublicParameterlessConstructor, memberType.FullName), "memberType");			
+				throw new ArgumentException(string.Format(TokenizerMessages.CantUseTypeXAsTokenGroupBecauseItHasNoPublicParameterlessConstructor, valueType.FullName), "memberType");
+
+			if (valueType != null && !_member.DataType.IsAssignableFrom(valueType))
+				throw new ArgumentException("valueType must be assignable to datatype of member", "valueType");
 		}
 
 		/// <summary>
@@ -82,21 +84,12 @@ namespace QQn.TurtleUtils.Tokenizer.Definitions
 		}
 
 		/// <summary>
-		/// Gets the type of the value.
-		/// </summary>
-		/// <value>The type of the value.</value>
-		public Type ValueType
-		{
-			get { return _valueType; }
-		}
-
-		/// <summary>
 		/// Gets the name.
 		/// </summary>
 		/// <value>The name.</value>
 		public string Name
 		{
 			get { return _name; }
-		} 
+		}
 	}
 }

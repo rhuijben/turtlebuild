@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.XPath;
-using QQn.TurtleUtils.Tokenizer.Definitions;
+using QQn.TurtleUtils.Tokens.Definitions;
 using System.Xml;
 using System.Collections;
 
-namespace QQn.TurtleUtils.Tokenizer.Tokenizers
+namespace QQn.TurtleUtils.Tokens.Tokenizers
 {
 	static class XmlTokenizer<T>
 		where T : class, new()

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using QQn.TurtleUtils.Tokenizer.Definitions;
+using QQn.TurtleUtils.Tokens.Definitions;
 
-namespace QQn.TurtleUtils.Tokenizer
+namespace QQn.TurtleUtils.Tokens
 {
 	/// <summary>
 	/// Tokenizer group
@@ -66,7 +66,7 @@ namespace QQn.TurtleUtils.Tokenizer
 		/// <returns></returns>
 		protected internal virtual TokenGroupItem CreateGroup(TokenMember tokenMember)
 		{
-			return new TokenGroupItem(Name, GroupType, tokenMember);
+			return new TokenGroupItem(Name, tokenMember, GroupType);
 		}
 	}
 }
