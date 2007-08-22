@@ -5,112 +5,69 @@ using System.ComponentModel;
 using QQn.TurtleUtils.Tokens.Definitions;
 using QQn.TurtleUtils.Tokens;
 using QQn.TurtleUtils.Tokens.Converters;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Security.Cryptography;
+using QQn.TurtleUtils.Cryptography;
+using System.Diagnostics;
 
 namespace QQn.TurtleUtils.IO
 {
 	/// <summary>
 	/// 
 	/// </summary>
-	public class DirectoryMapFile : IVerifiableFile, ITokenizerInitialize
+	public class DirectoryMapFile : DirectoryMapItem, IUpdatableVerifiableFile
 	{
-		bool _initCompleted;
-		string _fileName;
 		/// <summary>
 		/// Initializes a new instance of the <see cref="DirectoryMapFile"/> class.
 		/// </summary>
 		/// <param name="name">The name.</param>
 		public DirectoryMapFile(string name)
+			: base(name)
 		{
-			_fileName = name;
-			_initCompleted = true;
-		}
-
-		internal DirectoryMapFile()
-		{
-			_initCompleted = false;
-		}
-
-		string _hash;
-		long _size;
-		DateTime _lwt;
-		
-		#region IVerifiableFile Members
-
-		/// <summary>
-		/// Gets the filename.
-		/// </summary>
-		/// <value>The filename.</value>
-		[Token("name")]
-		public string Filename
-		{
-			get { return _fileName; }
-			set
-			{
-				if (_initCompleted)
-					throw new InvalidOperationException();
-
-				_fileName = value;
-			}
 		}
 
 		/// <summary>
-		/// Gets the file hash.
+		/// Initializes a new instance of the <see cref="DirectoryMapFile"/> class.
 		/// </summary>
-		/// <value>The file hash.</value>
-		public string FileHash
+		public DirectoryMapFile()
+			: base()
 		{
-			get { return _hash; }
-			set
-			{
-				if (_initCompleted)
-					throw new InvalidOperationException();
-
-				_hash = value;
-			}
 		}
 
 		/// <summary>
-		/// Gets the size of the file.
+		/// Updates the data.
 		/// </summary>
-		/// <value>The size of the file.</value>
-		public long FileSize
+		/// <param name="newHash">The new hash.</param>
+		/// <param name="size">The size.</param>
+		/// <param name="dateTime">The date time.</param>
+		internal override void UpdateData(string newHash, long size, DateTime dateTime)
 		{
-			get { return _size; }
-			set
+			using (Updater())
 			{
-				if (_initCompleted)
-					throw new InvalidOperationException();
+				this.FileHash = newHash;
 
-				_size = value;
+				this.FileSize = (size < 0L) ? -1L : size;
+
+				this.LastWriteTimeUtc = dateTime;
 			}
 		}
 
-		/// <summary>
-		/// Gets the last written time in UTC.
-		/// </summary>
-		/// <value>The last written time in UTC.</value>
-		[Token("time", TypeConverter=typeof(TicksDateTimeConverter))]
-		public DateTime? LastWriteTimeUtc
+		public void Update()
 		{
-			get { return _lwt; }
-			set
+			using (Updater())
 			{
-				if (_initCompleted)
-					throw new InvalidOperationException();
-
-				_lwt = value.Value;
+				VerifyUtils.UpdateFile(Map.FullPath, this);
 			}
+		}
+
+		#region IUpdatableVerifiableFile Members
+
+		public void UpdateVerifyData(string fileHash, long? size, DateTime? lastWriteTimeUtc)
+		{
+			UpdateData(fileHash, size.Value, lastWriteTimeUtc.Value);
 		}
 
 		#endregion
-
-		#region ITokenizerInit Members
-
-		void ITokenizerInitialize.EndInit()
-		{
-			_initCompleted = true;
-		}
-
-		#endregion
-	}
+	}	
 }

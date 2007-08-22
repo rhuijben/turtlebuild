@@ -105,6 +105,32 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		/// <summary>
+		/// Gets the parent directory of a directory of file
+		/// </summary>
+		/// <param name="path">Name of the directory.</param>
+		/// <returns></returns>
+		public static string GetParentDirectory(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			if(path.Length > 0)
+			{
+				char c =path[path.Length - 1];
+				
+				if((c == Path.DirectorySeparatorChar) || (c == Path.AltDirectorySeparatorChar))
+				{
+					string root = Path.GetPathRoot(path);
+
+					if(root.Length < path.Length)
+						path = path.Substring(0, path.Length-1);
+				}
+			}
+
+			return GetFullDirectory(Path.GetDirectoryName(path));
+		}
+
+		/// <summary>
 		/// Combines the specified path parts to a complete directory
 		/// </summary>
 		/// <param name="path">The path.</param>

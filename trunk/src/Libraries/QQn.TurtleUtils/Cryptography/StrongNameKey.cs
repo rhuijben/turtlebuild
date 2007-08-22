@@ -28,9 +28,9 @@ namespace QQn.TurtleUtils.Cryptography
 		}
 
 		/// <summary>
-		/// 
+		/// Loads a strong key from the stream
 		/// </summary>
-		/// <param name="stream"></param>
+		/// <param name="stream">The stream.</param>
 		/// <returns></returns>
 		public static StrongNameKey LoadFrom(Stream stream)
 		{
@@ -52,7 +52,7 @@ namespace QQn.TurtleUtils.Cryptography
 		}
 
 		/// <summary>
-		/// 
+		/// Loads a strong name from the byte array
 		/// </summary>
 		/// <param name="bytes"></param>
 		/// <returns></returns>
@@ -68,7 +68,7 @@ namespace QQn.TurtleUtils.Cryptography
 		}
 
 		/// <summary>
-		/// 
+		/// Loads a strong name from the specified container
 		/// </summary>
 		/// <param name="containerName"></param>
 		/// <param name="machineScope"></param>
@@ -99,23 +99,25 @@ namespace QQn.TurtleUtils.Cryptography
 		}
 
 		/// <summary>
-		/// 
+		/// Signs the hash.
 		/// </summary>
-		/// <param name="hash"></param>
+		/// <param name="hash">The hash.</param>
 		/// <returns></returns>
 		public byte[] SignHash(byte[] hash)
 		{
 			if (hash == null)
 				throw new ArgumentNullException("hash");
+			else if (PublicOnly)
+				throw new InvalidOperationException();
 
 			return _rcsp.SignHash(hash, HashAlgorithmOID);
 		}
 
 		/// <summary>
-		/// 
+		/// Verifies the hash.
 		/// </summary>
-		/// <param name="hash"></param>
-		/// <param name="signature"></param>
+		/// <param name="hash">The hash.</param>
+		/// <param name="signature">The signature.</param>
 		/// <returns></returns>
 		public bool VerifyHash(byte[] hash, byte[] signature)
 		{
@@ -179,17 +181,7 @@ namespace QQn.TurtleUtils.Cryptography
 		/// </summary>
 		public int HashLength
 		{
-			get
-			{
-				if (_hashLength == 0)
-				{
-					using (HashAlgorithm hasher = CreateHasher())
-					{
-						_hashLength = hasher.HashSize / 8;
-					}
-				}
-				return _hashLength;
-			}
+			get { return QQnCryptoHelpers.GetHashBits(HashType) / 8; }
 		}
 
 		/// <summary>
@@ -220,7 +212,26 @@ namespace QQn.TurtleUtils.Cryptography
 			}
 		}
 
+		HashType _hashType;
+		/// <summary>
+		/// Gets the type of the hash.
+		/// </summary>
+		/// <value>The type of the hash.</value>
+		public HashType HashType
+		{
+			get
+			{
+				if (_hashType == HashType.Null)
+					_hashType = (HashType)Enum.Parse(typeof(HashType), HashAlgorithmName, true);
+				return _hashType;
+			}
+		}
+
 		string _algorithmOid;
+		/// <summary>
+		/// Gets the hash algorithm OID.
+		/// </summary>
+		/// <value>The hash algorithm OID.</value>
 		string HashAlgorithmOID
 		{
 			get
@@ -238,7 +249,7 @@ namespace QQn.TurtleUtils.Cryptography
 		/// <returns></returns>
 		public HashAlgorithm CreateHasher()
 		{
-			return HashAlgorithm.Create(HashAlgorithmName);
+			return QQnCryptoHelpers.CreateHashAlgorithm(HashType);
 		}
 	}
 }

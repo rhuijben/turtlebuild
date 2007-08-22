@@ -22,7 +22,7 @@ namespace QQn.TurtleUtils.Cryptography
 		{
 			if (bytes == null)
 				throw new ArgumentNullException("bytes");
-			StringBuilder sb = new StringBuilder(bytes.Length * 2);
+			StringBuilder sb = new StringBuilder(bytes.Length * 2+2);
 
 			foreach (byte b in bytes)
 				sb.AppendFormat(CultureInfo.InvariantCulture, "{0:x2}", b);
@@ -30,7 +30,41 @@ namespace QQn.TurtleUtils.Cryptography
 			return sb.ToString();
 		}
 
-		static HashAlgorithm CreateAlgorithm(HashType hashType)
+		/// <summary>
+		/// Generates a string version of the byte-array
+		/// </summary>
+		/// <param name="bytes">The bytes.</param>
+		/// <param name="hashType">Type of the hash.</param>
+		/// <returns></returns>
+		public static string HashString(byte[] bytes, HashType hashType)
+		{
+			if (bytes == null)
+				throw new ArgumentNullException("bytes");
+			else if (bytes.Length != GetHashBits(hashType) / 8)
+				throw new ArgumentException("Invalid number of bytes", "hashType");
+
+			StringBuilder sb = new StringBuilder(bytes.Length * 2 + 2 + 16);
+
+			foreach (byte b in bytes)
+				sb.AppendFormat(CultureInfo.InvariantCulture, "{0:x2}", b);
+
+			sb.AppendFormat(CultureInfo.InvariantCulture, ",type={0}", (hashType & ~(HashType.PlusSize | HashType.PlusType)).ToString());
+
+			return sb.ToString();
+		}
+
+		/// <summary>
+		/// Gets the type of the default hash.
+		/// </summary>
+		/// <value>The type of the default hash.</value>
+		public const HashType DefaultHashType = HashType.SHA1;
+
+		/// <summary>
+		/// Creates a <see cref="HashAlgorithm"/> for the specified <paramref name="hashType"/>
+		/// </summary>
+		/// <param name="hashType">Type of the hash.</param>
+		/// <returns></returns>
+		public static HashAlgorithm CreateHashAlgorithm(HashType hashType)
 		{
 			switch (hashType & ~(HashType.PlusSize | HashType.PlusType))
 			{
@@ -42,6 +76,36 @@ namespace QQn.TurtleUtils.Cryptography
 					return SHA256.Create();
 				case HashType.SHA512:
 					return SHA512.Create();
+				case HashType.SHA384:
+					return SHA384.Create();
+				case HashType.RIPEMD160:
+					return RIPEMD160.Create();
+				default:
+					throw new ArgumentException("Invalid hashtype", "hashType");
+			}
+		}
+
+		/// <summary>
+		/// Gets the bits used for the hash of the specified type
+		/// </summary>
+		/// <param name="hashType">Type of the hash.</param>
+		/// <returns></returns>
+		public static int GetHashBits(HashType hashType)
+		{
+			switch (hashType)
+			{
+				case HashType.MD5:
+					return 128;
+				case HashType.RIPEMD160:
+					return 160;
+				case HashType.SHA1:
+					return 160;
+				case HashType.SHA256:
+					return 256;
+				case HashType.SHA384:
+					return 384;
+				case HashType.SHA512:
+					return 512;
 				default:
 					throw new ArgumentException("Invalid hashtype", "hashType");
 			}
@@ -79,11 +143,11 @@ namespace QQn.TurtleUtils.Cryptography
 				throw new ArgumentNullException("stream");
 
 			if (hashType == HashType.Null)
-				hashType = HashType.SHA256 | HashType.PlusType | HashType.PlusSize;
+				hashType = DefaultHashType | HashType.PlusType | HashType.PlusSize;
 
 			long length;
 			byte[] bytes;
-			using (HashAlgorithm ha = CreateAlgorithm(hashType))
+			using (HashAlgorithm ha = CreateHashAlgorithm(hashType))
 			{
 				length = stream.Length;
 				bytes = ha.ComputeHash(stream);
@@ -106,9 +170,10 @@ namespace QQn.TurtleUtils.Cryptography
 		/// Normalizes the hash value to a comparable string
 		/// </summary>
 		/// <param name="hash">The hash.</param>
-		/// <param name="removeSize">if set to <c>true</c> [remove size].</param>
+		/// <param name="removeSize">if set to <c>true</c> remove size data.</param>
+		/// <param name="removeType">if set to <c>true</c> remove type date.</param>
 		/// <returns></returns>
-		public static string NormalizeHashValue(string hash, bool removeSize)
+		public static string NormalizeHashValue(string hash, bool removeSize, bool removeType)
 		{
 			if (hash == null)
 				throw new ArgumentNullException("hash");
@@ -117,12 +182,13 @@ namespace QQn.TurtleUtils.Cryptography
 			long length;
 			string hashValue;
 
-			if (TryParsehash(hash, out hashType, out length, out hashValue))
+			if (TryParseHash(hash, out hashType, out length, out hashValue))
 			{
 				StringBuilder sb = new StringBuilder();
 				sb.Append(hash.ToLowerInvariant()); // Lower case the hex string
 
-				sb.AppendFormat(CultureInfo.InvariantCulture, ",type={0}", hashType.ToString());
+				if(!removeType)
+					sb.AppendFormat(CultureInfo.InvariantCulture, ",type={0}", hashType.ToString());
 
 				if ((length >= 0) && !removeSize)
 					sb.AppendFormat(",size={0}", length);
@@ -131,6 +197,33 @@ namespace QQn.TurtleUtils.Cryptography
 			}
 
 			return hash;
+		}
+
+		/// <summary>
+		/// Normalizes the hash value.
+		/// </summary>
+		/// <param name="hash">The hash.</param>
+		/// <param name="removeSize">if set to <c>true</c> remove size data.</param>
+		/// <returns></returns>
+		public static string NormalizeHashValue(string hash, bool removeSize)
+		{
+			if (hash == null)
+				throw new ArgumentNullException("hash");
+
+			return NormalizeHashValue(hash, removeSize, false);
+		}
+
+		/// <summary>
+		/// Normalizes the hash value.
+		/// </summary>
+		/// <param name="hash">The hash.</param>
+		/// <returns></returns>
+		public static string NormalizeHashValue(string hash)
+		{
+			if (hash == null)
+				throw new ArgumentNullException("hash");
+
+			return NormalizeHashValue(hash, true, false);
 		}
 
 		/// <summary>
@@ -147,7 +240,7 @@ namespace QQn.TurtleUtils.Cryptography
 			long length;
 			string hashValue;
 
-			if (TryParsehash(hash, out hashType, out length, out hashValue))
+			if (TryParseHash(hash, out hashType, out length, out hashValue))
 			{
 				return length;
 			}
@@ -155,7 +248,7 @@ namespace QQn.TurtleUtils.Cryptography
 			return -1;
 		}
 
-		static bool TryParsehash(string hash, out HashType hashType, out long length, out string hashValue)
+		static bool TryParseHash(string hash, out HashType hashType, out long length, out string hashValue)
 		{
 			if (hash == null)
 				throw new ArgumentNullException("hash");
@@ -206,9 +299,13 @@ namespace QQn.TurtleUtils.Cryptography
 						break;
 					case 40:
 						hashType = HashType.SHA1;
+						// Colision with RIPEMD160
 						break;
 					case 64:
 						hashType = HashType.SHA256;
+						break;
+					case 96:
+						hashType = HashType.SHA384;
 						break;
 					case 128:
 						hashType = HashType.SHA512;
@@ -238,7 +335,7 @@ namespace QQn.TurtleUtils.Cryptography
 			string hashValue;
 			long length;
 
-			if(!TryParsehash(hash, out hashType, out length, out hashValue))
+			if(!TryParseHash(hash, out hashType, out length, out hashValue))
 				return false;
 
 			if(length >= 0 && new FileInfo(filename).Length != length)
@@ -262,7 +359,7 @@ namespace QQn.TurtleUtils.Cryptography
 			string hashValue;
 			long length;
 
-			if (!TryParsehash(hash, out hashType, out length, out hashValue))
+			if (!TryParseHash(hash, out hashType, out length, out hashValue))
 				return false;
 
 			if (length >= 0 && stream.Length != length)

@@ -140,18 +140,27 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		/// <summary>
-		/// When overridden translates a position in the parent stream to one in the substream
+		/// Translates a position in the parent stream to one in the substream
 		/// </summary>
 		/// <param name="parentPosition">The parent position.</param>
 		/// <returns></returns>
-		protected abstract long PositionToSubStream(long parentPosition);
+		/// <remarks>The default implementation returns the input value untranslated</remarks>
+		protected virtual long PositionToSubStream(long parentPosition)
+		{
+			return parentPosition;
+		}
 
 		/// <summary>
-		/// When overridden translates a position in the substream to one in the parent stream
+		/// Translates a position in the substream to one in the parent stream
 		/// </summary>
 		/// <param name="subStreamPosition">The sub stream position.</param>
 		/// <returns></returns>
-		protected abstract long PositionToParent(long subStreamPosition);
+		/// <remarks>The default implementation returns the input value untranslated</remarks>
+		protected virtual long PositionToParent(long subStreamPosition)
+		{
+			return subStreamPosition;
+		}
+
 
 		/// <summary>
 		/// Reads a sequence of bytes from the current stream and advances the position within the stream by the number of bytes read.

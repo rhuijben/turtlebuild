@@ -13,18 +13,21 @@ namespace QQn.TurtleUtils.IO
 		bool _nullGuid;
 		StrongNameKey _strongName;
 		string _fileType;
+		HashType _hashType;		
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AssuredStreamCreateArgs"/> class.
 		/// </summary>
 		public AssuredStreamCreateArgs()
 		{
+			_hashType = QQnCryptoHelpers.DefaultHashType;
 		}
 
-		internal AssuredStreamCreateArgs(StrongNameKey strongName, string fileType)
+		internal AssuredStreamCreateArgs(StrongNameKey strongName, string fileType, HashType hashType)
 		{
 			StrongNameKey = strongName;
 			FileType = fileType;
+			HashType = hashType;
 		}
 
 		internal void VerifyArgs(string paramName)
@@ -61,6 +64,16 @@ namespace QQn.TurtleUtils.IO
 		{
 			get { return _strongName; }
 			set { _strongName = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the type of the hash.
+		/// </summary>
+		/// <value>The type of the hash.</value>
+		public HashType HashType
+		{
+			get { return _hashType; }
+			set { _hashType = value; }
 		}
 	}
 }

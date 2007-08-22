@@ -35,6 +35,16 @@ namespace QQn.TurtleUtils.Cryptography
 		/// <summary>
 		/// 
 		/// </summary>
+		SHA384	= 0x05,
+
+		/// <summary>
+		/// 
+		/// </summary>
+		RIPEMD160 = 0x06,
+
+		/// <summary>
+		/// 
+		/// </summary>
 		PlusSize = 0x100,
 		/// <summary>
 		/// 

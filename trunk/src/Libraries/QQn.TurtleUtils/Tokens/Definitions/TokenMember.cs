@@ -170,11 +170,6 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 					Type fieldType = FieldType;
 					_tokenMemberMode = TokenMemberMode.Default;
 
-					if(typeof(Nullable<>).IsAssignableFrom(fieldType))
-					{
-						GC.KeepAlive(fieldType);
-					}
-
 					if (typeof(Array).IsAssignableFrom(fieldType))
 					{
 						fieldType = fieldType.GetElementType();
@@ -214,6 +209,19 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 							}
 						}
 
+					Type nullableBase = Nullable.GetUnderlyingType(fieldType);
+
+					if (nullableBase != null)
+					{
+						// The .NET reflection api hides all nullable instances for the reflection code
+						// (No need to wrap and unwrap boxed types)
+						// See http://blogs.msdn.com/haibo_luo/archive/2005/08/23/455241.aspx for more information
+						//
+						// Before RTM there existed a method Nullable.Wrap<T>(T value) which we should have used all over the place;
+						// now we only need to unwrap the type to allow using TypeConverters... on the real type
+						//
+						fieldType = nullableBase;						
+					}
 
 					_dataType = fieldType;
 				}

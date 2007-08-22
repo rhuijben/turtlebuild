@@ -21,6 +21,7 @@ namespace QQn.TurtleUtils.IO
 		byte[] _hashSignature;
 		long _hashLength;
 		bool _updating;
+		readonly HashType _hashType;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AssuredSubStream"/> class.
@@ -33,7 +34,10 @@ namespace QQn.TurtleUtils.IO
 			AssuredStream signedParent = GetService<AssuredStream>();
 			
 			if (signedParent != null)
+			{
 				_snk = signedParent.AssemblyStrongNameKey;
+				_hashType = signedParent.HashType;
+			}				
 			
 			_headerPosition = parentStream.Position;
 
