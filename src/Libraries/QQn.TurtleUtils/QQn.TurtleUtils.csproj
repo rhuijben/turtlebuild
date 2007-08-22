@@ -97,7 +97,11 @@
   <ItemGroup>
     <None Include="QQn.TurtleUtils.snk" />
     <Compile Include="IO\DirectoryMap.cs" />
+    <Compile Include="IO\DirectoryMapData.cs" />
+    <Compile Include="IO\DirectoryMapDirectory.cs" />
     <Compile Include="IO\DirectoryMapFile.cs" />
+    <Compile Include="IO\DirectoryMapItem.cs" />
+    <Compile Include="IO\DirectoryMapStream.cs" />
     <Compile Include="IO\ZLibSubStream.cs" />
     <Compile Include="IO\QQnPath.cs" />
     <Compile Include="IO\SeekableStream.cs" />

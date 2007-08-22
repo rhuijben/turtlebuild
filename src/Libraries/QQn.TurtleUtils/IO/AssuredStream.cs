@@ -89,7 +89,7 @@ namespace QQn.TurtleUtils.IO
 		/// <param name="strongName">The strong name to hash/sign with (can be null)</param>
 		/// <param name="fileType">The string to use as fileType</param>
 		public AssuredStream(Stream stream, StrongNameKey strongName, string fileType)
-			: this(stream, new AssuredStreamCreateArgs(strongName, fileType))
+			: this(stream, new AssuredStreamCreateArgs(strongName, fileType, HashType.SHA1))
 		{
 		}
 
@@ -158,6 +158,15 @@ namespace QQn.TurtleUtils.IO
 		public StrongNameKey AssemblyStrongNameKey
 		{
 			get { return _header.AssemblyStrongNameKey; }
+		}
+
+		/// <summary>
+		/// Gets the type of the hash.
+		/// </summary>
+		/// <value>The type of the hash.</value>
+		public HashType HashType
+		{
+			get { return _header.HashType; }
 		}
 
 		/// <summary>

@@ -13,6 +13,7 @@ namespace QQn.TurtleUtils.IO
 		readonly string _fileType;
 		byte[] _fileHash;
 		byte[] _hashSignature;
+		readonly HashType _hashType;
 		readonly StrongNameKey _snk;
 		readonly Guid _guid;
 		long _headerPosition;
@@ -33,6 +34,7 @@ namespace QQn.TurtleUtils.IO
 				throw new FormatException();
 
 			_fileType = br.ReadString();
+			_hashType = (HashType)br.ReadByte();
 			_fileHash = br.ReadByteArray();
 			_hashSignature = br.ReadByteArray();
 			byte[] publicKey = br.ReadByteArray();
@@ -68,19 +70,13 @@ namespace QQn.TurtleUtils.IO
 			_headerPosition = SafePosition(stream);
 			bw.Write(FileSignature);
 			bw.Write(FileType);
+			bw.Write((byte)_hashType);
 			bw.WriteByteArray(_fileHash);
 			bw.WriteByteArray(_hashSignature);
 			bw.WriteByteArray(_snk != null ? _snk.GetPublicKeyData() : new byte[0]);
 			bw.Write(_guid.ToByteArray());
 			bw.Write(_bodyLength);
 			_hashPosition = SafePosition(stream);
-		}
-
-		const int Sha256HashSize = 256 / 8;
-
-		public AssuredStreamHeader(string fileType, StrongNameKey snk)
-			: this(new AssuredStreamCreateArgs(snk, fileType))
-		{
 		}
 
 		internal AssuredStreamHeader(AssuredStreamCreateArgs args)
@@ -91,10 +87,11 @@ namespace QQn.TurtleUtils.IO
 			args.VerifyArgs("args");
 
 			_fileType = args.FileType;
+			_hashType = args.HashType;
 
 			if (args.StrongNameKey == null)
 			{
-				_fileHash = new byte[Sha256HashSize];
+				_fileHash = new byte[QQnCryptoHelpers.GetHashBits(_hashType)/8];
 				_hashSignature = new byte[0];
 			}
 			else
@@ -129,6 +126,11 @@ namespace QQn.TurtleUtils.IO
 		public StrongNameKey AssemblyStrongNameKey
 		{
 			get { return _snk; }
+		}
+
+		public HashType HashType
+		{
+			get { return _hashType; }
 		}
 
 		long StreamLength(Stream stream)
@@ -182,7 +184,7 @@ namespace QQn.TurtleUtils.IO
 			if (create)
 				_bodyLength = StreamLength(stream);
 
-			using (HashAlgorithm hasher = (_snk != null) ? _snk.CreateHasher() : SHA256.Create())
+			using (HashAlgorithm hasher = (_snk != null) ? _snk.CreateHasher() : QQnCryptoHelpers.CreateHashAlgorithm(_hashType))
 			{
 				long newPos = _hashPosition;
 

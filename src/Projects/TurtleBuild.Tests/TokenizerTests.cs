@@ -221,7 +221,7 @@ namespace TurtleTests
 		class TestItemWithNullable
 		{
 			[Token("date"), Token("dateX", TypeConverter=typeof(TicksDateTimeConverter))]
-			public DateTime? date;
+			public DateTime? date = DateTime.MinValue;
 		}
 
 		[Test]
@@ -229,10 +229,16 @@ namespace TurtleTests
 		{
 			TestItemWithNullable item;
 			Assert.That(Tokenizer.TryParseCommandLine("-date 2007-08-17", out item), Is.True);
-
+			Assert.That(item.date.HasValue);
+			Assert.That(item.date.Value, Is.EqualTo(new DateTime(2007, 08, 17)));
 
 			Assert.That(Tokenizer.TryParseCommandLine("-dateX U20070817", out item), Is.True);
-			
+			Assert.That(item.date.HasValue);
+			Assert.That(item.date.Value, Is.EqualTo(new DateTime(0x20070817L, DateTimeKind.Utc)));
+
+			Assert.That(Tokenizer.TryParseCommandLine("-dateX L20070817", out item), Is.True);
+			Assert.That(item.date.HasValue);
+			Assert.That(item.date.Value, Is.EqualTo(new DateTime(0x20070817L, DateTimeKind.Local)));
 		}
 	}
 }
