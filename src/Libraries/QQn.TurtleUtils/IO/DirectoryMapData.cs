@@ -85,7 +85,10 @@ namespace QQn.TurtleUtils.IO
 			FileInfo fif = new FileInfo(file);
 
 			if (fif.Exists && (fif.Attributes & (FileAttributes.Hidden | FileAttributes.ReadOnly)) != 0)
+			{
+				// The hidden flag is threated for some read-only like flag by .Net, so we must reset it
 				fif.Attributes = FileAttributes.Normal;
+			}
 			
 			using(FileStream fs = File.Create(file))
 			using (XmlWriter xw = XmlWriter.Create(fs))

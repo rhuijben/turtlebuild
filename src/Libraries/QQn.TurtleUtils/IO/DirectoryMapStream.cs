@@ -60,10 +60,13 @@ namespace QQn.TurtleUtils.IO
 					_hashOnClose = true;
 					_hashWhileWriting = true;
 				}
+				else
+					file.UpdateData(_newHash, _size, File.GetLastWriteTimeUtc(file.FullName));
 			}
 
 			_hashType = hashType;
 			_file = file;
+			_size = size;
 		}
 
 		/// <summary>

@@ -13,6 +13,7 @@ using Microsoft.Build.BuildEngine;
 using QQn.TurtleMSBuild;
 using QQn.TurtleBuildUtils.Files.TBLog;
 using QQn.TurtlePackage;
+using QQn.TurtleUtils.IO;
 
 namespace TurtleTests
 {
@@ -64,8 +65,12 @@ namespace TurtleTests
 			if (Directory.Exists(PackagePath))
 				Directory.Delete(PackagePath, true);
 
+			if (Directory.Exists(ExtractPath))
+				Directory.Delete(ExtractPath, true);
+
 			Directory.CreateDirectory(PackagePath);
 			Directory.CreateDirectory(LoggerPath);
+			Directory.CreateDirectory(ExtractPath);
 		}
 
 		string _testSolution;
@@ -124,6 +129,18 @@ namespace TurtleTests
 					_packagePath = Path.Combine(Path.GetTempPath(), "TBPackages");
 
 				return _packagePath;
+			}
+		}
+
+		string _extractPath;
+		public string ExtractPath
+		{
+			get
+			{
+				if (_extractPath == null)
+					_extractPath = Path.Combine(Path.GetTempPath(), "ExtractTBP");
+
+				return _extractPath;
 			}
 		}
 
@@ -219,7 +236,16 @@ namespace TurtleTests
 
 			Assert.That(PackUtils.TryCreatePack(log, out pack));
 
+			string path = Path.Combine(PackagePath, "QQn.TurtleMSBuild.tbPkg");
 			TurtlePackage.Create(Path.Combine(PackagePath, "QQn.TurtleMSBuild.tbPkg"), pack, log.Project.Path);
+
+			using (TurtlePackage pkg = TurtlePackage.OpenFrom(path, VerificationMode.Full))
+			using(DirectoryMap dm = DirectoryMap.Get(ExtractPath))
+			{
+				Assert.That(pkg, Is.Not.Null);
+
+				pkg.ExtractTo(dm);
+			}
 		}
 	}
 }

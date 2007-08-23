@@ -89,23 +89,19 @@ namespace TurtleTests
 
 				Assert.That(VerifyUtils.VerifyFile(DirMapPath, dmf, VerifyMode.Full), "File is the same in full");
 
-				Assert.That(VerifyUtils.VerifyFile(DirMapPath, dmf, VerifyMode.Time), "File is the same in time");
-				Assert.That(VerifyUtils.VerifyFile(DirMapPath, dmf, VerifyMode.TimeSize), "File is the same in size");
-				Assert.That(VerifyUtils.VerifyFile(DirMapPath, dmf, VerifyMode.FileHash), "File is the same in filehash");
-				Assert.That(VerifyUtils.FileEquals(DirMapPath, dmf, VerifyMode.Full), Is.True, "File has not changed");
+				Assert.That(VerifyUtils.VerifyFile(DirMapPath, dmf, VerifyMode.Time), Is.True, "File is the same in time");
+				Assert.That(VerifyUtils.VerifyFile(DirMapPath, dmf, VerifyMode.TimeSize), Is.True, "File is the same in size");
+				Assert.That(VerifyUtils.VerifyFile(DirMapPath, dmf, VerifyMode.FileHash), Is.True, "File is the same in filehash");
 								
 				File.SetLastWriteTime(dm.GetFile("test.txt").FullName, DateTime.Now);
 				Assert.That(VerifyUtils.VerifyFile(DirMapPath, dmf, VerifyMode.Time), Is.False, "File time changed");
 				Assert.That(VerifyUtils.VerifyFile(DirMapPath, dmf, VerifyMode.TimeSize), Is.False, "FileTime+Size changed");
-				Assert.That(VerifyUtils.VerifyFile(DirMapPath, dmf, VerifyMode.FileHash), Is.False, "File is the same in filehash");
-
-				Assert.That(VerifyUtils.FileEquals(DirMapPath, dmf, VerifyMode.Time), Is.False, "File time changed");
-				Assert.That(VerifyUtils.FileEquals(DirMapPath, dmf, VerifyMode.TimeSize), Is.False, "FileTime+Size changed");
-				Assert.That(VerifyUtils.FileEquals(DirMapPath, dmf, VerifyMode.FileHash), Is.True, "Filehash has not changed");
-				Assert.That(VerifyUtils.FileEquals(DirMapPath, dmf, VerifyMode.Full), Is.True, "File has not changed");
+				Assert.That(VerifyUtils.VerifyFile(DirMapPath, dmf, VerifyMode.FileHash), Is.True, "File is the same in filehash");
+				Assert.That(VerifyUtils.VerifyFile(DirMapPath, dmf, VerifyMode.Full), Is.True, "File has not changed");
 
 				dmf.Update();
 
+				Assert.That(VerifyUtils.VerifyFile(DirMapPath, dmf, VerifyMode.TimeSize), "File is the same in timesize after update");
 				Assert.That(VerifyUtils.VerifyFile(DirMapPath, dmf, VerifyMode.Full), "File is the same in full");
 			}
 		}

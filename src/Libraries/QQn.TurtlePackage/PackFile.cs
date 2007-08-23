@@ -64,7 +64,25 @@ namespace QQn.TurtlePackage
 			{
 				base.Name = NormalizePath(value);
 			}
-		}		
+		}
+
+
+		/// <summary>
+		/// Gets the relative path.
+		/// </summary>
+		/// <value>The relative path.</value>
+		public string RelativePath
+		{
+			get
+			{
+				string basePath = BaseDir;
+
+				if (basePath != null)
+					return Path.Combine(basePath, Name);
+				else
+					return Name;
+			}
+		}
 
 		#region IVerifiableFile Members
 

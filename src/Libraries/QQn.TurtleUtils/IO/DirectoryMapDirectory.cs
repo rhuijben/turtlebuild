@@ -21,6 +21,9 @@ namespace QQn.TurtleUtils.IO
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DirectoryMapDirectory"/> class.
+		/// </summary>
 		public DirectoryMapDirectory()
 			: base()
 		{

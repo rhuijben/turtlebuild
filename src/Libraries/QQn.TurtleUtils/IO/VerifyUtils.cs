@@ -90,49 +90,7 @@ namespace QQn.TurtleUtils.IO
 		/// <param name="verifyData">The verify data.</param>
 		/// <param name="verificationMode">The verification mode.</param>
 		/// <returns></returns>
-		public static bool VerifyFile(string baseDirectory, IVerifiableFile verifyData, VerifyMode verificationMode)
-		{
-			if(string.IsNullOrEmpty(baseDirectory))
-				throw new ArgumentNullException("baseDirectory");
-			else if(verifyData == null)
-				throw new ArgumentNullException("verifyData");
-			
-			string path = Path.Combine(baseDirectory, verifyData.Filename);
-
-			FileInfo fif = new FileInfo(path);
-
-			if(!fif.Exists)
-				return false;
-
-			if (verificationMode < VerifyMode.Time)
-				return true;
-
-			bool hasTime = verifyData.LastWriteTimeUtc.HasValue;
-			bool timeFailed = hasTime && fif.LastWriteTimeUtc != verifyData.LastWriteTimeUtc.Value;
-			if (timeFailed)
-				return false;
-
-			bool hasSize = (verifyData.FileSize >= 0);
-			bool sizeFailed = hasSize && fif.Length != verifyData.FileSize;
-			if (sizeFailed)
-				return false;
-
-			if (verificationMode < VerifyMode.TimeSize)
-				return true;
-
-			if (verifyData.FileSize >= 0 && fif.Length != verifyData.FileSize)
-				return false;
-
-			if (verificationMode < VerifyMode.FileHash)
-				return true;
-
-			if (!string.IsNullOrEmpty(verifyData.FileHash) && !QQnCryptoHelpers.VerifyFileHash(fif.FullName, verifyData.FileHash))
-				return false;
-
-			return true;
-		}
-
-		public static bool FileEquals(string baseDirectory, IVerifiableFile verifyData, VerifyMode verificationMode)
+		public static bool VerifyFile(string baseDirectory, IVerifiableFile verifyData, VerifyMode verificationMode)		
 		{
 			if (string.IsNullOrEmpty(baseDirectory))
 				throw new ArgumentNullException("baseDirectory");

@@ -163,6 +163,10 @@ namespace QQn.TurtleUtils.IO
 
 		#endregion
 
+		/// <summary>
+		/// Gets the full name.
+		/// </summary>
+		/// <value>The full name.</value>
 		public string FullName
 		{
 			get { return Path.Combine(_map.FullPath, Filename); }

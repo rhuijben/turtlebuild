@@ -45,8 +45,6 @@ namespace QQn.TurtlePackage
 					continue;
 
 				PackFile pf = projectOutput.Files.AddItem(QQnPath.MakeRelativePath(projectOutput.BaseDir, Path.Combine(projectDir, item.Src)));
-
-				Trace.WriteLine(Path.Combine(pf.BaseDir, pf.Name));
 			}
 
 			PackContainer projectContent = p.Containers.AddItem("#ProjectContent");
