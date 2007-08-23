@@ -11,46 +11,136 @@ using System.Net.Cache;
 
 namespace QQn.TurtlePackage
 {
-	public class TurtlePackage
+	public class TurtlePackage : IDisposable
 	{
-		public const string PackageFileType = "application/x-QQn-TurtlePackage"; 
+		public const string PackageFileType = "application/x-QQn-TurtlePackage";
 		//readonly FileInfo _package;
 		//readonly IXPathNavigable _manifest;
+		readonly List<IDisposable> _disposeAtClose;
+		readonly MultiStreamReader _reader;
+		MultiStreamReader _contentReader;
+		readonly Pack _pack;
 
-		public TurtlePackage()
+		internal TurtlePackage(Stream baseStream, params IDisposable[] disposeAtClose)
+		{
+			if (baseStream == null)
+				throw new ArgumentNullException("baseStream");
+			_disposeAtClose = new List<IDisposable>();
+			_disposeAtClose.Add(baseStream);
+			if (disposeAtClose == null)
+				_disposeAtClose.AddRange(disposeAtClose);
+
+			MultiStreamCreateArgs msa = new MultiStreamCreateArgs();
+			msa.VerificationMode = VerificationMode.Full;
+
+			_reader = new MultiStreamReader(baseStream, msa);
+
+			Pack pack;
+			using (Stream r = _reader.GetNextStream(0x01))
+			{
+				XPathDocument doc = new XPathDocument(r);
+				XPathNavigator nav = doc.CreateNavigator();
+				nav.MoveToRoot();
+				nav.MoveToFirstChild();
+
+				TokenizerArgs ta = new TokenizerArgs();
+				ta.SkipUnknownNamedItems = true;
+
+				if (!Tokenizer.TryParseXml(nav, out pack) || pack == null)
+					throw new IOException();
+				else
+					_pack = pack;
+			}
+		}
+
+		protected MultiStreamReader ContentReader
+		{
+			get
+			{
+				if (_contentReader == null)
+				{
+					_reader.Reset();
+					_contentReader = _contentReader = new MultiStreamReader(_reader.GetNextStream(0x02));
+				}
+
+				return _contentReader;
+			}
+		}
+
+		internal TurtlePackage()
 		{
 		}
 
+		public void Close()
+		{
+			Dispose(true);
+		}
 
+		void IDisposable.Dispose()
+		{
+			Dispose(true);
+		}
+
+		bool _disposed;
+		/// <summary>
+		/// Releases unmanaged and - optionally - managed resources
+		/// </summary>
+		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+		private void Dispose(bool disposing)
+		{
+			if (_disposed)
+				return;
+
+			_disposed = true;
+
+			if (disposing)
+			{
+				if (_reader != null)
+					_reader.Close();
+
+				foreach (IDisposable d in _disposeAtClose)
+					d.Dispose();
+			}
+		}
+
+
+		/// <summary>
+		/// Creates the specified package
+		/// </summary>
+		/// <param name="fileName">Name of the file.</param>
+		/// <param name="definition">The definition.</param>
+		/// <param name="basePath">The base path.</param>
+		/// <returns></returns>
 		public static TurtlePackage Create(string fileName, Pack definition, string basePath)
 		{
-			if(fileName == null)
+			if (fileName == null)
 				throw new ArgumentNullException("fileName");
 
-			if(definition == null)
+			if (definition == null)
 				throw new ArgumentNullException("definition");
 
 			AssuredStreamCreateArgs args = new AssuredStreamCreateArgs();
-			if(definition.StrongNameKey != null)
+			if (definition.StrongNameKey != null)
 				args.StrongNameKey = definition.StrongNameKey;
 
 			args.FileType = PackageFileType;
 
 			MultiStreamArgs fileCreateArgs = new MultiStreamArgs();
+			fileCreateArgs.StreamType = 0x04;
 			fileCreateArgs.Assured = true;
 			fileCreateArgs.GZipped = true;
 
 			MultiStreamCreateArgs msca = new MultiStreamCreateArgs();
 			msca.MaximumNumberOfStreams = 8;
 
-			using(FileStream fs = File.Create(fileName, 16384))
-			using(AssuredStream assurance = new AssuredStream(fs, args))
+			using (FileStream fs = File.Create(fileName, 16384))
+			using (AssuredStream assurance = new AssuredStream(fs, args))
 			using (MultiStreamWriter msw = new MultiStreamWriter(assurance))
 			{
 				MultiStreamArgs msa = new MultiStreamArgs();
-				msa.StreamType = 0x00;
+				msa.StreamType = 0x01;
 				msa.Assured = true;
-				using (XmlWriter xw = new XmlTextWriter(msw.CreateStream(0x01), Encoding.UTF8))
+				using (XmlWriter xw = new XmlTextWriter(msw.CreateStream(msa), Encoding.UTF8))
 				{
 					xw.WriteStartDocument();
 					xw.WriteStartElement("TurtlePackage", "http://schemas.qqn.nl/2007/TurtlePackage");
@@ -60,17 +150,17 @@ namespace QQn.TurtlePackage
 
 				MultiStreamCreateArgs zipcArgs = new MultiStreamCreateArgs();
 				zipcArgs.MaximumNumberOfStreams = definition.Containers.Count;
-				using (MultiStreamWriter zipBase = new MultiStreamWriter(msw.CreateStream(0x01)))
+				using (MultiStreamWriter zipBase = new MultiStreamWriter(msw.CreateStream(0x02), zipcArgs))
 				{
 					foreach (PackContainer container in definition.Containers)
 					{
 						MultiStreamCreateArgs ccArgs = new MultiStreamCreateArgs();
 						ccArgs.MaximumNumberOfStreams = container.Files.Count;
-						using (MultiStreamWriter containerWriter = new MultiStreamWriter(zipBase.CreateStream(0x02)))
+						using (MultiStreamWriter containerWriter = new MultiStreamWriter(zipBase.CreateStream(0x03), ccArgs))
 						{
 							foreach (PackFile file in container.Files)
 							{
-								using(FileStream fileSrc = File.OpenRead(Path.Combine(file.BaseDir, file.Name)))
+								using (FileStream fileSrc = File.OpenRead(Path.Combine(file.BaseDir, file.Name)))
 								using (Stream fileBlob = containerWriter.CreateStream(fileCreateArgs))
 								{
 									QQnPath.CopyStream(fileSrc, fileBlob);
@@ -83,7 +173,13 @@ namespace QQn.TurtlePackage
 			return null;
 		}
 
-		public static TurtlePackage OpenFrom(string file)
+		/// <summary>
+		/// Opens from.
+		/// </summary>
+		/// <param name="file">The file.</param>
+		/// <param name="verificationMode">The verification mode.</param>
+		/// <returns></returns>
+		public static TurtlePackage OpenFrom(string file, VerificationMode verificationMode)
 		{
 			if (string.IsNullOrEmpty(file))
 				throw new ArgumentNullException("file");
@@ -93,7 +189,7 @@ namespace QQn.TurtlePackage
 			if (Uri.TryCreate(file, UriKind.Absolute, out uri))
 			{
 				if (!uri.IsFile && !uri.IsUnc)
-					return OpenFrom(uri);
+					return OpenFrom(uri, verificationMode);
 				else
 					file = uri.LocalPath;
 			}
@@ -106,7 +202,7 @@ namespace QQn.TurtlePackage
 			FileStream fs = File.Open(file, FileMode.Open, FileAccess.Read, FileShare.Read);
 			try
 			{
-				return Open(fs);
+				return Open(fs, verificationMode);
 			}
 			catch (Exception)
 			{
@@ -120,19 +216,21 @@ namespace QQn.TurtlePackage
 		/// Opens a TurtlePackage from the specified uri.
 		/// </summary>
 		/// <param name="uri">The URI.</param>
+		/// <param name="verificationMode">The verification mode.</param>
 		/// <returns></returns>
-		public static TurtlePackage OpenFrom(Uri uri)
+		public static TurtlePackage OpenFrom(Uri uri, VerificationMode verificationMode)
 		{
-			return OpenFrom(uri, null);
+			return OpenFrom(uri, verificationMode, null);
 		}
 
 		/// <summary>
 		/// Opens a TurtlePackage from the specified uri with the specified credentials
 		/// </summary>
 		/// <param name="uri">The URI.</param>
+		/// <param name="verificationMode">The verification mode.</param>
 		/// <param name="credentials">The credentials.</param>
 		/// <returns></returns>
-		public static TurtlePackage OpenFrom(Uri uri, ICredentials credentials)
+		public static TurtlePackage OpenFrom(Uri uri, VerificationMode verificationMode, ICredentials credentials)
 		{
 			if (uri == null)
 				throw new ArgumentNullException("uri");
@@ -156,7 +254,7 @@ namespace QQn.TurtlePackage
 				ftpRequest.CachePolicy = new System.Net.Cache.RequestCachePolicy(RequestCacheLevel.Revalidate);
 				ftpRequest.EnableSsl = true;
 				if (credentials != null)
-					ftpRequest.Credentials = credentials;				
+					ftpRequest.Credentials = credentials;
 			}
 
 			WebResponse rsp = request.GetResponse();
@@ -168,7 +266,7 @@ namespace QQn.TurtlePackage
 					if (!sr.CanSeek)
 						sr = new SeekableStream(sr, rsp.ContentLength);
 
-					return Open(sr);
+					return Open(sr, verificationMode);
 				}
 				catch (Exception)
 				{
@@ -187,12 +285,13 @@ namespace QQn.TurtlePackage
 		/// Opens the specified stream.
 		/// </summary>
 		/// <param name="stream">The stream.</param>
+		/// <param name="verificationMode">The verification mode.</param>
 		/// <returns></returns>
-		static TurtlePackage Open(Stream stream)
+		static TurtlePackage Open(Stream stream, VerificationMode verificationMode)
 		{
-			stream.Close();
+			AssuredStream rootStream = new AssuredStream(stream, verificationMode);
 
-			return null;
+			return new TurtlePackage(rootStream, stream);
 		}
 
 		/*protected TurtlePackage(string fileName, IXPathNavigable manifest)
@@ -266,5 +365,113 @@ namespace QQn.TurtlePackage
 		{
 			throw new Exception("The method or operation is not implemented.");
 		}*/
+
+		delegate void ExtractItem(PackFile file, Stream fileStream);
+
+		public void ExtractTo(DirectoryMap directory, string[] containers)
+		{
+			if (directory == null)
+				throw new ArgumentNullException("directory");			
+
+			ExtractFiles(containers, delegate(PackFile file, Stream fileStream)
+			{
+				using (Stream s = directory.CreateFile(file.RelativePath, file.FileHash, file.FileSize))
+				{
+					QQnPath.CopyStream(fileStream, s);
+				}
+			});
+		}
+
+		/// <summary>
+		/// Extracts to.
+		/// </summary>
+		/// <param name="directory">The directory.</param>
+		public void ExtractTo(DirectoryMap directory)
+		{
+			ExtractTo(directory, null);
+		}
+
+		private void ExtractFiles(string[] containers, ExtractItem extract)
+		{
+			SortedList<string, string> containerList = null;
+
+			ContentReader.Reset();
+			
+			if(containers != null)
+			{
+				containerList = new SortedList<string,string>(StringComparer.InvariantCultureIgnoreCase);
+				foreach(string c in containers)
+					containerList[c] = c;
+			}
+
+			foreach (PackContainer container in _pack.Containers)
+			{
+				using (Stream s = ContentReader.GetNextStream(0x03))
+				{
+					if (containerList != null && !containerList.ContainsKey(container.Name))
+						continue;
+
+					using(MultiStreamReader fr = new MultiStreamReader(s))
+					{
+						foreach (PackFile pf in container.Files)
+						{
+							using (Stream fs = fr.GetNextStream(0x04))
+							{
+								extract(pf, fs);
+							}
+						}
+					}
+				}
+			}			
+		}
+
+		/// <summary>
+		/// Extracts the package to the specified directory, optionally using the specified 
+		/// </summary>
+		/// <param name="directory"></param>
+		/// <param name="useMap"></param>
+		public void ExtractTo(string directory, bool useMap)
+		{
+			if (string.IsNullOrEmpty(directory))
+				throw new ArgumentNullException("directory");
+
+			ExtractTo(directory, useMap, null);
+		}
+
+		/// <summary>
+		/// Extracts the specified containers to the specified directory
+		/// </summary>
+		/// <param name="directory"></param>
+		/// <param name="containers"></param>
+		public void ExtractTo(string directory, bool useMap, string[] containers)
+		{
+			if (string.IsNullOrEmpty(directory))
+				throw new ArgumentNullException("directory");
+
+			if (useMap)
+			{
+				using (DirectoryMap dm = DirectoryMap.Get(directory))
+				{
+					ExtractTo(dm, containers);
+				}
+			}
+			else
+				ExtractFiles(containers, delegate(PackFile file, Stream fileStream)
+				{
+					using (Stream s = File.Create(Path.Combine(directory, file.RelativePath)))
+					{
+						QQnPath.CopyStream(fileStream, s);
+					}
+				});
+		}
+
+		/// <summary>
+		/// Extracts the package to the specified directory
+		/// </summary>
+		/// <param name="directory">The directory.</param>
+		public void ExtractTo(string directory)
+		{
+			ExtractTo(directory, false, null);
+		}
 	}
 }

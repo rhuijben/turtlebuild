@@ -48,7 +48,7 @@ namespace QQn.TurtleUtils.Cryptography
 			foreach (byte b in bytes)
 				sb.AppendFormat(CultureInfo.InvariantCulture, "{0:x2}", b);
 
-			sb.AppendFormat(CultureInfo.InvariantCulture, ",type={0}", (hashType & ~(HashType.PlusSize | HashType.PlusType)).ToString());
+			sb.AppendFormat(CultureInfo.InvariantCulture, ",type={0}", GetHashType(hashType).ToString());
 
 			return sb.ToString();
 		}
@@ -66,7 +66,7 @@ namespace QQn.TurtleUtils.Cryptography
 		/// <returns></returns>
 		public static HashAlgorithm CreateHashAlgorithm(HashType hashType)
 		{
-			switch (hashType & ~(HashType.PlusSize | HashType.PlusType))
+			switch (GetHashType(hashType))
 			{
 				case HashType.MD5:
 					return MD5.Create();
@@ -86,13 +86,23 @@ namespace QQn.TurtleUtils.Cryptography
 		}
 
 		/// <summary>
+		/// Gets the type of the hash from the <paramref name="hashType"/>, removing all flags
+		/// </summary>
+		/// <param name="hashType">Type of the hash.</param>
+		/// <returns></returns>
+		public static HashType GetHashType(HashType hashType)
+		{
+			return hashType & ~(HashType.PlusSize | HashType.PlusType);
+		}
+
+		/// <summary>
 		/// Gets the bits used for the hash of the specified type
 		/// </summary>
 		/// <param name="hashType">Type of the hash.</param>
 		/// <returns></returns>
 		public static int GetHashBits(HashType hashType)
 		{
-			switch (hashType)
+			switch (GetHashType(hashType))
 			{
 				case HashType.MD5:
 					return 128;
@@ -153,15 +163,20 @@ namespace QQn.TurtleUtils.Cryptography
 				bytes = ha.ComputeHash(stream);
 			}
 
+			return FormatHash(bytes, hashType, length);
+		}
+
+		private static string FormatHash(byte[] bytes, HashType hashType, long size)
+		{
 			StringBuilder sb = new StringBuilder(bytes.Length * 2 + 64);
 
 			foreach (byte b in bytes)
 				sb.AppendFormat(CultureInfo.InvariantCulture, "{0:x2}", b);
 
 			if ((hashType & HashType.PlusType) != 0)
-				sb.AppendFormat(CultureInfo.InvariantCulture, ",type={0}", (hashType & ~(HashType.PlusSize | HashType.PlusType)).ToString());
-			if ((hashType & HashType.PlusSize) != 0)
-				sb.AppendFormat(CultureInfo.InvariantCulture, ",size={0}", length);
+				sb.AppendFormat(CultureInfo.InvariantCulture, ",type={0}", GetHashType(hashType).ToString());
+			if (((hashType & HashType.PlusSize) != 0) && size >= 0)
+				sb.AppendFormat(CultureInfo.InvariantCulture, ",size={0}", size);
 
 			return sb.ToString();
 		}
@@ -242,7 +257,7 @@ namespace QQn.TurtleUtils.Cryptography
 
 			if (TryParseHash(hash, out hashType, out length, out hashValue))
 			{
-				return length;
+				return length < 0L ? -1L : length;
 			}
 
 			return -1;
@@ -266,7 +281,7 @@ namespace QQn.TurtleUtils.Cryptography
 				{
 					try
 					{
-						hashType = (HashType)Enum.Parse(typeof(HashType), p.Substring(5), true) & ~(HashType.PlusSize | HashType.PlusType);
+						hashType = GetHashType((HashType)Enum.Parse(typeof(HashType), p.Substring(5), true));
 
 						if (!Enum.IsDefined(typeof(HashType), hashType))
 							hashType = HashType.Null;
