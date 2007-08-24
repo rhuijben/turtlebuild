@@ -33,6 +33,19 @@ namespace QQn.TurtleUtils.Tokens
 		}
 
 		/// <summary>
+		/// Clones this instance.
+		/// </summary>
+		/// <returns></returns>
+		public virtual TokenizerArgs Clone(object context)
+		{
+			TokenizerArgs clone = (TokenizerArgs)MemberwiseClone();
+
+			clone._context = context;
+
+			return clone;
+		}
+
+		/// <summary>
 		/// Gets or sets the command line chars.
 		/// </summary>
 		/// <value>The command line chars.</value>
@@ -154,6 +167,16 @@ namespace QQn.TurtleUtils.Tokens
 		{
 			get { return _cultureInfo ?? (_cultureInfo = CultureInfo.CurrentCulture); }
 			set { _cultureInfo = value; }
+		}
+
+		object _context;
+		/// <summary>
+		/// Gets or sets the context.
+		/// </summary>
+		/// <value>The context.</value>
+		internal object Context
+		{
+			get { return _context; }
 		}
 	}
 }

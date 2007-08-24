@@ -15,7 +15,13 @@ namespace QQn.TurtlePackage
 		Pack _pack;
 		PackItem _parent;
 		string _name;
+		/// <summary>
+		/// Occurs when [pack changed].
+		/// </summary>
 		public event EventHandler PackChanged;
+		/// <summary>
+		/// Occurs when [parent changed].
+		/// </summary>
 		public event EventHandler ParentChanged;
 
 		/// <summary>
@@ -62,6 +68,10 @@ namespace QQn.TurtlePackage
 				PackChanged(this, e);
 		}
 
+		/// <summary>
+		/// Gets or sets the parent.
+		/// </summary>
+		/// <value>The parent.</value>
 		public PackItem Parent
 		{
 			get { return _parent; }
@@ -76,6 +86,10 @@ namespace QQn.TurtlePackage
 			}
 		}
 
+		/// <summary>
+		/// Raises the <see cref="E:ParentChanged"/> event.
+		/// </summary>
+		/// <param name="eventArgs">The <see cref="System.EventArgs"/> instance containing the event data.</param>
 		protected virtual void OnParentChanged(EventArgs eventArgs)
 		{
 			if(ParentChanged != null)
@@ -101,6 +115,10 @@ namespace QQn.TurtlePackage
 		}
 
 		string _baseDir;
+		/// <summary>
+		/// Gets or sets the base dir.
+		/// </summary>
+		/// <value>The base dir.</value>
 		public string BaseDir
 		{
 			get 
@@ -142,6 +160,11 @@ namespace QQn.TurtlePackage
 			}
 		}
 
+		/// <summary>
+		/// Normalizes the path.
+		/// </summary>
+		/// <param name="value">The value.</param>
+		/// <returns></returns>
 		protected static string NormalizePath(string value)
 		{
 			if (value == null)
@@ -150,6 +173,11 @@ namespace QQn.TurtlePackage
 			return value.Replace(Path.DirectorySeparatorChar, '/').Replace(Path.AltDirectorySeparatorChar, '/');
 		}
 
+		/// <summary>
+		/// Normalizes the directory.
+		/// </summary>
+		/// <param name="value">The value.</param>
+		/// <returns></returns>
 		protected static string NormalizeDirectory(string value)
 		{
 			value = NormalizePath(value);

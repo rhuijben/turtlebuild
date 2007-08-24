@@ -109,7 +109,7 @@
     <Compile Include="IO\TempStream.cs" />
     <Compile Include="Tokens\Converters\UtcDateTimeConverter.cs" />
     <Compile Include="Tokens\Converters\VersionConverter.cs" />
-    <Compile Include="Tokens\Definitions\ITokenizerInitialize.cs" />
+    <Compile Include="Tokens\ITokenizerInitialize.cs" />
     <Compile Include="Tokens\Tokenizer.ConnectionString.cs" />
     <Compile Include="Tokens\Tokenizer.Xml.cs" />
   </ItemGroup>

@@ -17,21 +17,35 @@ namespace QQn.TurtlePackage
 			return item;
 		}
 	}
+	/// <summary>
+	/// 
+	/// </summary>
 	public class TurtleExtractArgs
 	{
 		KeyedCollection<string, string> _containerList;
 		bool _dontUseDirectoryMap;
 
 		//SortedList<string, string> _containerList = null;
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TurtleExtractArgs"/> class.
+		/// </summary>
 		public TurtleExtractArgs()
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TurtleExtractArgs"/> class.
+		/// </summary>
+		/// <param name="containers">The containers.</param>
 		public TurtleExtractArgs(ICollection<string> containers)
 		{
 			Containers = containers;
 		}
 
+		/// <summary>
+		/// Gets or sets the containers.
+		/// </summary>
+		/// <value>The containers.</value>
 		public ICollection<string> Containers
 		{
 			get { return _containerList; }
@@ -55,6 +69,10 @@ namespace QQn.TurtlePackage
 			return (_containerList == null) || _containerList.Contains(containerName);
 		}
 
+		/// <summary>
+		/// Gets or sets a value indicating whether [use directory map].
+		/// </summary>
+		/// <value><c>true</c> if [use directory map]; otherwise, <c>false</c>.</value>
 		public bool UseDirectoryMap
 		{
 			get { return !_dontUseDirectoryMap; }

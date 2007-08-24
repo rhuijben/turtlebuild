@@ -51,7 +51,7 @@ namespace QQn.TurtleUtils.Tokens.Tokenizers
 							{
 								object value;
 
-								if (!group.TryParseXml(nav, args, out value))
+								if (!group.TryParseXml(nav, args.Clone(state.Instance), out value))
 									return false;
 
 								group.Member.SetValue(state, value);
@@ -150,7 +150,7 @@ namespace QQn.TurtleUtils.Tokens.Tokenizers
 							writer.WriteStartElement(tg.Name);
 
 							// Will throw if multiple times written -> Definition bug, resolve there
-							if (!tg.TryWriteXml(writer, args, value))
+							if (!tg.TryWriteXml(writer, args.Clone(state.Instance), value))
 								return false;							
 
 							writer.WriteEndElement();

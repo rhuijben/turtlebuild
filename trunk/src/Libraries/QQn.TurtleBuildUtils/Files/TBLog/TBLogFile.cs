@@ -4,10 +4,11 @@ using System.Text;
 using QQn.TurtleUtils.Tokens;
 using System.Xml;
 using System.Xml.XPath;
+using QQn.TurtleUtils.Tokens.Definitions;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
-	public class TBLogFile
+	public class TBLogFile : IHasFullPath, ITokenizerInitialize
 	{
 		[TokenGroup("Generator")]
 		public TBLogGenerator Generator = new TBLogGenerator();
@@ -50,5 +51,45 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 					return null;
 			}
 		}
+
+		#region ITokenizerInitialize Members
+
+		#endregion
+
+		#region IHasFullPath Members
+
+		string _fullPath;
+		string IHasFullPath.FullPath
+		{
+			get { return _fullPath; }
+		}
+
+		/// <summary>
+		/// Gets the project path.
+		/// </summary>
+		/// <value>The project path.</value>
+		public string ProjectPath
+		{
+			get { return _fullPath; }
+		}
+
+		#endregion
+
+		#region ITokenizerInitialize Members
+
+		void ITokenizerInitialize.BeginInitialize(TokenizerEventArgs e)
+		{
+			
+		}
+
+		void ITokenizerInitialize.EndInitialize(TokenizerEventArgs e)
+		{
+			_fullPath = Project.Path;
+			ProjectOutput.Parent = this;
+			Content.Parent = this;
+			Scripts.Parent = this;
+		}
+
+		#endregion
 	}
 }
