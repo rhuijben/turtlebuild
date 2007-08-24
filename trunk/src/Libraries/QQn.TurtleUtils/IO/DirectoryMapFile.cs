@@ -69,5 +69,10 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		#endregion
+
+		public bool Unmodified()
+		{
+			return VerifyUtils.VerifyFile(Map.FullPath, this, VerifyMode.TimeSize);
+		}
 	}	
 }

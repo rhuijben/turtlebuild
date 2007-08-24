@@ -14,12 +14,14 @@ namespace QQn.TurtleUtils.IO
 	public sealed class DirectoryMapStream : StreamProxy
 	{
 		readonly DirectoryMapItem _file;
+		readonly HashType _hashType;
+		readonly bool _updateOnClose;
+
 		bool _hashOnClose;
 		string _newHash;
-		long _size;
-		HashType _hashType;
-		HashAlgorithm _hasher;
+		long _size;		
 		bool _hashWhileWriting;
+		
 
 		static bool UseAsync(FileMode mode, string hash)
 		{
@@ -53,20 +55,30 @@ namespace QQn.TurtleUtils.IO
 			if (mode == FileMode.Create || mode == FileMode.CreateNew)
 			{
 				_newHash = hash;
-				_hasher = QQnCryptoHelpers.CreateHashAlgorithm(hashType);
+				_updateOnClose = true;
 
 				if (string.IsNullOrEmpty(hash))
 				{
 					_hashOnClose = true;
 					_hashWhileWriting = true;
-				}
-				else
-					file.UpdateData(_newHash, _size, File.GetLastWriteTimeUtc(file.FullName));
+				}				
 			}
 
 			_hashType = hashType;
 			_file = file;
 			_size = size;
+		}
+
+		HashAlgorithm _hashAlgorithm;
+		protected HashAlgorithm Hasher
+		{
+			get
+			{
+				if (_hashAlgorithm == null)
+					_hashAlgorithm = QQnCryptoHelpers.CreateHashAlgorithm(_hashType);
+
+				return _hashAlgorithm;
+			}
 		}
 
 		/// <summary>
@@ -84,7 +96,7 @@ namespace QQn.TurtleUtils.IO
 		public override void Write(byte[] buffer, int offset, int count)
 		{
 			if (_hashWhileWriting)
-				_hasher.TransformBlock(buffer, 0, count, null, 0);
+				Hasher.TransformBlock(buffer, 0, count, null, 0);
 
 			base.Write(buffer, offset, count);
 		}
@@ -99,7 +111,7 @@ namespace QQn.TurtleUtils.IO
 		public override void WriteByte(byte value)
 		{
 			if (_hashWhileWriting)
-				_hasher.TransformBlock(new byte[] { value }, 0, 1, null, 0);
+				Hasher.TransformBlock(new byte[] { value }, 0, 1, null, 0);
 
 			base.WriteByte(value);
 		}
@@ -118,19 +130,18 @@ namespace QQn.TurtleUtils.IO
 			if (!string.IsNullOrEmpty(_newHash) && _size != Length)
 			{
 				Debug.WriteLine(">>> Got invalid predefined hash");
-				_hashOnClose = true;
+				_hashOnClose = true;				
 			}
+
 
 			if (_hashOnClose)
 			{
 				if (!_hashWhileWriting)
 				{
-					if (_hasher.CanReuseTransform)
-						_hasher.TransformFinalBlock(_emptyBytes, 0, 0);
-					else
+					if (_hashAlgorithm != null)
 					{
-						_hasher.Clear();
-						_hasher = QQnCryptoHelpers.CreateHashAlgorithm(_hashType);
+						Hasher.TransformFinalBlock(_emptyBytes, 0, 0);
+						GC.KeepAlive(Hasher.Hash);
 					}
 
 					base.Position = 0;
@@ -138,25 +149,24 @@ namespace QQn.TurtleUtils.IO
 					int nRead;
 
 					while (0 <= (nRead = base.Read(buffer, 0, buffer.Length)))
-						_hasher.TransformBlock(buffer, 0, nRead, null, 0);
+						Hasher.TransformBlock(buffer, 0, nRead, null, 0);
 				}
 
-				_hasher.TransformFinalBlock(_emptyBytes, 0, 0);
+				Hasher.TransformFinalBlock(_emptyBytes, 0, 0);
 
-				_newHash = QQnCryptoHelpers.HashString(_hasher.Hash, _hashType);
+				_newHash = QQnCryptoHelpers.HashString(Hasher.Hash, _hashType);
 				_size = Length;
 
-				base.Close();
-
-				_file.UpdateData(_newHash, _size, File.GetLastWriteTimeUtc(_file.FullName));
 			}
-			else
-				base.Close();
+			base.Close();
 
-			if (_hasher != null)
+			if (_updateOnClose)
+				_file.UpdateData(_newHash, _size, File.GetLastWriteTimeUtc(_file.FullName));
+
+			if (_hashAlgorithm != null)
 			{
-				_hasher.Clear(); // Disposes the hasher
-				_hasher = null;
+				_hashAlgorithm.Clear(); // Disposes the hasher
+				_hashAlgorithm = null;
 			}
 		}
 

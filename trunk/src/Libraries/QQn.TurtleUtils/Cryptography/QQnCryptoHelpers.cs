@@ -200,7 +200,7 @@ namespace QQn.TurtleUtils.Cryptography
 			if (TryParseHash(hash, out hashType, out length, out hashValue))
 			{
 				StringBuilder sb = new StringBuilder();
-				sb.Append(hash.ToLowerInvariant()); // Lower case the hex string
+				sb.Append(hashValue.ToLowerInvariant()); // Lower case the hex string
 
 				if(!removeType)
 					sb.AppendFormat(CultureInfo.InvariantCulture, ",type={0}", hashType.ToString());
@@ -261,6 +261,16 @@ namespace QQn.TurtleUtils.Cryptography
 			}
 
 			return -1;
+		}
+
+		static readonly QQnHashComparer _hashComparer = new QQnHashComparer();
+		/// <summary>
+		/// Gets the hash comparer.
+		/// </summary>
+		/// <value>The hash comparer.</value>
+		public static QQnHashComparer HashComparer
+		{
+			get { return _hashComparer; }
 		}
 
 		static bool TryParseHash(string hash, out HashType hashType, out long length, out string hashValue)
