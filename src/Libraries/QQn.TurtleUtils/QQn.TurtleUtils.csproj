@@ -96,6 +96,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="QQn.TurtleUtils.snk" />
+    <Compile Include="Cryptography\QQnHashComparer.cs" />
     <Compile Include="IO\DirectoryMap.cs" />
     <Compile Include="IO\DirectoryMapData.cs" />
     <Compile Include="IO\DirectoryMapDirectory.cs" />

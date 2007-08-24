@@ -8,6 +8,7 @@ using QQn.TurtleUtils.IO;
 using QQn.TurtleUtils.Tokens;
 using System.Net;
 using System.Net.Cache;
+using QQn.TurtleUtils.Cryptography;
 
 namespace QQn.TurtlePackage
 {
@@ -366,21 +367,12 @@ namespace QQn.TurtlePackage
 			throw new Exception("The method or operation is not implemented.");
 		}*/
 
-		delegate void ExtractItem(PackFile file, Stream fileStream);
+		delegate void Extractor(PackFile file, Stream fileStream);
 
-		public void ExtractTo(DirectoryMap directory, string[] containers)
+		public void ExtractTo(DirectoryMap directory, ICollection<string> containers)
 		{
-			if (directory == null)
-				throw new ArgumentNullException("directory");			
-
-			ExtractFiles(containers, delegate(PackFile file, Stream fileStream)
-			{
-				using (Stream s = directory.CreateFile(file.RelativePath, file.FileHash, file.FileSize))
-				{
-					QQnPath.CopyStream(fileStream, s);
-				}
-			});
-		}
+			ExtractTo(directory, new TurtleExtractArgs(containers));
+		}		
 
 		/// <summary>
 		/// Extracts to.
@@ -388,27 +380,23 @@ namespace QQn.TurtlePackage
 		/// <param name="directory">The directory.</param>
 		public void ExtractTo(DirectoryMap directory)
 		{
-			ExtractTo(directory, null);
+			ExtractTo(directory, new TurtleExtractArgs());
 		}
 
-		private void ExtractFiles(string[] containers, ExtractItem extract)
+		private void ExtractFiles(TurtleExtractArgs args, Extractor extractor)
 		{
-			SortedList<string, string> containerList = null;
+			if (args == null)
+				throw new ArgumentNullException("args");
+			else if (extractor == null)
+				throw new ArgumentNullException("extract");
 
 			ContentReader.Reset();
 			
-			if(containers != null)
-			{
-				containerList = new SortedList<string,string>(StringComparer.InvariantCultureIgnoreCase);
-				foreach(string c in containers)
-					containerList[c] = c;
-			}
-
 			foreach (PackContainer container in _pack.Containers)
 			{
 				using (Stream s = ContentReader.GetNextStream(0x03))
 				{
-					if (containerList != null && !containerList.ContainsKey(container.Name))
+					if (!args.ExtractContainer(container.Name))
 						continue;
 
 					using(MultiStreamReader fr = new MultiStreamReader(s))
@@ -417,7 +405,7 @@ namespace QQn.TurtlePackage
 						{
 							using (Stream fs = fr.GetNextStream(0x04))
 							{
-								extract(pf, fs);
+								extractor(pf, fs);
 							}
 						}
 					}
@@ -439,6 +427,58 @@ namespace QQn.TurtlePackage
 		}
 
 		/// <summary>
+		/// Extracts the package to the specified <see cref="DirectoryMap"/>
+		/// </summary>
+		/// <param name="directory"></param>
+		/// <param name="args"></param>
+		public void ExtractTo(DirectoryMap directory, TurtleExtractArgs args)
+		{
+			if (directory == null)
+				throw new ArgumentNullException("directory");
+			else if (args == null)
+				throw new ArgumentNullException("args");
+
+			ExtractFiles(args, delegate(PackFile file, Stream fileStream)
+			{
+				DirectoryMapFile dmf = directory.GetFile(file.RelativePath);
+
+				if (dmf == null || !dmf.Unmodified() || !QQnCryptoHelpers.HashComparer.Equals(dmf.FileHash, file.FileHash))
+					using (Stream s = directory.CreateFile(file.RelativePath, file.FileHash, file.FileSize))
+					{
+						QQnPath.CopyStream(fileStream, s);
+					}
+			});
+		}
+
+		/// <summary>
+		/// Extracts the package to the specified directory
+		/// </summary>
+		/// <param name="directory">The directory.</param>
+		/// <param name="args">The args.</param>
+		public void ExtractTo(string directory, TurtleExtractArgs args)
+		{
+			if (string.IsNullOrEmpty(directory))
+				throw new ArgumentNullException("directory");
+
+			if(args.UseDirectoryMap)
+			{
+				using (DirectoryMap dm = DirectoryMap.Get(directory))
+				{
+					ExtractTo(dm, args);
+				}
+				return;
+			}
+
+			ExtractFiles(args, delegate(PackFile file, Stream fileStream)
+			{
+				using (Stream s = File.Create(Path.Combine(directory, file.RelativePath)))
+				{
+					QQnPath.CopyStream(fileStream, s);
+				}
+			});
+		}
+
+		/// <summary>
 		/// Extracts the specified containers to the specified directory
 		/// </summary>
 		/// <param name="directory"></param>
@@ -448,21 +488,14 @@ namespace QQn.TurtlePackage
 			if (string.IsNullOrEmpty(directory))
 				throw new ArgumentNullException("directory");
 
-			if (useMap)
-			{
-				using (DirectoryMap dm = DirectoryMap.Get(directory))
-				{
-					ExtractTo(dm, containers);
-				}
-			}
-			else
-				ExtractFiles(containers, delegate(PackFile file, Stream fileStream)
-				{
-					using (Stream s = File.Create(Path.Combine(directory, file.RelativePath)))
-					{
-						QQnPath.CopyStream(fileStream, s);
-					}
-				});
+			TurtleExtractArgs args = new TurtleExtractArgs();
+
+			if (containers != null)
+				args.Containers = containers;
+
+			args.UseDirectoryMap = useMap;
+
+			ExtractTo(directory, args);
 		}
 
 		/// <summary>

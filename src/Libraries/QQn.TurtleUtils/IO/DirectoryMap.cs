@@ -300,5 +300,14 @@ namespace QQn.TurtleUtils.IO
 				throw new FileNotFoundException("File not found", fullPath);
 		}
 
+
+		/// <summary>
+		/// Gets the full name of the root of the <see cref="DirectoryMap"/>
+		/// </summary>
+		/// <value>The full name.</value>
+		public string FullName
+		{
+			get { return _directory; }
+		}
 	}
 }

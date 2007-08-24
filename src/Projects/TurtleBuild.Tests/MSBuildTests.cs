@@ -246,6 +246,14 @@ namespace TurtleTests
 
 				pkg.ExtractTo(dm);
 			}
+
+			using (TurtlePackage pkg = TurtlePackage.OpenFrom(path, VerificationMode.Full))
+			using (DirectoryMap dm = DirectoryMap.Get(ExtractPath))
+			{
+				Assert.That(pkg, Is.Not.Null);
+
+				pkg.ExtractTo(dm);
+			}
 		}
 	}
 }
