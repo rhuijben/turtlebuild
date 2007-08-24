@@ -34,6 +34,10 @@ namespace QQn.TurtleUtils.Tokens
 	/// </summary>
 	public interface ITokenizerInitialize
 	{
+		/// <summary>
+		/// Called when initialization via the tokenizer starts
+		/// </summary>
+		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
 		void BeginInitialize(TokenizerEventArgs e);
 
 		/// <summary>

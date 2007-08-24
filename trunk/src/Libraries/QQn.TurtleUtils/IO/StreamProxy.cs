@@ -29,6 +29,7 @@ namespace QQn.TurtleUtils.IO
 
 			_parentStream = parentStream;
 			_closeParent = closeParent;
+			_proxyAsyncRequests = proxyAsyncRequest;
 		}
 
 		/// <summary>

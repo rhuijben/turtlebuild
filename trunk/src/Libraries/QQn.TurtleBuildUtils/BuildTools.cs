@@ -7,6 +7,9 @@ using Microsoft.Win32;
 
 namespace QQn.TurtleBuildUtils
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public static class BuildTools
 	{
 
@@ -124,7 +127,8 @@ namespace QQn.TurtleBuildUtils
 		/// Res the sign assembly.
 		/// </summary>
 		/// <param name="assembly">The assembly.</param>
-		/// <param name="strongNameFile">The strong name file.</param>
+		/// <param name="container">The container.</param>
+		/// <returns></returns>
 		public static bool ReSignAssemblyWithContainer(string assembly, string container)
 		{
 			if (string.IsNullOrEmpty(assembly))

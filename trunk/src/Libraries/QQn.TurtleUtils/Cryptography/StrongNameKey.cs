@@ -175,7 +175,6 @@ namespace QQn.TurtleUtils.Cryptography
 			}
 		}
 
-		int _hashLength;
 		/// <summary>
 		/// Gets the length of a hash in bytes
 		/// </summary>

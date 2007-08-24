@@ -6,12 +6,22 @@ using System.Collections.ObjectModel;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class TBLogProjectOutput : IHasFullPath
-	{		
+	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TBLogProjectOutput"/> class.
+		/// </summary>
 		public TBLogProjectOutput()
 		{
 			Items = new TBReferenceCollection<TBLogReferenceItem>(this);
 		}
+
+		/// <summary>
+		/// 
+		/// </summary>
 		[TokenGroup("Item", typeof(TBLogItem))]
 		[TokenGroup("SharedItem", typeof(TBLogSharedItem))]
 		[TokenGroup("CopyItem", typeof(TBLogCopyItem))]

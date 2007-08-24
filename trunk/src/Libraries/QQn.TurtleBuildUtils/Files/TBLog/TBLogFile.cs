@@ -8,26 +8,52 @@ using QQn.TurtleUtils.Tokens.Definitions;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class TBLogFile : IHasFullPath, ITokenizerInitialize
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		[TokenGroup("Generator")]
 		public TBLogGenerator Generator = new TBLogGenerator();
 
+		/// <summary>
+		/// 
+		/// </summary>
 		[TokenGroup("Project")]
 		public TBLogProject Project = new TBLogProject();
 
+		/// <summary>
+		/// 
+		/// </summary>
 		[TokenGroup("References")]
 		public TBLogReferences References = new TBLogReferences();
 
+		/// <summary>
+		/// 
+		/// </summary>
 		[TokenGroup("ProjectOutput")]
 		public TBLogProjectOutput ProjectOutput = new TBLogProjectOutput();
 
+		/// <summary>
+		/// 
+		/// </summary>
 		[TokenGroup("Content")]
 		public TBLogContent Content = new TBLogContent();
 
+		/// <summary>
+		/// 
+		/// </summary>
 		[TokenGroup("Scripts")]
 		public TBLogScripts Scripts = new TBLogScripts();
 
+		/// <summary>
+		/// Loads the logfile at the specified path.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <returns></returns>
 		public static TBLogFile Load(string path)
 		{
 			using (XmlReader xr = XmlReader.Create(path))

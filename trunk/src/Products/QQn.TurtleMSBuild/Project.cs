@@ -176,13 +176,13 @@ namespace QQn.TurtleMSBuild
 			get { return _references; }
 		}
 
-		readonly FileList _contentFiles = new FileList();
-		protected FileList ContentFiles
+		readonly SortedFileList _contentFiles = new SortedFileList();
+		protected SortedFileList ContentFiles
 		{
 			get { return _contentFiles; }
 		}
-		readonly FileList _scriptFiles = new FileList();
-		protected FileList ScriptFiles
+		readonly SortedFileList _scriptFiles = new SortedFileList();
+		protected SortedFileList ScriptFiles
 		{
 			get { return _scriptFiles; }
 		}

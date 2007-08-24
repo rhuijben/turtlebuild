@@ -6,13 +6,22 @@ using System.Collections.ObjectModel;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class TBLogScripts : IHasFullPath
 	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TBLogScripts"/> class.
+		/// </summary>
 		public TBLogScripts()
 		{
 			 Items = new TBReferenceCollection<TBLogItem>(this);
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
 		[TokenGroup("Item")]
 		public readonly Collection<TBLogItem> Items;
 
