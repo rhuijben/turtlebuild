@@ -36,7 +36,9 @@ namespace QQn.TurtleBuildUtils
 		/// Updates the version info in the file header from the attributes defined on the assembly.
 		/// </summary>
 		/// <param name="file">The file.</param>
-		/// <param name="strongNameKey">The strong name key.</param>
+		/// <param name="keyFile">The key file.</param>
+		/// <param name="keyContainer">The key container.</param>
+		/// <returns></returns>
 		public static bool RefreshVersionInfoFromAttributes(string file, string keyFile, string keyContainer)
 		{
 			if (!File.Exists(file))

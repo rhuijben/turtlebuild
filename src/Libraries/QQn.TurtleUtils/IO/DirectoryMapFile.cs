@@ -53,6 +53,9 @@ namespace QQn.TurtleUtils.IO
 			}
 		}
 
+		/// <summary>
+		/// Updates this instance.
+		/// </summary>
 		public void Update()
 		{
 			using (Updater())
@@ -63,6 +66,12 @@ namespace QQn.TurtleUtils.IO
 
 		#region IUpdatableVerifiableFile Members
 
+		/// <summary>
+		/// Updates the verify data.
+		/// </summary>
+		/// <param name="fileHash">The file hash.</param>
+		/// <param name="size">The size.</param>
+		/// <param name="lastWriteTimeUtc">The last write time UTC.</param>
 		public void UpdateVerifyData(string fileHash, long? size, DateTime? lastWriteTimeUtc)
 		{
 			UpdateData(fileHash, size.Value, lastWriteTimeUtc.Value);
@@ -70,6 +79,10 @@ namespace QQn.TurtleUtils.IO
 
 		#endregion
 
+		/// <summary>
+		/// Unmodifieds this instance.
+		/// </summary>
+		/// <returns></returns>
 		public bool Unmodified()
 		{
 			return VerifyUtils.VerifyFile(Map.FullPath, this, VerifyMode.TimeSize);

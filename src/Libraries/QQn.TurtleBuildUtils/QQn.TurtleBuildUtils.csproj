@@ -38,7 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BuildTools.cs" />
-    <Compile Include="FileList.cs" />
+    <Compile Include="SortedFileList.cs" />
     <Compile Include="Files\TBLog\TBLogAssembly.cs" />
     <Compile Include="Files\TBLog\TBLogContent.cs" />
     <Compile Include="Files\TBLog\TBLogGenerator.cs" />
@@ -48,7 +48,6 @@
     <Compile Include="Files\TBLog\TBLogItems.cs" />
     <Compile Include="Files\TBLog\TBLogReferences.cs" />
     <Compile Include="Files\TBLog\TBLogScripts.cs" />
-    <Compile Include="Files\TBLog\TBProjectOutput.cs" />
     <Compile Include="VersionInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

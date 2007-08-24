@@ -7,6 +7,9 @@ using QQn.TurtleUtils.Tokens.Converters;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class TBLogGenerator
 	{
 		/// <summary>

@@ -70,7 +70,11 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		HashAlgorithm _hashAlgorithm;
-		protected HashAlgorithm Hasher
+		/// <summary>
+		/// Gets the hasher.
+		/// </summary>
+		/// <value>The hasher.</value>
+		HashAlgorithm Hasher
 		{
 			get
 			{

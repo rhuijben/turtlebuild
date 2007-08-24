@@ -5,6 +5,9 @@ using QQn.TurtleUtils.Tokens;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class TBLogAssembly
 	{
 		/// <summary>
