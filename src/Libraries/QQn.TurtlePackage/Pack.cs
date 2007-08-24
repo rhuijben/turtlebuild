@@ -9,8 +9,14 @@ using QQn.TurtleUtils.Tokens.Definitions;
 
 namespace QQn.TurtlePackage
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class Pack : PackItem, ITokenizerInitialize
 	{
+		/// <summary>
+		/// Gets "http://schemas.qqn.nl/2007/TurtlePackage"
+		/// </summary>
 		public const string Namespace = "http://schemas.qqn.nl/2007/TurtlePackage";
 		bool _readOnly;
 
@@ -45,18 +51,12 @@ namespace QQn.TurtlePackage
 
 		#region ISupportInitialize Members
 
-		/// <summary>
-		/// Signals the object that initialization is starting.
-		/// </summary>
-		public void BeginInit()
+		void ITokenizerInitialize.BeginInitialize(TokenizerEventArgs e)
 		{
 			_readOnly = false;
 		}
 
-		/// <summary>
-		/// Signals the object that initialization is complete.
-		/// </summary>
-		public void EndInit()
+		void ITokenizerInitialize.EndInitialize(TokenizerEventArgs e)
 		{
 			_readOnly = true;
 		}
@@ -75,6 +75,10 @@ namespace QQn.TurtlePackage
 		}
 
 		StrongNameKey _strongNameKey;
+		/// <summary>
+		/// Gets or sets the strong name key.
+		/// </summary>
+		/// <value>The strong name key.</value>
 		public StrongNameKey StrongNameKey
 		{
 			get { return _strongNameKey; }

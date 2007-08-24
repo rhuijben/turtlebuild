@@ -120,7 +120,15 @@ namespace QQn.TurtleUtils.IO
 
 		#region ITokenizerInit Members
 
-		void ITokenizerInitialize.EndInit()
+		void ITokenizerInitialize.BeginInitialize(TokenizerEventArgs e)
+		{
+			
+		}
+		/// <summary>
+		/// Ends the init.
+		/// </summary>
+		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
+		void ITokenizerInitialize.EndInitialize(TokenizerEventArgs e)
 		{
 			_initCompleted = true;
 		}

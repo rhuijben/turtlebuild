@@ -26,6 +26,7 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 		/// <param name="definition">The definition.</param>
 		/// <param name="args">The args.</param>
 		/// <param name="forCreate">if set to <c>true</c> [for create].</param>
+		/// <param name="context">The context.</param>
 		/// <remarks>Calls <see cref="ISupportInitialize.BeginInit"/> if the instance implements <see cref="ISupportInitialize"/></remarks>
 		public TokenizerState(T instance, TokenizerDefinition definition, TokenizerArgs args, bool forCreate)
 		{
@@ -39,8 +40,17 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 			_instance = instance;
 			_definition = definition;
 			_args = args;
-			if(forCreate)
+
+			if (forCreate)
+			{
 				_init = instance as ITokenizerInitialize;
+
+				if (_init != null)
+				{
+					TokenizerEventArgs e = new TokenizerEventArgs();
+					e.Context = args.Context;
+				}
+			}
 		}
 
 		/// <summary>
@@ -99,7 +109,9 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 			{
 				_init = null;
 
-				init.EndInit();
+				TokenizerEventArgs e = new TokenizerEventArgs();
+				e.Context = _args.Context;
+				init.EndInitialize(e);
 			}
 		}
 

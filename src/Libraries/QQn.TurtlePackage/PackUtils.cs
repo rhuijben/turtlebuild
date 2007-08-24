@@ -9,6 +9,9 @@ using System.Diagnostics;
 
 namespace QQn.TurtlePackage
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class PackUtils
 	{
 		/// <summary>
@@ -52,7 +55,7 @@ namespace QQn.TurtlePackage
 			if (!string.IsNullOrEmpty(log.Project.OutputDir))
 			{
 				projectContent.ContainerDir = "content/" + log.Project.Name;
-				projectContent.BaseDir = log.Project.Path;
+				projectContent.BaseDir = log.ProjectPath;
 			}
 
 			foreach (TBLogItem item in log.Content.Items)

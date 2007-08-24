@@ -9,6 +9,9 @@ using QQn.TurtleUtils.Tokens;
 
 namespace QQn.TurtlePackage
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	[DebuggerDisplay("File={Name}")]
 	public class PackFile : PackItem, IVerifiableFile, IUpdatableVerifiableFile
 	{
@@ -16,6 +19,10 @@ namespace QQn.TurtlePackage
 		string _hash;
 		DateTime _lastWriteTimeUtc;
 
+		/// <summary>
+		/// Gets the size of the file.
+		/// </summary>
+		/// <value>The size of the file.</value>
 		[Token("size"), DefaultValue(-1L)]
 		public long FileSize
 		{
@@ -23,6 +30,10 @@ namespace QQn.TurtlePackage
 			set { EnsureWritable(); _size = value; }
 		}
 
+		/// <summary>
+		/// Gets the file hash.
+		/// </summary>
+		/// <value>The file hash.</value>
 		[Token("hash"), DefaultValue(null)]
 		public string FileHash
 		{
@@ -30,6 +41,10 @@ namespace QQn.TurtlePackage
 			set { EnsureWritable(); _hash = value; }
 		}
 
+		/// <summary>
+		/// Gets the last written time in UTC.
+		/// </summary>
+		/// <value>The last written time in UTC.</value>
 		[Token("lastWritten", TypeConverter=typeof(QQn.TurtleUtils.Tokens.Converters.UtcDateTimeConverter)), DefaultValue(typeof(DateTime), "")]
 		public DateTime LastWriteTimeUtc
 		{
@@ -53,6 +68,10 @@ namespace QQn.TurtlePackage
 			}
 		}
 
+		/// <summary>
+		/// Gets or sets the name.
+		/// </summary>
+		/// <value>The name.</value>
 		[Token("name")]
 		public override string Name
 		{

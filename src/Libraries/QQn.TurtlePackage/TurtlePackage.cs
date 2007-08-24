@@ -12,8 +12,14 @@ using QQn.TurtleUtils.Cryptography;
 
 namespace QQn.TurtlePackage
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public class TurtlePackage : IDisposable
 	{
+		/// <summary>
+		/// 
+		/// </summary>
 		public const string PackageFileType = "application/x-QQn-TurtlePackage";
 		//readonly FileInfo _package;
 		//readonly IXPathNavigable _manifest;
@@ -54,6 +60,10 @@ namespace QQn.TurtlePackage
 			}
 		}
 
+		/// <summary>
+		/// Gets the content reader.
+		/// </summary>
+		/// <value>The content reader.</value>
 		protected MultiStreamReader ContentReader
 		{
 			get
@@ -72,6 +82,9 @@ namespace QQn.TurtlePackage
 		{
 		}
 
+		/// <summary>
+		/// Closes this instance.
+		/// </summary>
 		public void Close()
 		{
 			Dispose(true);
@@ -369,6 +382,11 @@ namespace QQn.TurtlePackage
 
 		delegate void Extractor(PackFile file, Stream fileStream);
 
+		/// <summary>
+		/// Extracts to.
+		/// </summary>
+		/// <param name="directory">The directory.</param>
+		/// <param name="containers">The containers.</param>
 		public void ExtractTo(DirectoryMap directory, ICollection<string> containers)
 		{
 			ExtractTo(directory, new TurtleExtractArgs(containers));
@@ -481,8 +499,9 @@ namespace QQn.TurtlePackage
 		/// <summary>
 		/// Extracts the specified containers to the specified directory
 		/// </summary>
-		/// <param name="directory"></param>
-		/// <param name="containers"></param>
+		/// <param name="directory">The directory.</param>
+		/// <param name="useMap">if set to <c>true</c> [use map].</param>
+		/// <param name="containers">The containers.</param>
 		public void ExtractTo(string directory, bool useMap, string[] containers)
 		{
 			if (string.IsNullOrEmpty(directory))
@@ -505,6 +524,15 @@ namespace QQn.TurtlePackage
 		public void ExtractTo(string directory)
 		{
 			ExtractTo(directory, false, null);
+		}
+
+		/// <summary>
+		/// Gets the pack.
+		/// </summary>
+		/// <value>The pack.</value>
+		public Pack Pack
+		{
+			get { return _pack; }
 		}
 	}
 }
