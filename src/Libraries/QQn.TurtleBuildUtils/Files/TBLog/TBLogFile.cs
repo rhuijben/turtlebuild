@@ -5,6 +5,7 @@ using QQn.TurtleUtils.Tokens;
 using System.Xml;
 using System.Xml.XPath;
 using QQn.TurtleUtils.Tokens.Definitions;
+using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
@@ -117,5 +118,14 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Gets the full name of the target output
+		/// </summary>
+		/// <value>The full name of the target.</value>
+		public string TargetFullName
+		{
+			get { return QQnPath.Combine(ProjectPath, Project.OutputDir, Project.TargetName + Project.TargetExt); }
+		}
 	}
 }
