@@ -22,7 +22,7 @@ namespace QQn.TurtleBuildUtils
 		/// Adds the specified filename.
 		/// </summary>
 		/// <param name="filename">The filename.</param>
-		public void Add(string filename)
+		public virtual void Add(string filename)
 		{
 			Add(filename, filename);
 		}
@@ -31,7 +31,7 @@ namespace QQn.TurtleBuildUtils
 		/// Adds the specified file if it was not already added
 		/// </summary>
 		/// <param name="filename"></param>
-		public void AddUnique(string filename)
+		public virtual void AddUnique(string filename)
 		{
 			if (!ContainsKey(filename))
 				Add(filename, filename);

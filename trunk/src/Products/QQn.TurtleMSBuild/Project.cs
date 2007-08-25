@@ -46,6 +46,11 @@ namespace QQn.TurtleMSBuild
 			_projectFile = projectFile;
 			ProjectName = projectName;
 			_parameters = parameters;
+
+			_contentFiles = new SortedRelativeFileList();
+			_scriptFiles = new SortedRelativeFileList();
+			_contentFiles.BasePath = ProjectPath;
+			_scriptFiles.BasePath = ProjectPath;
 		}
 
 		/// <summary>
@@ -176,12 +181,12 @@ namespace QQn.TurtleMSBuild
 			get { return _references; }
 		}
 
-		readonly SortedFileList _contentFiles = new SortedFileList();
+		readonly SortedRelativeFileList _contentFiles;
 		protected SortedFileList ContentFiles
 		{
 			get { return _contentFiles; }
 		}
-		readonly SortedFileList _scriptFiles = new SortedFileList();
+		readonly SortedRelativeFileList _scriptFiles;
 		protected SortedFileList ScriptFiles
 		{
 			get { return _scriptFiles; }

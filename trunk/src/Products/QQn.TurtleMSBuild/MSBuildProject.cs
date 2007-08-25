@@ -351,9 +351,6 @@ namespace QQn.TurtleMSBuild
 				keys.Add(v, "Item");
 			}
 
-			SortedList<string, string> added = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
-
-			
 			foreach (ProjectItem i in BuildItems)
 			{
 				if (i.Name.StartsWith("_"))
@@ -363,17 +360,7 @@ namespace QQn.TurtleMSBuild
 				if (!keys.TryGetValue(i.Name, out name))
 					continue;
 
-				if (added.ContainsKey(i.Include))
-					continue;
-
-				added.Add(i.Include, name);
-
-				string include = i.Include;
-
-				if (Path.IsPathRooted(include) || include.Contains(_dotSlash))
-					include = MakeRelativePath(Path.Combine(ProjectPath, include));				
-
-				ContentFiles.AddUnique(include);
+				ContentFiles.AddUnique(i.Include);
 			}
 		}
 
@@ -387,7 +374,6 @@ namespace QQn.TurtleMSBuild
 		{
 			SortedList<string, string> items = new SortedList<string, string>();
 			SortedList<string, string> extensions = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
-			SortedList<string, string> added = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
 
 			foreach (string v in GetParameters("ScriptItems", Parameters.ScriptItems, "Content;Compile;EmbeddedResource;None"))
 			{
@@ -412,23 +398,12 @@ namespace QQn.TurtleMSBuild
 				if (!items.TryGetValue(i.Name, out name))
 					continue;
 
-				if (added.ContainsKey(i.Include))
-					continue;
-
 				string extension = Path.GetExtension(i.Include);
 
-				string extensionAs;
-				if (!extensions.TryGetValue(extension, out extensionAs))
+				if (!extensions.ContainsKey(extension))
 					continue;
 
-				added.Add(i.Include, name);
-
-				string include = i.Include;
-
-				if (Path.IsPathRooted(include) || include.Contains(_dotSlash))
-					include = MakeRelativePath(Path.Combine(ProjectPath, include));
-
-				ScriptFiles.AddUnique(include);
+				ScriptFiles.AddUnique(i.Include);
 			}
 		}
 

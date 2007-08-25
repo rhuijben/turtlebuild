@@ -48,6 +48,7 @@
     <Compile Include="Files\TBLog\TBLogItems.cs" />
     <Compile Include="Files\TBLog\TBLogReferences.cs" />
     <Compile Include="Files\TBLog\TBLogScripts.cs" />
+    <Compile Include="SortedRelativeFileList.cs" />
     <Compile Include="VersionInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
