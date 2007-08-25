@@ -28,6 +28,16 @@ namespace QQn.TurtleBuildUtils
 		}
 
 		/// <summary>
+		/// Adds the specified file if it was not already added
+		/// </summary>
+		/// <param name="filename"></param>
+		public void AddUnique(string filename)
+		{
+			if (!ContainsKey(filename))
+				Add(filename, filename);
+		}
+
+		/// <summary>
 		/// Returns an enumerator that iterates through the collection.
 		/// </summary>
 		/// <returns>
