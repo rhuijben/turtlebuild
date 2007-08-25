@@ -42,7 +42,7 @@ namespace QQn.TurtlePackage
 				projectOutput.BaseDir = log.Project.OutputDir;
 			}
 
-			foreach (TBLogReferenceItem item in log.ProjectOutput.Items)
+			foreach (TBLogItem item in log.ProjectOutput.Items)
 			{
 				if (item.IsShared)
 					continue;

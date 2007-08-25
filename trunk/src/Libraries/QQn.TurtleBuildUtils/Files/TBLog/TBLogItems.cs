@@ -11,7 +11,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// 
 	/// </summary>
 	[DebuggerDisplay("src={Src}, fromSrc={FromSrc}")]
-	public abstract class TBLogReferenceItem
+	public class TBLogItem
 	{
 		IHasFullPath _parent;
 
@@ -31,18 +31,18 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// Gets a value indicating whether this instance is shared.
 		/// </summary>
 		/// <value><c>true</c> if this instance is shared; otherwise, <c>false</c>.</value>
-		public abstract bool IsShared
+		public virtual bool IsShared
 		{
-			get;
+			get { return false; }
 		}
 
 		/// <summary>
 		/// Gets a value indicating whether this instance is copy.
 		/// </summary>
 		/// <value><c>true</c> if this instance is copy; otherwise, <c>false</c>.</value>
-		public abstract bool IsCopy
+		public virtual bool IsCopy
 		{
-			get;
+			get { return false; }
 		}
 
 		/// <summary>
@@ -74,29 +74,6 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		}
 	}
 
-	/// <summary>
-	/// 
-	/// </summary>
-	public class TBLogItem : TBLogReferenceItem
-	{
-		/// <summary>
-		/// Gets a value indicating whether this instance is shared.
-		/// </summary>
-		/// <value><c>true</c> if this instance is shared; otherwise, <c>false</c>.</value>
-		public override bool IsShared
-		{
-			get { return false; }
-		}
-
-		/// <summary>
-		/// Gets a value indicating whether this instance is copy.
-		/// </summary>
-		/// <value><c>true</c> if this instance is copy; otherwise, <c>false</c>.</value>
-		public override bool IsCopy
-		{
-			get { return false; }
-		}
-	}
 	/// <summary>
 	/// 
 	/// </summary>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using QQn.TurtleUtils.Tokens;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
@@ -11,12 +12,14 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// </summary>
 	public class TBLogProjectOutput : IHasFullPath
 	{
+		readonly TBReferenceCollection<TBLogItem> _items;
+
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TBLogProjectOutput"/> class.
 		/// </summary>
 		public TBLogProjectOutput()
 		{
-			Items = new TBReferenceCollection<TBLogReferenceItem>(this);
+			_items = new TBReferenceCollection<TBLogItem>(this);
 		}
 
 		/// <summary>
@@ -26,7 +29,11 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		[TokenGroup("SharedItem", typeof(TBLogSharedItem))]
 		[TokenGroup("CopyItem", typeof(TBLogCopyItem))]
 		[TokenGroup("SharedCopyItem", typeof(TBLogSharedCopyItem))]
-		public readonly Collection<TBLogReferenceItem> Items;
+		public Collection<TBLogItem> Items
+		{
+			[DebuggerStepThrough]
+			get { return _items; }
+		}
 
 		IHasFullPath _parent;
 		string IHasFullPath.FullPath
@@ -47,7 +54,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	}
 
 	class TBReferenceCollection<T> : Collection<T>
-		where T : TBLogReferenceItem
+		where T : TBLogItem
 	{
 		readonly IHasFullPath _parent;
 
