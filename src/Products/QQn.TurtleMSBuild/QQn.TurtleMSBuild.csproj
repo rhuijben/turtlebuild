@@ -54,7 +54,8 @@
     <Compile Include="VCBuildHandler.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="QQn.TurtleMSBuild.snk" />
+    <None Include="QQn.TurtleMSBuild.snk">
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Libraries\QQn.TurtleBuildUtils\QQn.TurtleBuildUtils.csproj">

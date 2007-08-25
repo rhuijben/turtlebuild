@@ -97,7 +97,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 				foreach (XPathNavigator nav in doc.CreateNavigator().Select("//File[@RelativePath]"))
 				{
-					string file = MakeRelativePath(Path.Combine(ProjectPath, nav.GetAttribute("RelativePath", "")));
+					string file = nav.GetAttribute("RelativePath", "");
 					bool deploymentContent = ("true" == nav.GetAttribute("DeploymentContent", ""));
 
 					if (deploymentContent)
