@@ -100,11 +100,11 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 					string file = MakeRelativePath(Path.Combine(ProjectPath, nav.GetAttribute("RelativePath", "")));
 					bool deploymentContent = ("true" == nav.GetAttribute("DeploymentContent", ""));
 
-					if (deploymentContent && !ContentFiles.Contains(file))
-						ContentFiles.Add(file);
+					if (deploymentContent)
+						ContentFiles.AddUnique(file);
 
-					if (extensions.ContainsKey(Path.GetExtension(file)) && !ScriptFiles.Contains(file))
-						ScriptFiles.Add(file);
+					if (extensions.ContainsKey(Path.GetExtension(file)))
+						ScriptFiles.AddUnique(file);
 				}
 
 				XPathNavigator n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + Configuration + "'] and @Name='VCLinkerTool' and @KeyFile!='']");

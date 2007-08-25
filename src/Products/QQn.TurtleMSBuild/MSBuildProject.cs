@@ -368,7 +368,12 @@ namespace QQn.TurtleMSBuild
 
 				added.Add(i.Include, name);
 
-				ContentFiles.Add(MakeRelativePath(i.Include));
+				string include = i.Include;
+
+				if (Path.IsPathRooted(include) || include.Contains(_dotSlash))
+					include = MakeRelativePath(Path.Combine(ProjectPath, include));				
+
+				ContentFiles.AddUnique(include);
 			}
 		}
 
@@ -418,7 +423,12 @@ namespace QQn.TurtleMSBuild
 
 				added.Add(i.Include, name);
 
-				ScriptFiles.Add(MakeRelativePath(i.Include));
+				string include = i.Include;
+
+				if (Path.IsPathRooted(include) || include.Contains(_dotSlash))
+					include = MakeRelativePath(Path.Combine(ProjectPath, include));
+
+				ScriptFiles.AddUnique(include);
 			}
 		}
 
