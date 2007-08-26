@@ -200,16 +200,8 @@ namespace QQn.TurtleMSBuild
 				}
 
 				if (type != TargetType.None)
-				{
-					string destinationSubDirectory;
-					string target;
-
-					if (pi.TryGetMetaData("TargetPath", out target))
-						target = Path.Combine(OutDir, target);
-					else if (pi.TryGetMetaData("DestinationSubDirectory", out destinationSubDirectory))
-						target = Path.Combine(Path.Combine(OutDir, destinationSubDirectory), pi.Filename);
-					else
-						target = Path.Combine(OutDir, pi.Filename);
+				{					
+					string target = CalculateTarget(pi);
 
 					if (!items.ContainsKey(target))
 						items.Add(new TargetItem(EnsureRelativePath(target), EnsureRelativePath(pi.Include), type, pi));
@@ -242,10 +234,23 @@ namespace QQn.TurtleMSBuild
 			}
 		}
 
+		private string CalculateTarget(ProjectItem pi)
+		{
+			string target;
+			string destinationSubDirectory;
+
+			if (pi.TryGetMetaData("TargetPath", out target))
+				return Path.Combine(OutDir, target);
+			else if (pi.TryGetMetaData("DestinationSubDirectory", out destinationSubDirectory))
+				return Path.Combine(Path.Combine(OutDir, destinationSubDirectory), pi.Filename);
+			else
+				return Path.Combine(OutDir, pi.Filename);
+		}
+
 		string _intermediateOutputPath;
 		public string IntermediateOutputPath
 		{
-			get { return _intermediateOutputPath ?? (_intermediateOutputPath = GetProperty("IntermediateOutputPath")); }
+			get { return _intermediateOutputPath ?? (_intermediateOutputPath = EnsureRelativePath(GetProperty("IntermediateOutputPath"))); }
 		}
 
 		public string GetProperty(string key)
