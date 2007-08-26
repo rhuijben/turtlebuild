@@ -180,7 +180,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 		{
 			string path = item.ItemSpec;
 
-			string src = MakeRelativePath(path);
+			string src = EnsureRelativePath(path);
 
 			if (!ProjectOutput.ContainsKey(src))
 			{

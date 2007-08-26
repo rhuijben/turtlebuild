@@ -5,6 +5,7 @@ using System.IO;
 using System.Xml;
 using System.Reflection;
 using QQn.TurtleBuildUtils;
+using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleMSBuild
 {
@@ -47,10 +48,10 @@ namespace QQn.TurtleMSBuild
 			ProjectName = projectName;
 			_parameters = parameters;
 
-			_contentFiles = new SortedRelativeFileList();
-			_scriptFiles = new SortedRelativeFileList();
-			_contentFiles.BasePath = ProjectPath;
-			_scriptFiles.BasePath = ProjectPath;
+			_contentFiles = new SortedFileList();
+			_scriptFiles = new SortedFileList();
+			_contentFiles.BaseDirectory = ProjectPath;
+			_scriptFiles.BaseDirectory = ProjectPath;
 		}
 
 		/// <summary>
@@ -112,7 +113,7 @@ namespace QQn.TurtleMSBuild
 				if (value == null)
 					_outDir = null;
 				else
-					_outDir = MakeRelativePath(Path.Combine(ProjectPath, value)).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar) + Path.DirectorySeparatorChar; 
+					_outDir = QQnPath.EnsureRelativePath(ProjectPath, value).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar; 
 			}
 		}
 
@@ -181,12 +182,12 @@ namespace QQn.TurtleMSBuild
 			get { return _references; }
 		}
 
-		readonly SortedRelativeFileList _contentFiles;
+		readonly SortedFileList _contentFiles;
 		protected SortedFileList ContentFiles
 		{
 			get { return _contentFiles; }
 		}
-		readonly SortedRelativeFileList _scriptFiles;
+		readonly SortedFileList _scriptFiles;
 		protected SortedFileList ScriptFiles
 		{
 			get { return _scriptFiles; }
@@ -222,13 +223,9 @@ namespace QQn.TurtleMSBuild
 		/// </summary>
 		/// <param name="include">The include.</param>
 		/// <returns></returns>
-		public string MakeRelativePath(string include)
+		public string EnsureRelativePath(string include)
 		{
-			Uri includeUri = new Uri(Path.GetFullPath(include).Replace(Path.DirectorySeparatorChar, '/'));
-			Uri projectUri = new Uri(ProjectPath.Replace(Path.DirectorySeparatorChar, '/')+'/');
-			Uri relUri = projectUri.MakeRelativeUri(includeUri);
-
-			return relUri.ToString().Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+			return QQnPath.EnsureRelativePath(ProjectPath, include);
 		}
 
 		public virtual bool IsSolution
@@ -325,7 +322,7 @@ namespace QQn.TurtleMSBuild
 
 			xw.WriteAttributeString("targetName", TargetName);
 			xw.WriteAttributeString("targetExt", TargetExt);
-			xw.WriteAttributeString("file", MakeRelativePath(ProjectFile));
+			xw.WriteAttributeString("file", Path.GetFileName(ProjectFile));
 
 			if (!string.IsNullOrEmpty(KeyFile))
 				xw.WriteAttributeString("keyFile", KeyFile);

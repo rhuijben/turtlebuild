@@ -6,6 +6,7 @@ using System.IO;
 using System.Xml;
 using System.Collections;
 using QQn.TurtleUtils.Tokens;
+using QQn.TurtleBuildUtils;
 
 namespace QQn.TurtleMSBuild
 {
@@ -14,8 +15,8 @@ namespace QQn.TurtleMSBuild
 	/// </summary>
 	public class MSBuildLogger : ILogger
 	{
-		readonly SortedList<string, Project> completed = new SortedList<string, Project>(StringComparer.InvariantCultureIgnoreCase);
-		readonly SortedList<string, Project> building = new SortedList<string, Project>(StringComparer.InvariantCultureIgnoreCase);
+		readonly SortedFileList<Project> completed = new SortedFileList<Project>();
+		readonly SortedFileList<Project> building = new SortedFileList<Project>();
 		string _parameters;
 		TurtleParameters _settings = new TurtleParameters();
 		int _nodeId;

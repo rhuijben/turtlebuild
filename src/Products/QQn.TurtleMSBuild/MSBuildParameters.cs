@@ -60,13 +60,13 @@ namespace QQn.TurtleMSBuild
 		public string[] ContentItems;
 
 		/// <summary>
-		/// 
+		/// The specified file is inserted in the buildlog
 		/// </summary>
 		[Token("BuildManifest")]
 		public string BuildManifest;
 
 		/// <summary>
-		/// 
+		/// If set to true the unmanaged version resource is replaced with the managed information in the assembly attributes
 		/// </summary>
 		[Token("VC-UpdateVersionInformation")]
 		public bool UpdateVCVersionInfo;
