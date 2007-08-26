@@ -18,7 +18,8 @@ namespace QQn.TurtleUtils.IO
 	/// Static wrapper for several path utilities
 	/// </summary>
 	public static class QQnPath
-	{/// <summary>
+	{
+		/// <summary>
 		/// Tries to make a relative path
 		/// </summary>
 		/// <param name="path"></param>
@@ -175,6 +176,49 @@ namespace QQn.TurtleUtils.IO
 
 			while (0 < (nRead = from.Read(buffer, 0, buffer.Length)))
 				to.Write(buffer, 0, nRead);
+		}
+
+
+		static readonly string dotSlash = "." + Path.DirectorySeparatorChar;
+		static readonly string doubleSlash = String.Concat(Path.DirectorySeparatorChar, Path.DirectorySeparatorChar);
+
+		/// <summary>
+		/// Determines whether the specified path is a subpath.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <returns>
+		/// 	<c>true</c> if [is safe sub path] [the specified path]; otherwise, <c>false</c>.
+		/// </returns>
+		public static bool IsRelativeSubPath(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			if (Path.IsPathRooted(path))
+				return false;
+			else if (path.IndexOf(Path.AltDirectorySeparatorChar) >= 0 || path.Contains(dotSlash) || path.Contains(doubleSlash))
+				return false;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Ensures the path is a relative path from the specified origin
+		/// </summary>
+		/// <param name="origin">The origin.</param>
+		/// <param name="path">The path.</param>
+		/// <returns></returns>
+		public static string EnsureRelativePath(string origin, string path)
+		{
+			if (string.IsNullOrEmpty(origin))
+				throw new ArgumentNullException("origin");
+			else if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			if (IsRelativeSubPath(path))
+				return path;
+			else
+				return MakeRelativePath(origin, Path.Combine(origin, path));
 		}
 	}
 }

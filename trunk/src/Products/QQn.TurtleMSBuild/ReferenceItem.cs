@@ -67,7 +67,7 @@ namespace QQn.TurtleMSBuild
 
 			_assemblyName = assemblyName;
 			if (item != null && project != null)
-				_src = project.MakeRelativePath(item.ItemSpec);
+				_src = project.EnsureRelativePath(item.ItemSpec);
 		}
 
 		public void WriteAttributes(XmlWriter xw)

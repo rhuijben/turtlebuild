@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml;
+using QQn.TurtleBuildUtils;
 
 namespace QQn.TurtleMSBuild
 {
@@ -55,10 +56,9 @@ namespace QQn.TurtleMSBuild
 		}
 	}
 
-	class ProjectOutputList : SortedList<string, TargetItem>
+	class ProjectOutputList : SortedFileList<TargetItem>
 	{
 		public ProjectOutputList()
-			: base(StringComparer.InvariantCultureIgnoreCase)
 		{ }
 
 		public void Add(TargetItem target)

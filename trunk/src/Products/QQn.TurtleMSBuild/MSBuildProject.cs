@@ -7,6 +7,7 @@ using System.IO;
 using Microsoft.Build.Framework;
 using System.Xml;
 using System.Reflection;
+using QQn.TurtleBuildUtils;
 
 namespace QQn.TurtleMSBuild
 {
@@ -104,9 +105,12 @@ namespace QQn.TurtleMSBuild
 		private void ParseProjectOutput()
 		{
 			ProjectOutputList items = ProjectOutput;
-			SortedList<string, bool> localCopyItems = new SortedList<string, bool>(StringComparer.InvariantCultureIgnoreCase);
+			SortedFileList<bool> localCopyItems = new SortedFileList<bool>();
+			SortedFileList<TargetType> keys = new SortedFileList<TargetType>();
 
-			SortedList<string, TargetType> keys = new SortedList<string, TargetType>();
+			localCopyItems.BaseDirectory = ProjectPath;
+			keys.BaseDirectory = ProjectPath;
+
 			SortedList<string, bool> copyKeys = new SortedList<string, bool>();
 
 			foreach (string v in GetParameters("SharedItems", Parameters.SharedItems, ""))
@@ -150,7 +154,7 @@ namespace QQn.TurtleMSBuild
 				if (string.IsNullOrEmpty(pi.Include))
 					continue;
 
-				string include = pi.Include;
+				string include = EnsureRelativePath(pi.Include);
 
 				string destinationSubDirectory;
 				string copyCondition;
@@ -162,11 +166,7 @@ namespace QQn.TurtleMSBuild
 				else
 					target = Path.Combine(OutDir, pi.Filename);
 
-				if (Path.IsPathRooted(include) || include.Contains(_dotSlash))
-					include = MakeRelativePath(include);
-
-				if (Path.IsPathRooted(target) || target.Contains(_dotSlash))
-					target = MakeRelativePath(include);
+				target = EnsureRelativePath(target);
 
 				if (!items.ContainsKey(target))
 				{

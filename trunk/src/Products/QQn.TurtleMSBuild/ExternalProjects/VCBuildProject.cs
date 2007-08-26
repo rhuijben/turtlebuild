@@ -111,7 +111,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 				if(n != null)
 				{
-					KeyFile = MakeRelativePath(Path.Combine(ProjectPath, n.GetAttribute("KeyFile", "")));
+					KeyFile = EnsureRelativePath(n.GetAttribute("KeyFile", ""));
 				}
 
 				n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + Configuration + "'] and @Name='VCLinkerTool' and @KeyContainer!='']");
