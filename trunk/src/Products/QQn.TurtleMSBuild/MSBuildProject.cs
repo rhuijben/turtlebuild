@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Collections;
-//using Microsoft.Build.BuildEngine;
+using System.Collections.Generic;
 using System.IO;
-using Microsoft.Build.Framework;
-using System.Xml;
 using System.Reflection;
+using System.Xml;
+using Microsoft.Build.Framework;
 using QQn.TurtleBuildUtils;
 
 namespace QQn.TurtleMSBuild
@@ -132,105 +130,101 @@ namespace QQn.TurtleMSBuild
 			}
 
 			string primaryTarget = Path.Combine(OutDir, TargetName + TargetExt);
-			string target = primaryTarget;
-			items.Add(new TargetItem(target, Path.Combine(IntermediateOutputPath, TargetName + TargetExt), TargetType.Item));
+			string itemTarget = primaryTarget;
+			items.Add(new TargetItem(itemTarget, Path.Combine(IntermediateOutputPath, TargetName + TargetExt), TargetType.Item));
 
 			if (BuildProperties.ContainsKey("_SGenDllCreated") && GetProperty("_SGenDllCreated") == "true" && BuildProperties.ContainsKey("_SGenDllName"))
 			{
 				string dllName = GetProperty("_SGenDllName");
-				target = Path.Combine(OutDir, dllName);
-				items.Add(new TargetItem(target, Path.Combine(IntermediateOutputPath, dllName), TargetType.Item));
+				itemTarget = Path.Combine(OutDir, dllName);
+				items.Add(new TargetItem(itemTarget, Path.Combine(IntermediateOutputPath, dllName), TargetType.Item));
 			}
 
 			if (BuildProperties.ContainsKey("_DebugSymbolsProduced") && GetProperty("_DebugSymbolsProduced") == "true")
 			{
 				string pdbName = GetProperty("TargetName") + ".pdb";
-				target = Path.Combine(OutDir, pdbName);
-				items.Add(new TargetItem(target, Path.Combine(IntermediateOutputPath, pdbName), TargetType.Item));
+				itemTarget = Path.Combine(OutDir, pdbName);
+				items.Add(new TargetItem(itemTarget, Path.Combine(IntermediateOutputPath, pdbName), TargetType.Item));
 			}
 
 			foreach (ProjectItem pi in BuildItems)
 			{
 				if (string.IsNullOrEmpty(pi.Include))
-					continue;
+					continue;				
 
-				string include = EnsureRelativePath(pi.Include);
-
-				string destinationSubDirectory;
-				string copyCondition;
-
-				if (pi.TryGetMetaData("TargetPath", out target))
-					target = Path.Combine(OutDir, target);
-				else if (pi.TryGetMetaData("DestinationSubDirectory", out destinationSubDirectory))
-					target = Path.Combine(Path.Combine(OutDir, destinationSubDirectory), pi.Filename);
-				else
-					target = Path.Combine(OutDir, pi.Filename);
-
-				target = EnsureRelativePath(target);
-
-				if (!items.ContainsKey(target))
+				TargetType type = TargetType.None;
+				switch (pi.Name)
 				{
-					string condition;
-					string fusionName;
-					TargetType type = TargetType.None;
-					switch (pi.Name)
-					{
-						// TODO: Rewrite to a per-language infrastructure
-						case "IntermediateAssembly":
-						case "AddModules":
-						case "DocFileItem":
-						case "IntermediateSatelliteAssembliesWithTargetPath":
-							type = TargetType.Item;		
+					// TODO: Rewrite to a per-language infrastructure
+					case "IntermediateAssembly":
+					case "AddModules":
+					case "DocFileItem":
+					case "IntermediateSatelliteAssembliesWithTargetPath":
+						type = TargetType.Item;
 
-							break;
-						case "ContentWithTargetPath":
-						case "AllItemsFullPathWithTargetPath":
-						case "ReferenceCopyLocal":
-							if (pi.TryGetMetaData("CopyToOutputDirectory", out condition))
+						break;
+					case "ContentWithTargetPath":
+					case "AllItemsFullPathWithTargetPath":
+					case "ReferenceCopyLocal":
+						string condition;
+						if (pi.TryGetMetaData("CopyToOutputDirectory", out condition))
+						{
+							switch (condition)
 							{
-								switch (condition)
-								{
-									case "Always":
-									case "PreserveNewest":
-										type = TargetType.SharedCopy;
-										break;
-									default:
-										break;
-								}
+								case "Always":
+								case "PreserveNewest":
+									type = TargetType.SharedCopy;
+									break;
+								default:
+									break;
 							}
-							if (type == TargetType.None)
-								goto default;
-							break;
-						case "ReferenceComWrappersToCopyLocal":
-						case "ResolvedIsolatedComModules":
-						case "_DeploymentLooseManifestFile":
-						case "ReferenceCopyLocalPaths":
-						case "NativeReferenceFile":
-							fusionName = pi.GetMetadata("FusionName");
-							if(!string.IsNullOrEmpty(fusionName))
-								References.Add(new AssemblyReference(fusionName, pi, null));
+						}
+						if (type == TargetType.None)
+							goto default;
+						break;
+					case "ReferenceComWrappersToCopyLocal":
+					case "ResolvedIsolatedComModules":
+					case "_DeploymentLooseManifestFile":
+					case "ReferenceCopyLocalPaths":
+					case "NativeReferenceFile":
+						string fusionName = pi.GetMetadata("FusionName");
+						if (!string.IsNullOrEmpty(fusionName))
+							References.Add(new AssemblyReference(fusionName, pi, null));
 
-							type = TargetType.SharedItem;
-							break;
-						default:
-							if (!keys.TryGetValue(pi.Name, out type))
-								type = TargetType.None;
-							break;
-					}
+						type = TargetType.SharedItem;
+						break;
+					default:
+						if (!keys.TryGetValue(pi.Name, out type))
+							type = TargetType.None;
+						break;
+				}
 
-					if (type != TargetType.None)
-						items.Add(new TargetItem(target, include, type, pi));
+				if (type != TargetType.None)
+				{
+					string destinationSubDirectory;
+					string target;
+
+					if (pi.TryGetMetaData("TargetPath", out target))
+						target = Path.Combine(OutDir, target);
+					else if (pi.TryGetMetaData("DestinationSubDirectory", out destinationSubDirectory))
+						target = Path.Combine(Path.Combine(OutDir, destinationSubDirectory), pi.Filename);
+					else
+						target = Path.Combine(OutDir, pi.Filename);
+
+					if (!items.ContainsKey(target))
+						items.Add(new TargetItem(EnsureRelativePath(target), EnsureRelativePath(pi.Include), type, pi));
 				}
 
 				if (copyKeys.ContainsKey(pi.Name))
 				{
+					string copyCondition;
 					if (pi.TryGetMetaData("CopyToOutputDirectory", out copyCondition))
 						switch (copyCondition)
 						{
 							case "Always":
 							case "PreserveNewest":
 								{
-									localCopyItems[include] = true;
+									localCopyItems[pi.Include] = true;
 								}
 								break;
 						}
@@ -309,7 +303,7 @@ namespace QQn.TurtleMSBuild
 		protected override void WriteProjectReferences(XmlWriter xw, bool forReadability)
 		{
 			base.WriteProjectReferences(xw, forReadability);
-			
+
 			foreach (ProjectItem i in BuildItems)
 			{
 				bool isProject = false;
@@ -332,7 +326,7 @@ namespace QQn.TurtleMSBuild
 					xw.WriteAttributeString("src", i.GetMetadata("HintPath"));
 
 				xw.WriteEndElement();
-			}			
+			}
 		}
 
 		static readonly string _dotSlash = "." + Path.DirectorySeparatorChar;
@@ -365,7 +359,7 @@ namespace QQn.TurtleMSBuild
 		}
 
 		protected override void WriteContent(XmlWriter xw, bool forReadability)
-		{			
+		{
 			UpdateContent();
 			base.WriteContent(xw, forReadability);
 		}
@@ -391,7 +385,7 @@ namespace QQn.TurtleMSBuild
 				if (!extensions.ContainsKey(ext))
 					extensions.Add(ext, "Item");
 			}
-			
+
 			foreach (ProjectItem i in BuildItems)
 			{
 				string name;
@@ -448,6 +442,6 @@ namespace QQn.TurtleMSBuild
 				}
 			}
 		}
-		#endregion		
+		#endregion
 	}
 }
