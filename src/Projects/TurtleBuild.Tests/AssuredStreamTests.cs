@@ -79,6 +79,35 @@ namespace TurtleTests
 		}
 
 		[Test]
+		public void CreateUnsignedFile()
+		{
+			string file;
+			using (FileStream f = File.Create(file = TmpPath))
+			using (AssuredStream s = new AssuredStream(f, null, "TestPackage"))
+			using (BinaryWriter bw = new BinaryWriter(s))
+			{
+				Assert.That(s.Position, Is.EqualTo(0L), "Position 0 within signed file");
+				bw.Write("Test String");
+
+				Assert.That(s.Position, Is.Not.EqualTo(0L), "Position 0 within signed file");
+			}
+
+			using (FileStream f = File.OpenRead(file))
+			using (AssuredStream s = new AssuredStream(f, VerificationMode.Full))
+			using (BinaryReader br = new BinaryReader(s))
+			{
+				Assert.That(s.PublicKeyToken, Is.Null, "Public key matches");
+
+				Assert.That(s.Position, Is.EqualTo(0L), "Position 0 within signed file");
+				Assert.That(br.ReadString(), Is.EqualTo("Test String"));
+
+				Assert.That(s.Position, Is.Not.EqualTo(0L), "Position not 0 within signed file");
+
+				Assert.That(s.HashString, Is.Not.Null, "Hash is set");
+			}
+		}
+
+		[Test]
 		public void CreateTrippleSignedFile()
 		{
 			// Tests whether a stream within a signed stream behaves as an outer stream

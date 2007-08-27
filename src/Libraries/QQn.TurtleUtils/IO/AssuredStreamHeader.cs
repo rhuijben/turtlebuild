@@ -172,6 +172,8 @@ namespace QQn.TurtleUtils.IO
 				_fileHash = fileHash;
 				_hashSignature = signature;
 			}
+			else
+				_fileHash = fileHash;
 
 			stream.Position = _headerPosition;
 			WriteHeader(stream);

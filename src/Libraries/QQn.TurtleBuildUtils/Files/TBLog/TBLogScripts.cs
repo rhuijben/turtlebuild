@@ -25,7 +25,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// 
 		/// </summary>
 		[TokenGroup("Item")]
-		public Collection<TBLogItem> Items
+		public TBLogItemCollection<TBLogItem> Items
 		{
 			[DebuggerStepThrough]
 			get { return _items; }

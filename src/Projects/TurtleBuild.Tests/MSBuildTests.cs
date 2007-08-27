@@ -233,7 +233,7 @@ namespace TurtleTests
 
 			TBLogFile log = TBLogFile.Load(logFile);
 
-			string _refPdb = null;
+			DebugReference reference = null;
 			foreach (TBLogItem item in log.ProjectOutput.Items)
 			{
 				if (!item.IsShared && !item.IsCopy)
@@ -242,14 +242,22 @@ namespace TurtleTests
 					{
 						case ".PDB":
 						case ".DLL":
-							if (_refPdb == null)
+							if (reference == null)
 							{
-								_refPdb = AssemblyInfo.GetPdbReferenceId(item.FullFromSrc);
+								reference = AssemblyUtils.GetDebugReference(item.FullFromSrc);
 
-								Assert.That(_refPdb, Is.Not.Null);
+								Assert.That(reference, Is.Not.Null);
+								Assert.That(reference.PdbFile, Is.Not.Null);
 							}
 							else
-								Assert.That(AssemblyInfo.GetPdbReferenceId(item.FullFromSrc), Is.EqualTo(_refPdb));
+							{
+								DebugReference dr = AssemblyUtils.GetDebugReference(item.FullFromSrc);
+
+								Assert.That(dr, Is.Not.Null);
+								// Path does not have to equal; the pdb information contains the sourcepath (obj directory for c# code)
+								Assert.That(Path.GetFileName(dr.PdbFile), Is.EqualTo(Path.GetFileName(reference.PdbFile)));
+								Assert.That(dr.DebugId, Is.EqualTo(reference.DebugId));
+							}
 							break;
 					}
 				}

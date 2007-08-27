@@ -71,7 +71,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 			if (Parameters.UpdateVCVersionInfo)
 			{
-				AssemblyInfo.RefreshVersionInfoFromAttributes(targetFile, KeyFile, KeyContainer);
+				AssemblyUtils.RefreshVersionInfoFromAttributes(targetFile, KeyFile, KeyContainer);
 			}
 		}		
 

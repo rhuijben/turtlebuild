@@ -76,10 +76,10 @@ namespace QQn.TurtlePackage
 				PackFile pf = projectContent.Files.AddItem(QQnPath.MakeRelativePath(projectContent.BaseDir, Path.Combine(projectDir, item.Src)));
 			}
 
-			if (log.Project.KeyFile != null)
-				p.StrongNameKey = StrongNameKey.LoadFrom(Path.Combine(log.Project.Path, log.Project.KeyFile));
-			else if (log.Project.KeyContainer != null)
-				p.StrongNameKey = StrongNameKey.LoadFromContainer(log.Project.KeyContainer, false);
+			if (log.Target.KeySrc != null)
+				p.StrongNameKey = StrongNameKey.LoadFrom(Path.Combine(log.Project.Path, log.Target.KeySrc));
+			else if (log.Target.KeyContainer != null)
+				p.StrongNameKey = StrongNameKey.LoadFromContainer(log.Target.KeyContainer, false);
 
 
 			foreach (PackContainer pc in p.Containers)

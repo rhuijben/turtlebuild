@@ -53,15 +53,15 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string File;
 
 		/// <summary>
-		/// The strong name keyfile used to sign the target(s)
+		/// Obsolete. Always null, use Target.KeyFile
 		/// </summary>
-		[Token("keyFile")]
+		[Obsolete("Always null, use Target.KeySrc")]
 		public string KeyFile;
 
 		/// <summary>
-		/// The strong name keycontainer used to sign the target(s)
+		/// Obsolete Always null, use Target.KeyContainer
 		/// </summary>
-		[Token("keyContainer")]
+		[Obsolete("Always null, use Target.KeyContainer")]
 		public string KeyContainer;
 	}
 }
