@@ -37,6 +37,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyInfoUpdater.cs" />
+    <Compile Include="AttributeParsers\AttributeParser.cs" />
+    <Compile Include="AttributeParsers\AttributeParser_T.cs" />
+    <Compile Include="AttributeParsers\CSharpAttributeParser.cs" />
+    <Compile Include="AttributeParsers\EcmaScriptAttributeParser.cs" />
+    <Compile Include="AttributeParsers\JSharpAttributeParser.cs" />
+    <Compile Include="AttributeParsers\MCppAttributeParser.cs" />
+    <Compile Include="AttributeParsers\VBAttributeParser.cs" />
     <Compile Include="BuildTools.cs" />
     <Compile Include="Files\TBLog\TBLogTarget.cs" />
     <Compile Include="NativeMethods.cs" />
