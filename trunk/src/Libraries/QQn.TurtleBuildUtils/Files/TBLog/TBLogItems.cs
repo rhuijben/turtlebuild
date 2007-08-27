@@ -4,6 +4,7 @@ using System.Text;
 using QQn.TurtleUtils.Tokens;
 using System.Diagnostics;
 using System.IO;
+using System.Collections.ObjectModel;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
@@ -71,6 +72,32 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		{
 			get { return _parent; }
 			set { _parent = value; }
+		}
+	}
+
+	/// <summary>
+	/// Collection of <see cref="TBLogItem"/> instances, indexed by <see cref="TBLogItem.Src"/>
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	public class TBLogItemCollection<T> : KeyedCollection<string, T>
+		where T : TBLogItem
+	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TBLogItemCollection&lt;T&gt;"/> class.
+		/// </summary>
+		public TBLogItemCollection()
+			: base(StringComparer.InvariantCultureIgnoreCase, 16)
+		{
+		}
+
+		/// <summary>
+		/// Extracts the key from the specified element.
+		/// </summary>
+		/// <param name="item">The element from which to extract the key.</param>
+		/// <returns>The key for the specified element.</returns>
+		protected override string GetKeyForItem(T item)
+		{
+			return item.Src;
 		}
 	}
 

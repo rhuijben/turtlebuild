@@ -263,12 +263,16 @@ namespace QQn.TurtleMSBuild
 		public void WriteTBLog(XmlWriter xw, bool forReadability)
 		{
 			xw.WriteStartDocument();
-			xw.WriteStartElement(null, "TurtleBuild", Ns);
+			xw.WriteStartElement(null, "TurtleBuildData", Ns);
 
 			WriteGenerator(xw, forReadability);
 
 			xw.WriteStartElement("Project");
 			WriteProjectInfo(xw, forReadability);
+			xw.WriteEndElement();
+
+			xw.WriteStartElement("Target");
+			WriteTargetInfo(xw, forReadability);
 			xw.WriteEndElement();
 
 			WriteAssemblyInfo(xw, forReadability);
@@ -323,11 +327,37 @@ namespace QQn.TurtleMSBuild
 			xw.WriteAttributeString("targetName", TargetName);
 			xw.WriteAttributeString("targetExt", TargetExt);
 			xw.WriteAttributeString("file", Path.GetFileName(ProjectFile));
+		}
+
+		protected virtual void WriteTargetInfo(XmlWriter xw, bool forReadability)
+		{
+			xw.WriteAttributeString("src", TargetPath);
 
 			if (!string.IsNullOrEmpty(KeyFile))
-				xw.WriteAttributeString("keyFile", KeyFile);
+				xw.WriteAttributeString("keySrc", KeyFile);
 			else if (!string.IsNullOrEmpty(KeyContainer))
 				xw.WriteElementString("keyContainer", KeyContainer);
+
+			DebugReference reference = AssemblyUtils.GetDebugReference(Path.Combine(ProjectPath, TargetPath));
+
+			if (reference != null)
+			{
+				string pdbSrc = EnsureRelativePath(Path.Combine(Path.GetDirectoryName(TargetPath), reference.PdbFile));
+
+				FileInfo pdbTarget = new FileInfo(QQnPath.Combine(ProjectPath, OutDir, Path.GetFileName(pdbSrc)));
+
+				if(pdbTarget.Exists)
+				{
+					FileInfo pdbFrom = new FileInfo(Path.Combine(ProjectPath, pdbSrc));
+
+					if(!pdbFrom.Exists || ((pdbFrom.Length == pdbTarget.Length) && (pdbFrom.LastWriteTime == pdbTarget.LastWriteTime)))
+						pdbSrc = EnsureRelativePath(pdbTarget.FullName);
+				}
+
+				xw.WriteAttributeString("debugSrc", pdbSrc);
+
+				xw.WriteAttributeString("debugId", reference.DebugId);
+			}
 		}
 
 		protected virtual void WriteManifest(XmlWriter xw, bool forReadability)
@@ -424,8 +454,7 @@ namespace QQn.TurtleMSBuild
 		/// <summary>
 		/// Gets "http://schemas.qqn.nl/2007/TurtleBuild/BuildResult"
 		/// </summary>
-		public const string Ns = "http://schemas.qqn.nl/2007/TurtleBuild/BuildResult";
-
+		public const string Ns = QQn.TurtleBuildUtils.Files.TBLog.TBLogFile.Namespace;
 
 		/// <summary>
 		/// Gets the project output.

@@ -58,7 +58,7 @@ namespace QQn.TurtleBuildUtils
 		[DllImport("version.dll", SetLastError = true)]
 		public static extern int GetFileVersionInfoSize(string pFilename, out int handle);
 
-		[DllImport("dbghelp.dll", SetLastError =true, CharSet=CharSet.Unicode)]
+		[DllImport("dbghelp.dll", SetLastError = false, CharSet = CharSet.Unicode)] // SetLastError=true, but if we set it to false we don't have to catch exceptions
 		[return: MarshalAs(UnmanagedType.Bool)]
 		public static extern bool SymSrvGetFileIndexInfo(string file, ref SYMSRV_INDEX_INFO info, [MarshalAs(UnmanagedType.U4)] int flags);
 	}

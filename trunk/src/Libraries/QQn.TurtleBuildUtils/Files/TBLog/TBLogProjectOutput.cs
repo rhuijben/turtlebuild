@@ -29,7 +29,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		[TokenGroup("SharedItem", typeof(TBLogSharedItem))]
 		[TokenGroup("CopyItem", typeof(TBLogCopyItem))]
 		[TokenGroup("SharedCopyItem", typeof(TBLogSharedCopyItem))]
-		public Collection<TBLogItem> Items
+		public TBLogItemCollection<TBLogItem> Items
 		{
 			[DebuggerStepThrough]
 			get { return _items; }
@@ -53,7 +53,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		string FullPath { get; }
 	}
 
-	class TBReferenceCollection<T> : Collection<T>
+	class TBReferenceCollection<T> : TBLogItemCollection<T>
 		where T : TBLogItem
 	{
 		readonly IHasFullPath _parent;

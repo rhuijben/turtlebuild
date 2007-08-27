@@ -113,7 +113,7 @@ namespace QQn.TurtleUtils.IO
 		DirectoryMapData _map;
 
 		public DirectoryMapCollection(DirectoryMapData map)
-			: base(StringComparer.InvariantCultureIgnoreCase)
+			: base(StringComparer.InvariantCultureIgnoreCase, 16)
 		{
 			_map = map;
 		}

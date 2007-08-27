@@ -13,7 +13,7 @@ namespace QQn.TurtleBuildUtils
 	/// <summary>
 	/// Helper functions for updating file versions
 	/// </summary>
-	public static class AssemblyInfo
+	public static class AssemblyUtils
 	{
 		/// <summary>
 		/// Updates the version info in the file header from the attributes defined on the assembly.
@@ -25,7 +25,7 @@ namespace QQn.TurtleBuildUtils
 		public static bool RefreshVersionInfoFromAttributes(string file, string keyFile, string keyContainer)
 		{
 			if (!File.Exists(file))
-				throw new FileNotFoundException("File to update not found", file);			
+				throw new FileNotFoundException("File to update not found", file);
 
 			string tmpDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 			Directory.CreateDirectory(tmpDir);
@@ -105,7 +105,7 @@ namespace QQn.TurtleBuildUtils
 					bool ok = NativeMethods.UpdateResource(resHandle, (IntPtr)16, (IntPtr)1, 0, versionInfo, size);
 					ok = NativeMethods.EndUpdateResource(resHandle, false) && ok;
 
-					if(ok && signFile)
+					if (ok && signFile)
 						ok = BuildTools.ReSignAssemblyWithFileOrContainer(toFile, keyFile, keyContainer);
 
 					return ok;
@@ -179,25 +179,112 @@ namespace QQn.TurtleBuildUtils
 		}
 
 		/// <summary>
-		/// Gets the debug information id. This guid is used by symbolserver to provide pdb's of released code
+		/// Gets the debug information id. This guid+age pair is used by symbolserver to provide pdb's of released code
 		/// </summary>
-		/// <param name="path">The path.</param>
-		/// <returns></returns>
-		public static string GetPdbReferenceId(string path)
+		/// <param name="path">The path of a library, executable or pdb file</param>
+		/// <returns>A string containing a guid as a 32 character uppercase hexadecimal string and an 
+		/// age (lowercase hexadecimal) suffix without separation in between</returns>
+		/// <exception cref="FileNotFoundException">Path not found</exception>
+		public static DebugReference GetDebugReference(string path)
 		{
 			if (string.IsNullOrEmpty(path))
 				throw new ArgumentNullException("path");
+			else if (!File.Exists(path))
+				throw new FileNotFoundException("Reference file not found", path);
 
 			SYMSRV_INDEX_INFO info = new SYMSRV_INDEX_INFO();
 			info.sizeofstruct = Marshal.SizeOf(info);
 
 			if (NativeMethods.SymSrvGetFileIndexInfo(path, ref info, 0))
 			{
-				if(!info.stripped)
-					return info.guid.ToString();
+				if (!info.stripped)
+				{
+					return new DebugReference(
+						string.IsNullOrEmpty(info.pdbfile) ? path : info.pdbfile, info.guid, info.age);
+				}
 			}
 
 			return null;
+		}
+	}
+
+	/// <summary>
+	/// Debug information container
+	/// </summary>
+	public class DebugReference
+	{
+		readonly string _pdbFile;
+		readonly Guid _guid;
+		readonly int _age;
+		string _debugId;
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DebugReference"/> class.
+		/// </summary>
+		/// <param name="pdbFile">The PDB file.</param>
+		/// <param name="guid">The GUID.</param>
+		/// <param name="age">The age.</param>
+		public DebugReference(string pdbFile, Guid guid, int age)
+		{
+			if (string.IsNullOrEmpty(pdbFile))
+				throw new ArgumentNullException("pdbFile");
+
+			_pdbFile = pdbFile;
+			_guid = guid;
+			_age = age;
+		}
+
+		/// <summary>
+		/// Gets the unique debug id of the file for retrieving the debug information from a symbol server
+		/// </summary>
+		/// <value>A string containing a guid as a 32 character uppercase hexadecimal string and an 
+		/// age (lowercase hexadecimal) suffix without separation in between</value>
+		public string DebugId
+		{
+			get
+			{
+				if (_debugId == null)
+					_debugId = Guid.ToString("N").ToUpperInvariant() + Age.ToString("x", CultureInfo.InvariantCulture);
+
+				return _debugId;
+			}
+		}
+
+		/// <summary>
+		/// Gets the file containing the debug information.
+		/// </summary>
+		/// <value>The PDB file.</value>
+		public string PdbFile
+		{
+			get { return _pdbFile; }
+		}
+
+		/// <summary>
+		/// Gets the age of the debug information
+		/// </summary>
+		/// <value>The age.</value>
+		public int Age
+		{
+			get { return _age; }
+		}
+
+		/// <summary>
+		/// Gets the GUID of the debug information
+		/// </summary>
+		/// <value>The GUID.</value>
+		public Guid Guid
+		{
+			get { return _guid; }
+		}
+
+		/// <summary>
+		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+		/// </summary>
+		/// <returns>
+		/// A <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+		/// </returns>
+		public override string ToString()
+		{
+			return DebugId;
 		}
 	}
 }

@@ -314,11 +314,11 @@ namespace QQn.TurtleMSBuild
 				bool isProject = false;
 				if (i.Name == "Reference")
 				{
-					xw.WriteStartElement("Reference", Ns);
+					xw.WriteStartElement("Reference");
 				}
 				else if (i.Name == "ProjectReference")
 				{
-					xw.WriteStartElement("Project", Ns);
+					xw.WriteStartElement("Project");
 					isProject = true;
 				}
 				else
