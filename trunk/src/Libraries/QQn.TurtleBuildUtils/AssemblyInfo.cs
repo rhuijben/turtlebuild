@@ -179,11 +179,11 @@ namespace QQn.TurtleBuildUtils
 		}
 
 		/// <summary>
-		/// Gets the debug information guid. This guid is used by symbolserver to provide pdb's of released code
+		/// Gets the debug information id. This guid is used by symbolserver to provide pdb's of released code
 		/// </summary>
 		/// <param name="path">The path.</param>
 		/// <returns></returns>
-		public static string GetPdbReferenceGuid(string path)
+		public static string GetPdbReferenceId(string path)
 		{
 			if (string.IsNullOrEmpty(path))
 				throw new ArgumentNullException("path");
@@ -193,7 +193,8 @@ namespace QQn.TurtleBuildUtils
 
 			if (NativeMethods.SymSrvGetFileIndexInfo(path, ref info, 0))
 			{
-				return info.guid.ToString();
+				if(!info.stripped)
+					return info.guid.ToString();
 			}
 
 			return null;
