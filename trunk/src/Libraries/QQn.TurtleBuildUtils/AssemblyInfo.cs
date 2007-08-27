@@ -6,31 +6,14 @@ using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using Microsoft.Win32;
+using System.Globalization;
 
 namespace QQn.TurtleBuildUtils
 {
-	static class NativeMethods
-	{
-		[DllImport("kernel32.dll", SetLastError = true)]
-		public static extern IntPtr BeginUpdateResource(string pFileName, [MarshalAs(UnmanagedType.Bool)]bool bDeleteExistingResources);
-
-		[DllImport("kernel32.dll", SetLastError = true)]
-		public static extern bool UpdateResource(IntPtr hUpdate, IntPtr type, IntPtr name, ushort wLanguage, byte[] lpData, int cbData);
-
-		[DllImport("kernel32.dll", SetLastError = true)]
-		public static extern bool EndUpdateResource(IntPtr hUpdate, bool fDiscard);
-
-		[DllImport("version.dll", SetLastError = true)]
-		public static extern bool GetFileVersionInfo(string pFilename, [MarshalAs(UnmanagedType.I4)]int handle, [MarshalAs(UnmanagedType.I4)]int len, [Out] byte[] data);
-
-		[DllImport("version.dll", SetLastError = true)]
-		public static extern int GetFileVersionInfoSize(string pFilename, out int handle);
-	}
-
 	/// <summary>
 	/// Helper functions for updating file versions
 	/// </summary>
-	public static class VersionInfo
+	public static class AssemblyInfo
 	{
 		/// <summary>
 		/// Updates the version info in the file header from the attributes defined on the assembly.
@@ -193,6 +176,27 @@ namespace QQn.TurtleBuildUtils
 			newAssembly.Save(tmpFile);
 
 			return Path.Combine(outputDirectory, tmpFile);
+		}
+
+		/// <summary>
+		/// Gets the debug information guid. This guid is used by symbolserver to provide pdb's of released code
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <returns></returns>
+		public static string GetPdbReferenceGuid(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			SYMSRV_INDEX_INFO info = new SYMSRV_INDEX_INFO();
+			info.sizeofstruct = Marshal.SizeOf(info);
+
+			if (NativeMethods.SymSrvGetFileIndexInfo(path, ref info, 0))
+			{
+				return info.guid.ToString();
+			}
+
+			return null;
 		}
 	}
 }

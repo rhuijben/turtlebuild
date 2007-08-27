@@ -14,6 +14,7 @@ using QQn.TurtleMSBuild;
 using QQn.TurtleBuildUtils.Files.TBLog;
 using QQn.TurtlePackage;
 using QQn.TurtleUtils.IO;
+using QQn.TurtleBuildUtils;
 
 namespace TurtleTests
 {
@@ -231,6 +232,28 @@ namespace TurtleTests
 				BuildInternal();
 
 			TBLogFile log = TBLogFile.Load(logFile);
+
+			string _refPdb;
+			foreach (TBLogItem item in log.ProjectOutput.Items)
+			{
+				if (!item.IsShared && !item.IsCopy)
+				{
+					switch (Path.GetExtension(item.Src).ToUpperInvariant())
+					{
+						case ".PDB":
+						case ".DLL":
+							if (_refPdb == null)
+							{
+								_refPdb = AssemblyInfo.GetPdbReference(item.FullFromSrc);
+
+								Assert.That(_refPdb, Is.Not.Null);
+							}
+							else
+								Assert.That(AssemblyInfo.GetPdbReference(item.FullFromSrc), Is.EqualTo(_refPdb));
+							break;
+					}
+				}
+			}
 
 			Pack pack = null;
 
