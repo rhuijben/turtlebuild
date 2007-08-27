@@ -15,12 +15,12 @@ namespace TurtleTests
 		[Test]
 		public void CopyResources()
 		{
-			Uri uri = new Uri(typeof(VersionInfo).Assembly.CodeBase);
+			Uri uri = new Uri(typeof(AssemblyInfo).Assembly.CodeBase);
 			string file = uri.LocalPath;
 			string tmpFile = Path.Combine(Path.GetTempPath(), Path.GetFileName(file));
 
 			File.Copy(file, tmpFile, true);
-			Assert.That(VersionInfo.RefreshVersionInfoFromAttributes(tmpFile, Path.GetFullPath("..\\..\\..\\..\\Libraries\\QQn.TurtleBuildUtils\\QQn.TurtleBuildUtils.snk"), null));
+			Assert.That(AssemblyInfo.RefreshVersionInfoFromAttributes(tmpFile, Path.GetFullPath("..\\..\\..\\..\\Libraries\\QQn.TurtleBuildUtils\\QQn.TurtleBuildUtils.snk"), null));
 		}
 	}
 }

@@ -96,20 +96,5 @@ namespace QQn.TurtleMSBuild
 			}
 			return externalProjects;
 		}
-
-		internal static void HandleVCProj(string file)
-		{
-			Type resolverType = Type.GetType("Microsoft.Build.Tasks.ResolveVCProjectOutput, Microsoft.Build.Tasks.v3.5", false, false);
-			if (resolverType == null)
-				resolverType = Type.GetType("Microsoft.Build.Tasks.ResolveVCProjectOutput, Microsoft.Build.Tasks", false, false);
-
-			if (resolverType == null)
-				return;
-
-			ITask task = (ITask)Activator.CreateInstance(resolverType);
-
-			GC.KeepAlive(task);
-
-		}
 	}
 }
