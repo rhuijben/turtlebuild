@@ -233,7 +233,7 @@ namespace TurtleTests
 
 			TBLogFile log = TBLogFile.Load(logFile);
 
-			string _refPdb;
+			string _refPdb = null;
 			foreach (TBLogItem item in log.ProjectOutput.Items)
 			{
 				if (!item.IsShared && !item.IsCopy)
@@ -244,12 +244,12 @@ namespace TurtleTests
 						case ".DLL":
 							if (_refPdb == null)
 							{
-								_refPdb = AssemblyInfo.GetPdbReference(item.FullFromSrc);
+								_refPdb = AssemblyInfo.GetPdbReferenceId(item.FullFromSrc);
 
 								Assert.That(_refPdb, Is.Not.Null);
 							}
 							else
-								Assert.That(AssemblyInfo.GetPdbReference(item.FullFromSrc), Is.EqualTo(_refPdb));
+								Assert.That(AssemblyInfo.GetPdbReferenceId(item.FullFromSrc), Is.EqualTo(_refPdb));
 							break;
 					}
 				}
