@@ -38,6 +38,20 @@ namespace TurtleTests
 		}
 
 		[Test]
+		public void TestCombine()
+		{
+			string result = QQnPath.Combine("d:\\buildenv\\project", "bin\\release\\", "file.tmp");
+
+			Assert.That(result, Is.EqualTo("d:\\buildenv\\project\\bin\\release\\file.tmp"));
+
+
+			string r = QQnPath.EnsureRelativePath(@"d:\buildenv\TcgTools\tb-src\Libraries\QQn.TurtleUtils", @"d:\buildenv\TcgTools\tb-src\Libraries\QQn.TurtleUtils\obj\Release\QQn.TurtleUtils.pdb");
+
+			Assert.That(r, Is.EqualTo(@"obj\Release\QQn.TurtleUtils.pdb"));
+
+		}
+
+		[Test]
 		public void TestFileWrite()
 		{
 			ClearMap();

@@ -351,6 +351,10 @@ namespace QQn.TurtleMSBuild
 
 				xw.WriteAttributeString("d-2", pdbTarget.FullName);
 
+				xw.WriteAttributeString("d-3", QQnPath.EnsureRelativePath(@"d:\buildenv\TcgTools\tb-src\Libraries\QQn.TurtleUtils", @"d:\buildenv\TcgTools\tb-src\Libraries\QQn.TurtleUtils\obj\Release\QQn.TurtleUtils.pdb"));
+
+				xw.WriteAttributeString("d-4", QQnPath.MakeRelativePath(@"d:\buildenv\TcgTools\tb-src\Libraries\QQn.TurtleUtils", @"d:\buildenv\TcgTools\tb-src\Libraries\QQn.TurtleUtils\obj\Release\QQn.TurtleUtils.pdb"));
+
 				if(pdbTarget.Exists)
 				{
 					FileInfo pdbFrom = new FileInfo(Path.Combine(ProjectPath, pdbSrc));
