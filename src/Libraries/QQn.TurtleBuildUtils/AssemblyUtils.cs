@@ -178,6 +178,8 @@ namespace QQn.TurtleBuildUtils
 			return Path.Combine(outputDirectory, tmpFile);
 		}
 
+		static bool _enfDebugReference;
+
 		/// <summary>
 		/// Gets the debug information id. This guid+age pair is used by symbolserver to provide pdb's of released code
 		/// </summary>
@@ -192,19 +194,30 @@ namespace QQn.TurtleBuildUtils
 			else if (!File.Exists(path))
 				throw new FileNotFoundException("Reference file not found", path);
 
-			SYMSRV_INDEX_INFO info = new SYMSRV_INDEX_INFO();
-			info.sizeofstruct = Marshal.SizeOf(info);
+			if (_enfDebugReference)
+				return null;
 
-			if (NativeMethods.SymSrvGetFileIndexInfo(path, ref info, 0))
+			try
 			{
-				if (!info.stripped)
-				{
-					return new DebugReference(
-						string.IsNullOrEmpty(info.pdbfile) ? path : info.pdbfile, info.guid, info.age);
-				}
-			}
+				SYMSRV_INDEX_INFO info = new SYMSRV_INDEX_INFO();
+				info.sizeofstruct = Marshal.SizeOf(info);
 
-			return null;
+				if (NativeMethods.SymSrvGetFileIndexInfo(path, ref info, 0))
+				{
+					if (!info.stripped)
+					{
+						return new DebugReference(
+							string.IsNullOrEmpty(info.pdbfile) ? path : info.pdbfile, info.guid, info.age);
+					}
+				}
+
+				return null;
+			}
+			catch (EntryPointNotFoundException)
+			{
+				_enfDebugReference = true;
+				return null;
+			}
 		}
 	}
 
