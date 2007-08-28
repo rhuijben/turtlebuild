@@ -342,18 +342,8 @@ namespace QQn.TurtleMSBuild
 
 			if (reference != null)
 			{
-				string pdbSrc = QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), reference.PdbFile);
-				xw.WriteAttributeString("d-0", pdbSrc);
-				pdbSrc = EnsureRelativePath(pdbSrc);
-
-				xw.WriteAttributeString("d-1", pdbSrc);
+				string pdbSrc = EnsureRelativePath(QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), reference.PdbFile));
 				FileInfo pdbTarget = new FileInfo(Path.GetFullPath(QQnPath.Combine(ProjectPath, OutDir, Path.GetFileName(pdbSrc))));
-
-				xw.WriteAttributeString("d-2", pdbTarget.FullName);
-
-				xw.WriteAttributeString("d-3", QQnPath.EnsureRelativePath(@"d:\buildenv\TcgTools\tb-src\Libraries\QQn.TurtleUtils", @"d:\buildenv\TcgTools\tb-src\Libraries\QQn.TurtleUtils\obj\Release\QQn.TurtleUtils.pdb"));
-
-				xw.WriteAttributeString("d-4", QQnPath.MakeRelativePath(@"d:\buildenv\TcgTools\tb-src\Libraries\QQn.TurtleUtils", @"d:\buildenv\TcgTools\tb-src\Libraries\QQn.TurtleUtils\obj\Release\QQn.TurtleUtils.pdb"));
 
 				if(pdbTarget.Exists)
 				{
@@ -362,13 +352,8 @@ namespace QQn.TurtleMSBuild
 					if(!pdbFrom.Exists || ((pdbFrom.Length == pdbTarget.Length) && (pdbFrom.LastWriteTime == pdbTarget.LastWriteTime)))
 						pdbSrc = EnsureRelativePath(pdbTarget.FullName);
 				}
-				else
-					
 
 				xw.WriteAttributeString("debugSrc", pdbSrc);
-
-				
-
 				xw.WriteAttributeString("debugId", reference.DebugId);
 			}
 		}
