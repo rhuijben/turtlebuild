@@ -342,7 +342,7 @@ namespace QQn.TurtleMSBuild
 
 			if (reference != null)
 			{
-				string pdbSrc = EnsureRelativePath(Path.Combine(Path.GetDirectoryName(TargetPath), reference.PdbFile));
+				string pdbSrc = EnsureRelativePath(QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), reference.PdbFile));
 
 				FileInfo pdbTarget = new FileInfo(QQnPath.Combine(ProjectPath, OutDir, Path.GetFileName(pdbSrc)));
 
