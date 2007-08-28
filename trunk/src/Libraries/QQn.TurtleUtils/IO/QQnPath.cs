@@ -9,7 +9,7 @@ namespace QQn.TurtleUtils.IO
 {
 	static class NativeMethods
 	{
-		[DllImport("shlwapi.dll", CharSet = CharSet.Auto)]
+		[DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		internal static extern bool PathRelativePathTo(StringBuilder pszPath, string pszFrom, [MarshalAs(UnmanagedType.U4)] int dwAttrFrom, string pszTo, [MarshalAs(UnmanagedType.U4)] int dwAttrTo);
 	}
@@ -38,22 +38,22 @@ namespace QQn.TurtleUtils.IO
 			string pathRoot = Path.GetPathRoot(path);
 			string relRoot = Path.GetPathRoot(relativeFrom);
 
-			if (0 != string.Compare(pathRoot, relRoot, true, CultureInfo.InvariantCulture))
-				return Path.GetFullPath(path);
+			if (!string.Equals(pathRoot, relRoot, StringComparison.InvariantCultureIgnoreCase))
+				return path;
 
 			const int FILE_ATTRIBUTE_FILE = 0x00000000;
 			const int FILE_ATTRIBUTE_DIRECTORY = 0x00000010;
-			StringBuilder result = new StringBuilder(260);
+			StringBuilder result = new StringBuilder(260); // 260 = MAX_PATH
 			if (NativeMethods.PathRelativePathTo(result, relativeFrom, FILE_ATTRIBUTE_DIRECTORY, path, FILE_ATTRIBUTE_FILE))
 			{
 				string p = result.ToString();
-				if (p.Length > 2 && p[0] == '.' && (p[1] == Path.DirectorySeparatorChar || p[1] == Path.AltDirectorySeparatorChar))
+				if (p.Length > 2 && p[0] == '.' && (p[1] == Path.DirectorySeparatorChar))
 					p = p.Substring(2);
 
 				return p;
 			}
 
-			return Path.GetFullPath(path);
+			return path;
 		}
 
 
