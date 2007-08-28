@@ -7,6 +7,9 @@ using System.IO;
 
 namespace QQn.TurtleBuildUtils
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	public static class AssemblyInfoUpdater
 	{
 		

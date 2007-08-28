@@ -20,5 +20,23 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 		{
 			return ".jsl".Equals(extension, StringComparison.InvariantCultureIgnoreCase);
 		}
+
+		/// <summary>
+		/// Gets the string that starts an attribute definition
+		/// </summary>
+		/// <value>"/** @assembly "</value>
+		protected override string AttributeStartToken
+		{
+			get { return "/** @assembly "; }
+		}
+
+		/// <summary>
+		/// Gets the string that ends an attribute definition
+		/// </summary>
+		/// <value>"*/"</value>
+		protected override string AttributeEndToken
+		{
+			get { return "*/"; }
+		}
 	}
 }

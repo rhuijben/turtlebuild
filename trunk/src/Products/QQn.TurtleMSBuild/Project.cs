@@ -6,6 +6,7 @@ using System.Xml;
 using System.Reflection;
 using QQn.TurtleBuildUtils;
 using QQn.TurtleUtils.IO;
+using QQn.TurtleUtils.Tokens.Converters;
 
 namespace QQn.TurtleMSBuild
 {
@@ -313,6 +314,7 @@ namespace QQn.TurtleMSBuild
 			xw.WriteAttributeString("name", typeof(MSBuildLogger).FullName);
 			xw.WriteAttributeString("product", product);
 			xw.WriteAttributeString("version", version);
+			xw.WriteAttributeString("date", UtcDateTimeConverter.ToString(DateTime.UtcNow));
 
 			xw.WriteEndElement();
 		}
@@ -324,14 +326,15 @@ namespace QQn.TurtleMSBuild
 			xw.WriteAttributeString("configuration", Configuration);
 			xw.WriteAttributeString("outputDir", OutDir);
 
-			xw.WriteAttributeString("targetName", TargetName);
-			xw.WriteAttributeString("targetExt", TargetExt);
 			xw.WriteAttributeString("file", Path.GetFileName(ProjectFile));
 		}
 
 		protected virtual void WriteTargetInfo(XmlWriter xw, bool forReadability)
 		{
 			xw.WriteAttributeString("src", TargetPath);
+
+			xw.WriteAttributeString("name", TargetName);
+			xw.WriteAttributeString("ext", TargetExt);			
 
 			if (!string.IsNullOrEmpty(KeyFile))
 				xw.WriteAttributeString("keySrc", KeyFile);

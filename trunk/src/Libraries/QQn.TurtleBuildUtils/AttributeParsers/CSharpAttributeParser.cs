@@ -22,5 +22,25 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 		{
 			return ".cs".Equals(extension, StringComparison.InvariantCultureIgnoreCase);
 		}
+
+		// The csharp parser is +- the default parser implemented in AttributeParser, so almost no overrides are necessary
+
+		/// <summary>
+		/// Gets the alt string regex.
+		/// </summary>
+		/// <value>"@\"([^\"]|\"\")*\""</value>
+		public override string AltStringRegex
+		{
+			get { return "\\@\"([^\"]|\"\")*\""; }
+		}
+
+		/// <summary>
+		/// Gets the identifier regex.
+		/// </summary>
+		/// <value>The identifier regex.</value>
+		protected override string IdentifierRegex
+		{
+			get { return "\\@?" + base.IdentifierRegex; }
+		}
 	}
 }

@@ -12,6 +12,16 @@ namespace QQn.TurtleUtils.Tokens.Converters
 	public sealed class UtcDateTimeConverter : TypeConverter
 	{
 		/// <summary>
+		/// Converts the timestamp to a UTC string, usable for roundtripping via this converter
+		/// </summary>
+		/// <param name="timestamp">The timestamp.</param>
+		/// <returns></returns>
+		public static string ToString(DateTime timestamp)
+		{
+			return timestamp.ToUniversalTime().ToString("u");
+		}
+
+		/// <summary>
 		/// Converts the given object to the type of this converter, using the specified context and culture information.
 		/// </summary>
 		/// <param name="context">An <see cref="T:System.ComponentModel.ITypeDescriptorContext"/> that provides a format context.</param>
