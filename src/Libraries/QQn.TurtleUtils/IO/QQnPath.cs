@@ -71,7 +71,10 @@ namespace QQn.TurtleUtils.IO
 				throw new ArgumentNullException("originPath");
 
 			itemPath = Path.GetFullPath(itemPath);
-			originDirectory = GetFullDirectory(originDirectory);
+			originDirectory = Path.GetFullPath(originDirectory);
+
+			if (originDirectory.Length > 3 && originDirectory[originDirectory.Length - 1] == Path.DirectorySeparatorChar)
+				originDirectory = originDirectory.Substring(0, originDirectory.Length - 1);
 
 			const int FILE_ATTRIBUTE_FILE = 0x00000000;
 			const int FILE_ATTRIBUTE_DIRECTORY = 0x00000010;
@@ -87,23 +90,6 @@ namespace QQn.TurtleUtils.IO
 
 			return Path.GetFullPath(itemPath);
 		}		
-
-		/// <summary>
-		/// Gets the full directory name ending with a directory separator char
-		/// </summary>
-		/// <param name="directoryName">Name of the directory.</param>
-		/// <returns></returns>
-		public static string GetFullDirectory(string directoryName)
-		{
-			if (string.IsNullOrEmpty(directoryName))
-				throw new ArgumentNullException("directoryName");
-
-			directoryName = Path.GetFullPath(directoryName);
-			if (directoryName[directoryName.Length - 1] != Path.DirectorySeparatorChar)
-				directoryName += Path.DirectorySeparatorChar;
-
-			return directoryName;
-		}
 
 		/// <summary>
 		/// Gets the parent directory of a directory of file
@@ -128,7 +114,7 @@ namespace QQn.TurtleUtils.IO
 				}
 			}
 
-			return GetFullDirectory(Path.GetDirectoryName(path));
+			return Path.GetFullPath(Path.GetDirectoryName(path));
 		}
 
 		/// <summary>

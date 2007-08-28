@@ -28,7 +28,7 @@ namespace QQn.TurtleUtils.IO
 		internal DirectoryMapData(string directory)
 			: this()
 		{
-			_directory = QQnPath.GetFullDirectory(directory);
+			_directory = Path.GetFullPath(directory);
 		}
 
 		[TokenGroup("File", typeof(DirectoryMapFile))]
@@ -57,7 +57,10 @@ namespace QQn.TurtleUtils.IO
 
 		public static DirectoryMapData Load(string path)
 		{
-			path = QQnPath.GetFullDirectory(path);
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			path = Path.GetFullPath(path);
 
 			using(FileStream fs = File.OpenRead(Path.Combine(path, DirMapFile)))
 			{

@@ -146,13 +146,13 @@ namespace QQn.TurtlePackage
 				else
 				{
 					if((Pack == this) || (Parent == null))
-						_baseDir = QQnPath.GetFullDirectory(value);
+						_baseDir = Path.GetFullPath(value);
 					else
 					{
 						string baseDir = Parent.BaseDir;
 
 						if(baseDir == null)
-							_baseDir = QQnPath.GetFullDirectory(value);
+							_baseDir = Path.GetFullPath(value);
 						else
 							_baseDir = QQnPath.MakeRelativePath(baseDir, Path.Combine(baseDir, value));
 					}

@@ -113,7 +113,7 @@ namespace QQn.TurtleMSBuild
 				if (value == null)
 					_outDir = null;
 				else
-					_outDir = QQnPath.EnsureRelativePath(ProjectPath, value).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar; 
+					_outDir = QQnPath.EnsureRelativePath(ProjectPath, value).TrimEnd(Path.DirectorySeparatorChar);
 			}
 		}
 
