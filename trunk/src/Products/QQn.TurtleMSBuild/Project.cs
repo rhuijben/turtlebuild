@@ -342,9 +342,14 @@ namespace QQn.TurtleMSBuild
 
 			if (reference != null)
 			{
-				string pdbSrc = EnsureRelativePath(QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), reference.PdbFile));
+				string pdbSrc = QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), reference.PdbFile);
+				xw.WriteAttributeString("d-0", pdbSrc);
+				pdbSrc = EnsureRelativePath(pdbSrc);
 
+				xw.WriteAttributeString("d-1", pdbSrc);
 				FileInfo pdbTarget = new FileInfo(Path.GetFullPath(QQnPath.Combine(ProjectPath, OutDir, Path.GetFileName(pdbSrc))));
+
+				xw.WriteAttributeString("d-2", pdbTarget.FullName);
 
 				if(pdbTarget.Exists)
 				{
@@ -352,13 +357,9 @@ namespace QQn.TurtleMSBuild
 
 					if(!pdbFrom.Exists || ((pdbFrom.Length == pdbTarget.Length) && (pdbFrom.LastWriteTime == pdbTarget.LastWriteTime)))
 						pdbSrc = EnsureRelativePath(pdbTarget.FullName);
-
-					if (pdbSrc.StartsWith("\\"))
-						xw.WriteAttributeString("dbgTmp-1", pdbTarget.FullName);
 				}
 				else
-					if (pdbSrc.StartsWith("\\"))
-						xw.WriteAttributeString("dbgTmp-2", QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), reference.PdbFile));
+					
 
 				xw.WriteAttributeString("debugSrc", pdbSrc);
 
