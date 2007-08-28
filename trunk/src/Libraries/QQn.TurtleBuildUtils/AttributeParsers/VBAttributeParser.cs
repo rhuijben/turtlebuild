@@ -4,7 +4,10 @@ using System.Text;
 
 namespace QQn.TurtleBuildUtils.AttributeParsers
 {
-	class VBAttributeParser : AttributeParser<VBAttributeParser>
+	/// <summary>
+	/// 
+	/// </summary>
+	public class VBAttributeParser : AttributeParser<VBAttributeParser>
 	{
 		/// <summary>
 		/// Gets a boolean indicating whether the parser can handle the specified fileextension
