@@ -16,6 +16,17 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		[Token("src")]
 		public string Src;
 
+		/// <summary>
+		/// The name of the target (assembly) file (file name without extension)
+		/// </summary>
+		[Token("name")]
+		public string TargetName;
+
+		/// <summary>
+		/// The extension of the target (assembly) file
+		/// </summary>
+		[Token("ext")]
+		public string TargetExt;
 
 		/// <summary>
 		/// The strong name keyfile used to sign the target(s)

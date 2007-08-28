@@ -33,7 +33,11 @@ namespace QQn.TurtlePackage
 		public string ContainerDir
 		{
 			get { return _containerDir; }
-			set { _containerDir = string.IsNullOrEmpty(value) ? null : NormalizeDirectory(value); }
+			set 
+			{
+				EnsureWritable();
+				_containerDir = string.IsNullOrEmpty(value) ? null : NormalizeDirectory(value);
+			}
 		}
 
 		/// <summary>

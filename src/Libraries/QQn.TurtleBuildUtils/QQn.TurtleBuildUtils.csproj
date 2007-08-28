@@ -38,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyInfoUpdater.cs" />
+    <Compile Include="AttributeParsers\ActionScriptAttributeParser.cs" />
     <Compile Include="AttributeParsers\AttributeDefinition.cs" />
     <Compile Include="AttributeParsers\AttributeParser.cs" />
     <Compile Include="AttributeParsers\AttributeParser_T.cs" />

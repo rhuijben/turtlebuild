@@ -33,6 +33,8 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 				return JSharpAttributeParser.Default;
 			else if (EcmaScriptAttributeParser.Default.HandlesExtension(extension))
 				return EcmaScriptAttributeParser.Default;
+			else if (ActionScriptAttributeParser.Default.HandlesExtension(extension))
+				return ActionScriptAttributeParser.Default;
 
 			return null;
 		}
@@ -52,7 +54,7 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 		/// <item>'value': The values of the named parameters</item>
 		/// <item>'comment': The comment following the attribute definition</item>
 		/// </list></remarks>
-		public Regex AttributeRegex
+		protected Regex AttributeRegex
 		{
 			get { return _attributeRegex ?? (_attributeRegex = BuildAttributeRegex()); }
 		}
@@ -60,7 +62,7 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 		/// <summary>
 		/// Gets the comment start string.
 		/// </summary>
-		/// <value>The string that starts a comment for the rest of the line (e.g. "//" for c#)</value>
+		/// <value>"//"</value>
 		protected virtual string CommentStartToken
 		{
 			get { return "//"; }
@@ -151,7 +153,7 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 		/// Gets the value start token.
 		/// </summary>
 		/// <value>"("</value>
-		protected string ValuesStartToken
+		protected virtual string ValuesStartToken
 		{
 			get { return "("; }
 		}
@@ -160,7 +162,7 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 		/// Gets the values end token.
 		/// </summary>
 		/// <value>")"</value>
-		protected string ValuesEndToken
+		protected virtual string ValuesEndToken
 		{
 			get { return ")"; }
 		}
@@ -265,24 +267,128 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 		/// <value>The attribute name regex.</value>
 		protected virtual string AttributeNameRegex
 		{
-			get { return "(?<nsPrefix>" + NamespacePrefixRegex + SplitTokenRegex + ")(?<attribute>" + IdentifierRegex + ")"; }
+			get
+			{
+				string suffix = "(?<attribute>" + IdentifierRegex + ")";
+				if (SupportsNamespaces)
+					return "(?<nsPrefix>" + NamespacePrefixRegex + SplitTokenRegex + ")" + suffix;
+				else
+					return suffix;
+			}
 		}
 
+		/// <summary>
+		/// Gets the alt string regex.
+		/// </summary>
+		/// <value>The alt string regex.</value>
+		public virtual string AltStringRegex
+		{
+			get { return null; }
+		}
+
+		/// <summary>
+		/// Gets the string regex.
+		/// </summary>
+		/// <value>The string regex.</value>
+		protected virtual string StringRegex
+		{
+			get { return "\"([^\\\\\"]|\\\\.)*\""; }
+		}
+
+		/// <summary>
+		/// Gets the char regex.
+		/// </summary>
+		/// <value>The char regex.</value>
+		protected virtual string CharRegex
+		{
+			get { return "'([^'\\\\]|\\\\.)'"; }
+		}
+
+		/// <summary>
+		/// Gets the number regex.
+		/// </summary>
+		/// <value>The number regex.</value>
+		protected virtual string NumberRegex
+		{
+			get { return "(0x[0-9a-fA-F]+)|(-?[0-9]+(\\.[0-9]*)?([eE][0-9]+)?)[UuLl]?"; }
+		}
+
+		/// <summary>
+		/// Gets the enum regex.
+		/// </summary>
+		/// <value>The enum regex.</value>
+		protected virtual string EnumRegex
+		{
+			get { return "(((" + NamespacePrefixRegex + ")?" + IdentifierRegex + EscapeAndSplitToken(EnumSeparatorToken) + ")+)?" + IdentifierRegex; }
+		}
+
+		string _valueRegex;
 		/// <summary>
 		/// Gets the value regex.
 		/// </summary>
 		/// <value>The value regex.</value>
+		/// <remarks>The regex is generated in <see cref="BuildValueRegex"/></remarks>
 		public string ValueRegex
 		{
 			get
 			{
-				const string stringRegex = "\"([^\\\\\"]|\\\\.)*\"";
-				const string charRegex = "'[^'\\\\]|\\\\.'";
-				const string numberRegex = "(0x[0-9a-fA-F]+)|(-?[0-9]+([eE][0-9]+)?)";
-				string enumRegex = "(((" + NamespacePrefixRegex +")?" + IdentifierRegex + EscapeAndSplitToken(EnumSeparatorToken) + ")+)?" + IdentifierRegex;
-
-				return "((" + stringRegex + ")|(" + charRegex + ")|(" + numberRegex + ")|(" + enumRegex + "))";
+				if (_valueRegex == null)
+				{
+					StringBuilder sb = new StringBuilder();
+					sb.Append("(");
+					BuildValueRegex(sb);
+					sb.Append(")");
+					_valueRegex = sb.ToString();
+				}
+				return _valueRegex;
 			}
+		}
+
+		/// <summary>
+		/// Builds the value regex.
+		/// </summary>
+		/// <param name="builder">The builder.</param>
+		protected virtual void BuildValueRegex(StringBuilder builder)
+		{
+			if (builder == null)
+				throw new ArgumentNullException("builder");
+
+			builder.Append("(");
+			builder.Append(StringRegex);
+			builder.Append(")");
+
+			AppendRegexIfNotNull(builder, AltStringRegex);
+			AppendRegexIfNotNull(builder, CharRegex);
+			AppendRegexIfNotNull(builder, NumberRegex);
+			AppendRegexIfNotNull(builder, EnumRegex);
+		}
+
+		internal void AppendRegexIfNotNull(StringBuilder builder, string value)
+		{
+			if (!string.IsNullOrEmpty(value))
+			{
+				builder.Append("|(");
+				builder.Append(value);
+				builder.Append(")");
+			}
+		}
+
+		/// <summary>
+		/// Gets the before named item token.
+		/// </summary>
+		/// <value><c>null</c></value>
+		protected virtual string BeforeNamedItemToken
+		{
+			get { return null; }
+		}
+
+		/// <summary>
+		/// Gets the before named item token.
+		/// </summary>
+		/// <value><c>null</c></value>
+		protected virtual string AfterNamedItemToken
+		{
+			get { return null; }
 		}
 
 		/// <summary>
@@ -294,6 +400,7 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 			StringBuilder sb = new StringBuilder();
 
 			sb.Append(LineStartRegex);
+			sb.Append(SplitTokenRegex);
 			sb.Append(EscapeAndSplitToken(AttributeStartToken));
 
 			sb.Append(SplitTokenRegex);
@@ -303,68 +410,23 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 			sb.Append(EscapeAndSplitToken(ValuesStartToken));
 			sb.Append(SplitTokenRegex);
 
-			sb.Append("(((?<arg>");
-			// Normal arguments, optionally followed by named arguments
-			sb.Append(ValueRegex);
-			sb.Append(")"); // /<arg>
-			sb.Append(SplitTokenRegex);
+			string arg = "((?<arg>" + ValueRegex + ")|(" + NameValuePairRegex + "))";
 
 			sb.Append("(");
-			sb.Append(EscapeAndSplitToken(AttributeValueSeparatorToken));
+			sb.Append(arg);
 			sb.Append(SplitTokenRegex);
-			sb.Append("(?<arg>");
-			sb.Append(ValueRegex);
-			sb.Append(")"); // /<arg>
+			sb.Append("(");			
+			sb.Append(AttributeValueSeparatorToken);
 			sb.Append(SplitTokenRegex);
-			sb.Append(")*");
-
-			StringBuilder sbNvFollow = null;
-			if (NamedValueSeparatorToken != null)
-			{
-				sbNvFollow = new StringBuilder();
-				sbNvFollow.Append("(");
-				sbNvFollow.Append(EscapeAndSplitToken(AttributeValueSeparatorToken));
-				sbNvFollow.Append(SplitTokenRegex);
-				sbNvFollow.Append("(?<name>");
-				sbNvFollow.Append(IdentifierRegex);
-				sbNvFollow.Append(")");
-				sbNvFollow.Append(SplitTokenRegex);
-				sbNvFollow.Append(EscapeAndSplitToken(NamedValueSeparatorToken));
-				sbNvFollow.Append(SplitTokenRegex);
-				sbNvFollow.Append("(?<value>");
-				sbNvFollow.Append(ValueRegex);
-				sbNvFollow.Append("))*");
-
-				sbNvFollow.Append(SplitTokenRegex);
-
-				sb.Append(sbNvFollow);
-			}
-			// Named arguments only
-			if (NamedValueSeparatorToken != null)
-			{
-				sb.Append(")|(");
-
-				sb.Append("(?<name>");
-				sb.Append(IdentifierRegex);
-				sb.Append(")");
-				sb.Append(SplitTokenRegex);
-				sb.Append(EscapeAndSplitToken(NamedValueSeparatorToken));
-				sb.Append(SplitTokenRegex);
-				sb.Append("(?<value>");
-				sb.Append(ValueRegex);
-				sb.Append(")");
-
-				sb.Append(sbNvFollow);
-			}
-			sb.Append("))?");
-
+			sb.Append(arg);
 			sb.Append(SplitTokenRegex);
+			sb.Append(")*)?");
+
 			sb.Append(EscapeAndSplitToken(ValuesEndToken));
 			sb.Append(SplitTokenRegex);
 
 			sb.Append(EscapeAndSplitToken(AttributeEndToken));
 			sb.Append(SplitTokenRegex);
-
 			if (AttributeEndSeparatorToken != null)
 			{
 				sb.Append(EscapeAndSplitToken(AttributeEndSeparatorToken));
@@ -380,7 +442,7 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 				sb.Append(".*");
 				sb.Append(")");
 
-				if(CommentEndToken != null)
+				if (CommentEndToken != null)
 					sb.Append(EscapeAndSplitToken(CommentEndToken));
 				sb.Append(")?");
 			}
@@ -388,6 +450,51 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 			sb.Append(LineEndRegex);
 
 			return new Regex(sb.ToString(), RegexOptions.ExplicitCapture | RegexOptions.Singleline | RegexOptions.CultureInvariant);
+		}
+
+		string _nameValuePair;
+
+		/// <summary>
+		/// Gets the name value pair regex.
+		/// </summary>
+		/// <value>The name value pair regex.</value>
+		protected virtual string NameValuePairRegex
+		{
+			get
+			{
+				if (_nameValuePair == null)
+				{
+					StringBuilder nvPair = new StringBuilder();
+
+					nvPair.Append("(");
+
+					if (BeforeNamedItemToken != null)
+					{
+						nvPair.Append(EscapeAndSplitToken(BeforeNamedItemToken));
+						nvPair.Append(SplitTokenRegex);
+					}
+					nvPair.Append("(?<name>");
+					nvPair.Append(IdentifierRegex);
+					nvPair.Append(")");
+					nvPair.Append(SplitTokenRegex);
+					nvPair.Append(EscapeAndSplitToken(NamedValueSeparatorToken));
+					nvPair.Append(SplitTokenRegex);
+					nvPair.Append("(?<value>");
+					nvPair.Append(ValueRegex);
+					nvPair.Append(")");
+
+					if (AfterNamedItemToken != null)
+					{
+						nvPair.Append(SplitTokenRegex);
+						nvPair.Append(AfterNamedItemToken);
+					}
+
+					nvPair.Append(")");
+
+					_nameValuePair = nvPair.ToString();
+				}
+				return _nameValuePair;
+			}
 		}
 
 		/// <summary>
@@ -413,15 +520,24 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 		}
 
 		/// <summary>
+		/// Gets a value indicating whether this parser supports namespaces
+		/// </summary>
+		/// <value><c>true</c> if [supports namespaces]; otherwise, <c>false</c>.</value>
+		public virtual bool SupportsNamespaces
+		{
+			get { return true; }
+		}
+
+		/// <summary>
 		/// Parses the attribute on the line
 		/// </summary>
 		/// <param name="line">The line to parse</param>
 		/// <returns>The <see cref="AttributeDefinition"/> of the found attribute, or <c>null</c> if the line does not contain an attribute</returns>
 		public AttributeDefinition ParseLine(string line)
 		{
-			if(line == null)
+			if (line == null)
 				throw new ArgumentNullException("line");
-			else if(line.Length < 5)
+			else if (line.Length < 5)
 			{
 				// 5 = [A()]
 				return null;
@@ -433,28 +549,31 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 				return null;
 
 			AttributeDefinition ad = new AttributeDefinition();
-			
-			ad.NamespacePrefix = m.Groups["nsPrefix"].Value;
 
-			if(ad.NamespacePrefix != null)
-				ad.NamespacePrefix.Replace(NamespaceSeparatorToken, ".");
+			if (SupportsNamespaces)
+			{
+				ad.NamespacePrefix = m.Groups["nsPrefix"].Value;
 
-			ad.Name = m.Groups["name"].Value;
+				if (ad.NamespacePrefix != null)
+					ad.NamespacePrefix = ad.NamespacePrefix.Replace(NamespaceSeparatorToken, ".").TrimEnd('.');
+			}
 
-			foreach(Capture c in m.Groups["arg"].Captures)
+			ad.Name = m.Groups["attribute"].Value;
+
+			foreach (Capture c in m.Groups["arg"].Captures)
 			{
 				ad.Arguments.Add(c.Value);
 			}
 
-			foreach(Capture c in m.Groups["name"].Captures)
+			foreach (Capture c in m.Groups["name"].Captures)
 			{
 				ad.NamedArguments.Add(new NamedAttributeArgument(c.Value));
 			}
 
 			CaptureCollection values = m.Groups["value"].Captures;
-			for(int i = 0; i < values.Count; i++)
+			for (int i = 0; i < values.Count; i++)
 			{
-				ad.NamedArguments[i++].Value = values[i].Value;
+				ad.NamedArguments[i].Value = values[i].Value;
 			}
 
 			ad.Comment = m.Groups["comment"].Value;
@@ -475,8 +594,11 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 			StringBuilder sb = new StringBuilder();
 			sb.Append(AttributeStartToken);
 
-			if(!string.IsNullOrEmpty(definition.NamespacePrefix))
+			if (SupportsNamespaces && !string.IsNullOrEmpty(definition.NamespacePrefix))
+			{
 				sb.Append(definition.NamespacePrefix.Replace(".", NamespaceSeparatorToken));
+				sb.Append(NamespaceSeparatorToken);
+			}
 
 			sb.Append(definition.Name);
 			sb.Append(ValuesStartToken);
@@ -495,16 +617,23 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 					if (i > 0 || (definition.Arguments.Count > 0))
 						sb.Append(AttributeValueSeparatorToken);
 
+					if (BeforeNamedItemToken != null)
+						sb.Append(BeforeNamedItemToken);
+
 					sb.Append(definition.NamedArguments[i].Name);
 					sb.Append(NamedValueSeparatorToken);
-					sb.Append(definition.NamedArguments[i++].Value);
+					sb.Append(definition.NamedArguments[i].Value);
+
+					if (AfterNamedItemToken != null)
+						sb.Append(AfterNamedItemToken);
 				}
 			}
 
 			sb.Append(ValuesEndToken);
+			sb.Append(AttributeEndToken);
+
 			if (AttributeEndSeparatorToken != null)
 				sb.Append(AttributeEndSeparatorToken);
-
 
 			if (CommentStartToken != null && definition.Comment != null)
 			{
@@ -513,6 +642,8 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 				if (CommentEndToken != null)
 					sb.Append(CommentEndToken);
 			}
+
+
 
 			return sb.ToString();
 		}

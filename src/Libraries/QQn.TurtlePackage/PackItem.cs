@@ -10,7 +10,7 @@ namespace QQn.TurtlePackage
 	/// <summary>
 	/// 
 	/// </summary>
-	public class PackItem
+	public class PackItem : ITokenizerInitialize
 	{
 		Pack _pack;
 		PackItem _parent;
@@ -128,14 +128,12 @@ namespace QQn.TurtlePackage
 				
 				string baseDir = Parent.BaseDir;
 
-				if(baseDir == null)
-				{
-					return ((_baseDir != null) && Path.IsPathRooted(_baseDir)) ? _baseDir : null;
-				}
-				else if(_baseDir == null)
+				if (_baseDir == null)
 					return baseDir;
-				else
-					return Path.GetFullPath(Path.Combine(baseDir, _baseDir));
+				else if (baseDir == null)
+					return _baseDir;
+				
+				return Path.Combine(baseDir, _baseDir);
 			}
 			set
 			{
@@ -145,17 +143,18 @@ namespace QQn.TurtlePackage
 					_baseDir = null;
 				else
 				{
-					if((Pack == this) || (Parent == null))
-						_baseDir = Path.GetFullPath(value);
-					else
+					if ((Pack != this) && (Parent != null))
 					{
-						string baseDir = Parent.BaseDir;
+						string parentBase = Parent.BaseDir;
 
-						if(baseDir == null)
-							_baseDir = Path.GetFullPath(value);
-						else
-							_baseDir = QQnPath.MakeRelativePath(baseDir, Path.Combine(baseDir, value));
+						if (parentBase != null)
+						{
+							_baseDir = QQnPath.EnsureRelativePath(parentBase, value);
+							return;
+						}
 					}
+
+					_baseDir = Path.GetFullPath(value);
 				}
 			}
 		}
@@ -187,5 +186,36 @@ namespace QQn.TurtlePackage
 
 			return value;
 		}
+
+		#region ITokenizerInitialize Members
+
+		void ITokenizerInitialize.BeginInitialize(TokenizerEventArgs e)
+		{
+			OnBeginInitialize(e);
+		}
+
+		void ITokenizerInitialize.EndInitialize(TokenizerEventArgs e)
+		{
+			OnEndInitialize(e);
+		}
+
+		/// <summary>
+		/// Handles tokenizer initialization
+		/// </summary>
+		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
+		protected virtual void OnBeginInitialize(TokenizerEventArgs e)
+		{
+		}
+
+		/// <summary>
+		/// Handles tokenizer initialization
+		/// </summary>
+		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
+		protected virtual void OnEndInitialize(TokenizerEventArgs e)
+		{
+			
+		}
+
+		#endregion
 	}
 }

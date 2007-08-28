@@ -17,7 +17,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string Name;
 
 		/// <summary>
-		/// The full path to the directory where the project was located
+		/// The full path to the directory where the project was located when the log was generated
 		/// </summary>
 		[Token("path")]
 		public string Path;
@@ -35,33 +35,9 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string OutputDir;
 
 		/// <summary>
-		/// The name of the target (assembly) file (file name without extension)
-		/// </summary>
-		[Token("targetName")]
-		public string TargetName;
-
-		/// <summary>
-		/// The extension of the target (assembly) file
-		/// </summary>
-		[Token("targetExt")]
-		public string TargetExt;
-
-		/// <summary>
 		/// The full name of the project file (relative from the project path)
 		/// </summary>
 		[Token("file")]
 		public string File;
-
-		/// <summary>
-		/// Obsolete. Always null, use Target.KeyFile
-		/// </summary>
-		[Obsolete("Always null, use Target.KeySrc")]
-		public string KeyFile;
-
-		/// <summary>
-		/// Obsolete Always null, use Target.KeyContainer
-		/// </summary>
-		[Obsolete("Always null, use Target.KeyContainer")]
-		public string KeyContainer;
 	}
 }

@@ -85,6 +85,15 @@ namespace QQn.TurtlePackage
 			}
 		}
 
+		/// <summary>
+		/// Gets the container which contains the file
+		/// </summary>
+		/// <value>The container.</value>
+		public PackContainer Container
+		{
+			get { return (PackContainer)Parent; }
+		}
+
 
 		/// <summary>
 		/// Gets the relative path.

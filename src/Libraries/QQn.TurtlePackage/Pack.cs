@@ -12,7 +12,7 @@ namespace QQn.TurtlePackage
 	/// <summary>
 	/// 
 	/// </summary>
-	public class Pack : PackItem, ITokenizerInitialize
+	public class Pack : PackItem
 	{
 		/// <summary>
 		/// Gets "http://schemas.qqn.nl/2007/TurtlePackage"
@@ -51,13 +51,23 @@ namespace QQn.TurtlePackage
 
 		#region ISupportInitialize Members
 
-		void ITokenizerInitialize.BeginInitialize(TokenizerEventArgs e)
+		/// <summary>
+		/// Handles tokenizer initialization
+		/// </summary>
+		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
+		protected override void OnBeginInitialize(TokenizerEventArgs e)
 		{
 			_readOnly = false;
+			base.OnBeginInitialize(e);			
 		}
 
-		void ITokenizerInitialize.EndInitialize(TokenizerEventArgs e)
-		{
+		/// <summary>
+		/// Handles tokenizer initialization
+		/// </summary>
+		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
+		protected override void OnEndInitialize(TokenizerEventArgs e)
+		{			
+			base.OnEndInitialize(e);
 			_readOnly = true;
 		}
 

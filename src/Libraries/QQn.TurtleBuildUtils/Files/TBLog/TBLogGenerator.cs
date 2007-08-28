@@ -29,5 +29,11 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// </summary>
 		[Token("version", TypeConverter=typeof(VersionConverter))]
 		public Version Version;
+
+		/// <summary>
+		/// The date-time of generation
+		/// </summary>
+		[Token("date", TypeConverter=typeof(UtcDateTimeConverter))]
+		public DateTime Date;
 	}
 }
