@@ -4,7 +4,10 @@ using System.Text;
 
 namespace QQn.TurtleBuildUtils.AttributeParsers
 {
-	class MCppAttributeParser : AttributeParser<MCppAttributeParser>
+	/// <summary>
+	/// 
+	/// </summary>
+	public class MCppAttributeParser : AttributeParser<MCppAttributeParser>
 	{
 		/// <summary>
 		/// Gets a boolean indicating whether the parser can handle the specified fileextension

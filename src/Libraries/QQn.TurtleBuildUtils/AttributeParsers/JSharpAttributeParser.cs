@@ -7,7 +7,7 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 	/// <summary>
 	/// 
 	/// </summary>
-	class JSharpAttributeParser : AttributeParser<JSharpAttributeParser>
+	public class JSharpAttributeParser : AttributeParser<JSharpAttributeParser>
 	{
 		/// <summary>
 		/// Gets a boolean indicating whether the parser can handle the specified fileextension

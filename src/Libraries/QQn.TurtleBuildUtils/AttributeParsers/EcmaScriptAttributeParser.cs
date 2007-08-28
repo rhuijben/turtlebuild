@@ -4,7 +4,10 @@ using System.Text;
 
 namespace QQn.TurtleBuildUtils.AttributeParsers
 {
-	class EcmaScriptAttributeParser : AttributeParser<EcmaScriptAttributeParser>
+	/// <summary>
+	/// 
+	/// </summary>
+	public class EcmaScriptAttributeParser : AttributeParser<EcmaScriptAttributeParser>
 	{
 		/// <summary>
 		/// Gets a boolean indicating whether the parser can handle the specified fileextension
