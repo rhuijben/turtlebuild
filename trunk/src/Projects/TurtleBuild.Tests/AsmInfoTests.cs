@@ -5,12 +5,29 @@ using NUnit.Framework;
 using System.Text.RegularExpressions;
 using QQn.TurtleBuildUtils.AttributeParsers;
 using System.Diagnostics;
+using NUnit.Framework.SyntaxHelpers;
 
 namespace TurtleTests
 {
 	[TestFixture]
 	public class AsmInfoTests
 	{
+		void DualParse(AttributeParser parser, string line)
+		{
+			Assert.That(parser, Is.Not.Null, "Parser available");
+
+			AttributeDefinition def = parser.ParseLine(line);
+
+			Assert.That(def, Is.Not.Null, "Can parse attribute with parser {0}", parser.GetType().Name);
+
+			string neLine = parser.GenerateAttributeLine(def);
+
+			Assert.That(line, Is.Not.Null, "Can regenerate attribute line with parser {0}", parser.GetType().Name);
+
+
+		}
+
+
 		[Test]
 		public void CreateRegex()
 		{

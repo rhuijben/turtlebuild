@@ -31,7 +31,7 @@ namespace QQn.TurtleUtils.IO
 				throw new DirectoryNotFoundException("Directory does not exist");
 
 			_dirInfo = dirInfo;
-			_directory = QQnPath.GetFullDirectory(dirInfo.FullName); // Gets directory with separator
+			_directory = Path.GetFullPath(dirInfo.FullName); // Gets directory with separator
 
 			string mapFile = Path.Combine(dirInfo.FullName, DirectoryMapData.DirMapFile);
 
@@ -210,7 +210,7 @@ namespace QQn.TurtleUtils.IO
 			if(string.IsNullOrEmpty(directory))
 				throw new ArgumentNullException("directory");
 
-			directory = QQnPath.GetFullDirectory(Path.Combine(_directory, directory)); // Gets directory with separator
+			directory = Path.GetFullPath(Path.Combine(_directory, directory)); // Gets directory with separator
 
 			if(!directory.StartsWith(_directory))
 				throw new ArgumentException(string.Format("Directory {0} is not below root", directory), "directory");
