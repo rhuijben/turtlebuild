@@ -352,9 +352,17 @@ namespace QQn.TurtleMSBuild
 
 					if(!pdbFrom.Exists || ((pdbFrom.Length == pdbTarget.Length) && (pdbFrom.LastWriteTime == pdbTarget.LastWriteTime)))
 						pdbSrc = EnsureRelativePath(pdbTarget.FullName);
+
+					if (pdbSrc.StartsWith("\\"))
+						xw.WriteAttributeString("dbgTmp-1", pdbTarget.FullName);
 				}
+				else
+					if (pdbSrc.StartsWith("\\"))
+						xw.WriteAttributeString("dbgTmp-2", QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), reference.PdbFile));
 
 				xw.WriteAttributeString("debugSrc", pdbSrc);
+
+				
 
 				xw.WriteAttributeString("debugId", reference.DebugId);
 			}
