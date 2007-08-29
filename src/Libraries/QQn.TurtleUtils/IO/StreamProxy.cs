@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
+using System.Diagnostics.CodeAnalysis;
+
+[module: SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Scope = "member", Target = "QQn.TurtleUtils.IO.StreamProxy.GetService():T")]
 
 namespace QQn.TurtleUtils.IO
 {

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.Security.Cryptography;
 using System.Diagnostics;
@@ -36,7 +35,7 @@ namespace QQn.TurtleUtils.IO
 				case FileMode.Open:
 					return true;
 				default:
-					throw new ArgumentException("mode");
+					throw new ArgumentException("Invalid filemode", "mode");
 			}
 		}
 

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Collections.ObjectModel;
 using QQn.TurtleUtils.Tokens;
 using System.IO;
@@ -232,9 +231,19 @@ namespace QQn.TurtleUtils.IO
 		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
-		public virtual void Dispose()
+		public void Dispose()
 		{
-			Flush();
+			Dispose(true);
+		}
+
+		/// <summary>
+		/// Releases uresources
+		/// </summary>
+		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+				Flush();
 		}
 
 		/// <summary>

@@ -43,12 +43,14 @@ namespace TurtleTests
 			string result = QQnPath.Combine("d:\\buildenv\\project", "bin\\release\\", "file.tmp");
 
 			Assert.That(result, Is.EqualTo("d:\\buildenv\\project\\bin\\release\\file.tmp"));
+		}
 
-
-			string r = QQnPath.EnsureRelativePath(@"d:\buildenv\TcgTools\tb-src\Libraries\QQn.TurtleUtils", @"d:\buildenv\TcgTools\tb-src\Libraries\QQn.TurtleUtils\obj\Release\QQn.TurtleUtils.pdb");
-
-			Assert.That(r, Is.EqualTo(@"obj\Release\QQn.TurtleUtils.pdb"));
-
+		[Test]
+		public void NormalizeTest()
+		{
+			Assert.That(QQnPath.NormalizePath("bin\\\\debug\\release\\test.dir\\"), Is.EqualTo("bin\\debug\\release\\test.dir"));
+			Assert.That(QQnPath.NormalizePath("bin\\\\debug\\release\\test.dir\\", false), Is.EqualTo("bin\\debug\\release\\test.dir"));
+			Assert.That(QQnPath.NormalizePath("bin\\\\debug\\release\\test.dir\\", true), Is.EqualTo("bin\\debug\\release\\test.dir\\"));
 		}
 
 		[Test]

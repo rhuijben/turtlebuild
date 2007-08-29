@@ -1,0 +1,1723 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FxCopProject Version="1.35" Name="TurtleBuild">
+ <ProjectOptions>
+  <SharedProject>True</SharedProject>
+  <Stylesheet Apply="False">http://www.gotdotnet.com/team/fxcop//xsl/1.35/FxCopReport.xsl</Stylesheet>
+  <SaveMessages>
+   <Project Status="Active, Excluded" NewOnly="False" />
+   <Report Status="Active" NewOnly="False" />
+  </SaveMessages>
+  <ProjectFile Compress="True" DefaultTargetCheck="True" DefaultRuleCheck="True" SaveByRuleGroup="" Deterministic="True" />
+  <EnableMultithreadedLoad>True</EnableMultithreadedLoad>
+  <EnableMultithreadedAnalysis>True</EnableMultithreadedAnalysis>
+  <SourceLookup>True</SourceLookup>
+  <AnalysisExceptionsThreshold>10</AnalysisExceptionsThreshold>
+  <RuleExceptionsThreshold>1</RuleExceptionsThreshold>
+  <Spelling Locale="en-us" />
+  <VersionAware>False</VersionAware>
+  <OverrideRuleVisibilities>False</OverrideRuleVisibilities>
+  <CustomDictionaries SearchFxCopDir="True" SearchUserProfile="True" SearchProjectDir="True" />
+  <SearchGlobalAssemblyCache>False</SearchGlobalAssemblyCache>
+  <DeadlockDetectionTimeout>120</DeadlockDetectionTimeout>
+ </ProjectOptions>
+ <Targets>
+  <Target Name="$(ProjectDir)/Libraries/QQn.TurtleBuildUtils/bin/Release/QQn.TurtleBuildUtils.dll" Analyze="False" AnalyzeAllChildren="False" />
+  <Target Name="$(ProjectDir)/Libraries/QQn.TurtlePackage/bin/Release/QQn.TurtlePackage.dll" Analyze="False" AnalyzeAllChildren="False" />
+  <Target Name="$(ProjectDir)/Libraries/QQn.TurtleUtils/bin/Release/QQn.TurtleUtils.dll" Analyze="True" AnalyzeAllChildren="True" />
+ </Targets>
+ <Rules>
+  <RuleFiles>
+   <RuleFile Name="$(FxCopDir)\Rules\DesignRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\GlobalizationRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\InteroperabilityRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\MobilityRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\NamingRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\PerformanceRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\PortabilityRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\SecurityRules.dll" Enabled="True" AllRulesEnabled="True" />
+   <RuleFile Name="$(FxCopDir)\Rules\UsageRules.dll" Enabled="True" AllRulesEnabled="True" />
+  </RuleFiles>
+  <Groups />
+  <Settings />
+ </Rules>
+ <FxCopReport Version="1.35">
+  <Namespaces>
+   <Namespace Name="QQn.TurtleUtils">
+    <Messages>
+     <Message TypeName="AvoidNamespacesWithFewTypes" Category="Microsoft.Design" CheckId="CA1020" Created="2007-08-29 09:35:12Z">
+      <Issue>
+       <Item>QQn.TurtleUtils</Item>
+      </Issue>
+     </Message>
+     <Message TypeName="ShortAcronymsShouldBeUppercase" Category="Microsoft.Naming" CheckId="CA1706" Created="2007-08-29 09:35:12Z">
+      <Issue Name="Namespace">
+       <Item>Qn</Item>
+       <Item>QQn.TurtleUtils</Item>
+      </Issue>
+     </Message>
+    </Messages>
+   </Namespace>
+   <Namespace Name="QQn.TurtleUtils.Cryptography">
+    <Messages>
+     <Message TypeName="AvoidNamespacesWithFewTypes" Category="Microsoft.Design" CheckId="CA1020" Created="2007-08-29 09:35:12Z">
+      <Issue>
+       <Item>QQn.TurtleUtils.Cryptography</Item>
+      </Issue>
+     </Message>
+     <Message TypeName="ShortAcronymsShouldBeUppercase" Category="Microsoft.Naming" CheckId="CA1706" Created="2007-08-29 09:35:12Z">
+      <Issue Name="Namespace">
+       <Item>Qn</Item>
+       <Item>QQn.TurtleUtils.Cryptography</Item>
+      </Issue>
+     </Message>
+    </Messages>
+   </Namespace>
+   <Namespace Name="QQn.TurtleUtils.Globalization">
+    <Messages>
+     <Message TypeName="AvoidNamespacesWithFewTypes" Category="Microsoft.Design" CheckId="CA1020" Created="2007-08-29 12:51:59Z">
+      <Issue>
+       <Item>QQn.TurtleUtils.Globalization</Item>
+      </Issue>
+     </Message>
+     <Message TypeName="ShortAcronymsShouldBeUppercase" Category="Microsoft.Naming" CheckId="CA1706" Created="2007-08-29 12:51:59Z">
+      <Issue Name="Namespace">
+       <Item>Qn</Item>
+       <Item>QQn.TurtleUtils.Globalization</Item>
+      </Issue>
+     </Message>
+    </Messages>
+   </Namespace>
+   <Namespace Name="QQn.TurtleUtils.IO">
+    <Messages>
+     <Message TypeName="ShortAcronymsShouldBeUppercase" Category="Microsoft.Naming" CheckId="CA1706" Created="2007-08-29 09:35:12Z">
+      <Issue Name="Namespace">
+       <Item>Qn</Item>
+       <Item>QQn.TurtleUtils.IO</Item>
+      </Issue>
+     </Message>
+    </Messages>
+   </Namespace>
+   <Namespace Name="QQn.TurtleUtils.Tokens">
+    <Messages>
+     <Message TypeName="ShortAcronymsShouldBeUppercase" Category="Microsoft.Naming" CheckId="CA1706" Created="2007-08-29 09:35:12Z">
+      <Issue Name="Namespace">
+       <Item>Qn</Item>
+       <Item>QQn.TurtleUtils.Tokens</Item>
+      </Issue>
+     </Message>
+    </Messages>
+   </Namespace>
+   <Namespace Name="QQn.TurtleUtils.Tokens.Converters">
+    <Messages>
+     <Message TypeName="AvoidNamespacesWithFewTypes" Category="Microsoft.Design" CheckId="CA1020" Created="2007-08-29 09:35:12Z">
+      <Issue>
+       <Item>QQn.TurtleUtils.Tokens.Converters</Item>
+      </Issue>
+     </Message>
+     <Message TypeName="ShortAcronymsShouldBeUppercase" Category="Microsoft.Naming" CheckId="CA1706" Created="2007-08-29 09:35:12Z">
+      <Issue Name="Namespace">
+       <Item>Qn</Item>
+       <Item>QQn.TurtleUtils.Tokens.Converters</Item>
+      </Issue>
+     </Message>
+    </Messages>
+   </Namespace>
+   <Namespace Name="QQn.TurtleUtils.Tokens.Definitions">
+    <Messages>
+     <Message TypeName="ShortAcronymsShouldBeUppercase" Category="Microsoft.Naming" CheckId="CA1706" Created="2007-08-29 09:35:12Z">
+      <Issue Name="Namespace">
+       <Item>Qn</Item>
+       <Item>QQn.TurtleUtils.Tokens.Definitions</Item>
+      </Issue>
+     </Message>
+    </Messages>
+   </Namespace>
+  </Namespaces>
+  <Targets>
+   <Target Name="$(ProjectDir)/Libraries/QQn.TurtleUtils/bin/Release/QQn.TurtleUtils.dll">
+    <Modules>
+     <Module Name="qqn.turtleutils.dll">
+      <Namespaces>
+       <Namespace Name="QQn.TurtleUtils">
+        <Types>
+         <Type Name="TokenAttributeBase">
+          <Messages>
+           <Message TypeName="IdentifiersShouldHaveCorrectSuffix" Category="Microsoft.Naming" CheckId="CA1710" Created="2007-08-29 09:35:12Z">
+            <Issue>
+             <Item>QQn.TurtleUtils.TokenAttributeBase</Item>
+             <Item>Attribute</Item>
+            </Issue>
+           </Message>
+          </Messages>
+         </Type>
+        </Types>
+       </Namespace>
+       <Namespace Name="QQn.TurtleUtils.Cryptography">
+        <Types>
+         <Type Name="HashType">
+          <Messages>
+           <Message TypeName="EnumsShouldHaveZeroValue" Category="Microsoft.Design" CheckId="CA1008" Created="2007-08-29 09:35:12Z" FixCategory="Breaking">
+            <Issue Name="FlagsRename">
+             <Item>QQn.TurtleUtils.Cryptography.HashType</Item>
+             <Item>HashType.Null</Item>
+            </Issue>
+           </Message>
+           <Message TypeName="FlagsEnumsShouldHavePluralNames" Category="Microsoft.Naming" CheckId="CA1714" Created="2007-08-29 09:35:12Z">
+            <Issue>
+             <Item>HashType</Item>
+            </Issue>
+           </Message>
+          </Messages>
+          <Members>
+           <Member Name="RIPEMD160">
+            <Messages>
+             <Message Id="Member" TypeName="LongAcronymsShouldBePascalCased" Category="Microsoft.Naming" CheckId="CA1705" Created="2007-08-29 09:35:12Z">
+              <Issue Name="Member">
+               <Item>HashType.RIPEMD160</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="QQnCryptoHelpers">
+          <Messages>
+           <Message TypeName="ShortAcronymsShouldBeUppercase" Category="Microsoft.Naming" CheckId="CA1706" Created="2007-08-29 09:35:12Z">
+            <Issue Name="Type">
+             <Item>Qn</Item>
+             <Item>QQn.TurtleUtils.Cryptography.QQnCryptoHelpers</Item>
+            </Issue>
+           </Message>
+          </Messages>
+          <Members>
+           <Member Name="CalculateFileHash(System.String,QQn.TurtleUtils.Cryptography.HashType):System.String">
+            <Messages>
+             <Message Id="System.IO.FileNotFoundException.#ctor(System.String,System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>QQnCryptoHelpers.CalculateFileHash(String, HashType):String</Item>
+               <Item>1</Item>
+               <Item>FileNotFoundException.FileNotFoundException(String, String)</Item>
+               <Item>File not found</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="CreateHashAlgorithm(QQn.TurtleUtils.Cryptography.HashType):System.Security.Cryptography.HashAlgorithm">
+            <Messages>
+             <Message Id="System.ArgumentException.#ctor(System.String,System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>QQnCryptoHelpers.CreateHashAlgorithm(HashType):HashAlgorithm</Item>
+               <Item>1</Item>
+               <Item>ArgumentException.ArgumentException(String, String)</Item>
+               <Item>Invalid hashtype</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="GetHashBits(QQn.TurtleUtils.Cryptography.HashType):System.Int32">
+            <Messages>
+             <Message Id="System.ArgumentException.#ctor(System.String,System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>QQnCryptoHelpers.GetHashBits(HashType):Int32</Item>
+               <Item>1</Item>
+               <Item>ArgumentException.ArgumentException(String, String)</Item>
+               <Item>Invalid hashtype</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="GuidFromString(System.Guid,System.String):System.Guid">
+            <Messages>
+             <Message Id="1#" TypeName="AvoidTypeNamesInParameters" Category="Microsoft.Naming" CheckId="CA1720" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>stringToHash</Item>
+              </Issue>
+             </Message>
+             <Message TypeName="InstantiateArgumentExceptionsCorrectly" Category="Microsoft.Usage" CheckId="CA2208" Created="2007-08-29 09:35:12Z">
+              <Issue Name="OneArgumentShouldBeParameterName">
+               <Item>System.ArgumentNullException</Item>
+               <Item>ArgumentNullException.ArgumentNullException(String)</Item>
+               <Item>bytesToHash</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="HashString(System.Byte[],QQn.TurtleUtils.Cryptography.HashType):System.String">
+            <Messages>
+             <Message Id="System.ArgumentException.#ctor(System.String,System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>QQnCryptoHelpers.HashString(Byte[], HashType):String</Item>
+               <Item>1</Item>
+               <Item>ArgumentException.ArgumentException(String, String)</Item>
+               <Item>Invalid number of bytes</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="TryParseHash(System.String,QQn.TurtleUtils.Cryptography.HashType&amp;,System.Int64&amp;,System.String&amp;):System.Boolean">
+            <Messages>
+             <Message TypeName="DoNotCatchGeneralExceptionTypes" Category="Microsoft.Design" CheckId="CA1031" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>QQnCryptoHelpers.TryParseHash(String, HashType&amp;, Int64&amp;, String&amp;):Boolean</Item>
+               <Item>System.Object</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="VerifyFileHash(System.String,System.String):System.Boolean">
+            <Messages>
+             <Message Id="System.IO.FileNotFoundException.#ctor(System.String,System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>QQnCryptoHelpers.VerifyFileHash(String, String):Boolean</Item>
+               <Item>1</Item>
+               <Item>FileNotFoundException.FileNotFoundException(String, String)</Item>
+               <Item>File not found</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="QQnHashComparer">
+          <Messages>
+           <Message TypeName="ShortAcronymsShouldBeUppercase" Category="Microsoft.Naming" CheckId="CA1706" Created="2007-08-29 09:35:12Z">
+            <Issue Name="Type">
+             <Item>Qn</Item>
+             <Item>QQn.TurtleUtils.Cryptography.QQnHashComparer</Item>
+            </Issue>
+           </Message>
+          </Messages>
+         </Type>
+        </Types>
+       </Namespace>
+       <Namespace Name="QQn.TurtleUtils.Globalization">
+        <Types>
+         <Type Name="QQnDateUtils">
+          <Messages>
+           <Message TypeName="ShortAcronymsShouldBeUppercase" Category="Microsoft.Naming" CheckId="CA1706" Created="2007-08-29 12:51:59Z">
+            <Issue Name="Type">
+             <Item>Qn</Item>
+             <Item>QQn.TurtleUtils.Globalization.QQnDateUtils</Item>
+            </Issue>
+           </Message>
+          </Messages>
+         </Type>
+        </Types>
+       </Namespace>
+       <Namespace Name="QQn.TurtleUtils.IO">
+        <Types>
+         <Type Name="AssuredStream">
+          <Members>
+           <Member Name=".ctor(System.IO.Stream,QQn.TurtleUtils.IO.VerificationMode)">
+            <Messages>
+             <Message Id="System.InvalidOperationException.#ctor(System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>AssuredStream.AssuredStream(Stream, VerificationMode)</Item>
+               <Item>1</Item>
+               <Item>InvalidOperationException.InvalidOperationException(String)</Item>
+               <Item>Can't fully verify unseekable streams</Item>
+              </Issue>
+             </Message>
+             <Message Id="System.Security.Cryptography.CryptographicException.#ctor(System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>AssuredStream.AssuredStream(Stream, VerificationMode)</Item>
+               <Item>1</Item>
+               <Item>CryptographicException.CryptographicException(String)</Item>
+               <Item>Invalid hash value</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name=".ctor(System.IO.Stream,System.Boolean)">
+            <Messages>
+             <Message Id="System.ArgumentException.#ctor(System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>AssuredStream.AssuredStream(Stream, Boolean)</Item>
+               <Item>1</Item>
+               <Item>ArgumentException.ArgumentException(String)</Item>
+               <Item>Can't create a SignedStream on an unwritable/unseekable stream</Item>
+              </Issue>
+              <Issue>
+               <Item>AssuredStream.AssuredStream(Stream, Boolean)</Item>
+               <Item>1</Item>
+               <Item>ArgumentException.ArgumentException(String)</Item>
+               <Item>Must be able to read from the stream</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="AssuredStreamCreateArgs">
+          <Members>
+           <Member Name="VerifyArgs(System.String):System.Void">
+            <Messages>
+             <Message Id="System.ArgumentException.#ctor(System.String,System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>AssuredStreamCreateArgs.VerifyArgs(String):Void</Item>
+               <Item>1</Item>
+               <Item>ArgumentException.ArgumentException(String, String)</Item>
+               <Item>FileType must be set on SignedStreamCreateArgs</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="AssuredStreamHeader">
+          <Members>
+           <Member Name=".ctor(System.IO.Stream)">
+            <Messages>
+             <Message TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>AssuredStreamHeader.AssuredStreamHeader(Stream)</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name=".ctor(System.IO.Stream,QQn.TurtleUtils.IO.VerificationMode)">
+            <Messages>
+             <Message Id="System.Security.Cryptography.CryptographicException.#ctor(System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>AssuredStreamHeader.AssuredStreamHeader(Stream, VerificationMode)</Item>
+               <Item>1</Item>
+               <Item>CryptographicException.CryptographicException(String)</Item>
+               <Item>Stream hash verification failed</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="AssuredSubStream">
+          <Members>
+           <Member Name=".ctor(System.IO.Stream,QQn.TurtleUtils.IO.VerificationMode)">
+            <Messages>
+             <Message TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>AssuredSubStream.AssuredSubStream(Stream, VerificationMode)</Item>
+               <Item>&#xD;&#xA;&#xD;&#xA;AssuredSubStream.AssuredSubStream(Stream, VerificationMode)&#xD;&#xA;AssuredSubStream.VerifyHash():Boolean&#xD;&#xA;AssuredSubStream.CalculateHash(Boolean):Byte[]&#xD;&#xA;Stream.Read(Byte[], Int32, Int32):Int32</Item>
+              </Issue>
+              <Issue>
+               <Item>AssuredSubStream.AssuredSubStream(Stream, VerificationMode)</Item>
+               <Item>&#xD;&#xA;&#xD;&#xA;AssuredSubStream.AssuredSubStream(Stream, VerificationMode)&#xD;&#xA;AssuredSubStream.VerifyHash():Boolean&#xD;&#xA;AssuredSubStream.CalculateHash(Boolean):Byte[]&#xD;&#xA;Stream.get_CanSeek():Boolean</Item>
+              </Issue>
+              <Issue>
+               <Item>AssuredSubStream.AssuredSubStream(Stream, VerificationMode)</Item>
+               <Item>&#xD;&#xA;&#xD;&#xA;AssuredSubStream.AssuredSubStream(Stream, VerificationMode)&#xD;&#xA;AssuredSubStream.VerifyHash():Boolean&#xD;&#xA;AssuredSubStream.CalculateHash(Boolean):Byte[]&#xD;&#xA;Stream.get_Length():Int64</Item>
+              </Issue>
+              <Issue>
+               <Item>AssuredSubStream.AssuredSubStream(Stream, VerificationMode)</Item>
+               <Item>&#xD;&#xA;&#xD;&#xA;AssuredSubStream.AssuredSubStream(Stream, VerificationMode)&#xD;&#xA;AssuredSubStream.VerifyHash():Boolean&#xD;&#xA;AssuredSubStream.CalculateHash(Boolean):Byte[]&#xD;&#xA;Stream.get_Position():Int64</Item>
+              </Issue>
+              <Issue>
+               <Item>AssuredSubStream.AssuredSubStream(Stream, VerificationMode)</Item>
+               <Item>&#xD;&#xA;&#xD;&#xA;AssuredSubStream.AssuredSubStream(Stream, VerificationMode)&#xD;&#xA;AssuredSubStream.VerifyHash():Boolean&#xD;&#xA;AssuredSubStream.CalculateHash(Boolean):Byte[]&#xD;&#xA;Stream.set_Position(Int64):Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="_hashType">
+            <Messages>
+             <Message TypeName="AvoidUnusedPrivateFields" Category="Microsoft.Performance" CheckId="CA1823" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>AssuredSubStream._hashType</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="DirectoryMap">
+          <Messages>
+           <Message TypeName="ImplementIDisposableCorrectly" Category="Microsoft.Design" CheckId="CA1063" Created="2007-08-29 09:35:12Z">
+            <Issue Name="ProvideDisposeBool">
+             <Item>QQn.TurtleUtils.IO.DirectoryMap</Item>
+            </Issue>
+           </Message>
+          </Messages>
+          <Members>
+           <Member Name=".ctor(System.IO.DirectoryInfo)">
+            <Messages>
+             <Message Id="System.IO.DirectoryNotFoundException.#ctor(System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>DirectoryMap.DirectoryMap(DirectoryInfo)</Item>
+               <Item>1</Item>
+               <Item>DirectoryNotFoundException.DirectoryNotFoundException(String)</Item>
+               <Item>Directory does not exist</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="_dirInfo">
+            <Messages>
+             <Message TypeName="AvoidUnusedPrivateFields" Category="Microsoft.Performance" CheckId="CA1823" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>DirectoryMap._dirInfo</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="AddFile(System.String):QQn.TurtleUtils.IO.DirectoryMapFile">
+            <Messages>
+             <Message Id="System.IO.FileNotFoundException.#ctor(System.String,System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>DirectoryMap.AddFile(String):DirectoryMapFile</Item>
+               <Item>1</Item>
+               <Item>FileNotFoundException.FileNotFoundException(String, String)</Item>
+               <Item>File not found</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="CreateDirectory(System.String):System.Void">
+            <Messages>
+             <Message Id="System.String.Format(System.String,System.Object)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>DirectoryMap.CreateDirectory(String):Void</Item>
+               <Item>System.String.Format(System.String,System.Object)</Item>
+               <Item>System.String.Format(System.IFormatProvider,System.String,System.Object[])</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="Dispose():System.Void">
+            <Messages>
+             <Message TypeName="ImplementIDisposableCorrectly" Category="Microsoft.Design" CheckId="CA1063" Created="2007-08-29 09:35:12Z">
+              <Issue Name="DisposeImplementation">
+               <Item>DirectoryMap.Dispose():Void</Item>
+              </Issue>
+              <Issue Name="DisposeSignature">
+               <Item>DirectoryMap.Dispose():Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="Exists(System.String):System.Boolean">
+            <Messages>
+             <Message TypeName="MarkMembersAsStatic" Category="Microsoft.Performance" CheckId="CA1822" Created="2007-08-29 09:35:12Z" FixCategory="Breaking">
+              <Issue>
+               <Item>DirectoryMap.Exists(String):Boolean</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="Merge(QQn.TurtleUtils.IO.DirectoryMapData):System.Void">
+            <Messages>
+             <Message TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>DirectoryMap.Merge(DirectoryMapData):Void</Item>
+              </Issue>
+             </Message>
+             <Message Id="System.Exception.#ctor(System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>DirectoryMap.Merge(DirectoryMapData):Void</Item>
+               <Item>1</Item>
+               <Item>Exception.Exception(String)</Item>
+               <Item>The method or operation is not implemented.</Item>
+              </Issue>
+             </Message>
+             <Message TypeName="DoNotRaiseReservedExceptionTypes" Category="Microsoft.Usage" CheckId="CA2201" Created="2007-08-29 09:35:12Z">
+              <Issue Name="TooGeneric">
+               <Item>DirectoryMap.Merge(DirectoryMapData):Void</Item>
+               <Item>System.Exception</Item>
+              </Issue>
+             </Message>
+             <Message TypeName="MarkMembersAsStatic" Category="Microsoft.Performance" CheckId="CA1822" Created="2007-08-29 09:35:12Z" FixCategory="NonBreaking">
+              <Issue>
+               <Item>DirectoryMap.Merge(DirectoryMapData):Void</Item>
+              </Issue>
+             </Message>
+             <Message Id="mapData" TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801" Created="2007-08-29 09:35:12Z" FixCategory="NonBreaking">
+              <Issue>
+               <Item>mapData</Item>
+               <Item>DirectoryMap.Merge(DirectoryMapData):Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="OpenFile(System.String,System.IO.FileMode,System.String,System.Int64,System.Boolean):System.IO.Stream">
+            <Messages>
+             <Message Id="System.ArgumentException.#ctor(System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>DirectoryMap.OpenFile(String, FileMode, String, Int64, Boolean):Stream</Item>
+               <Item>1</Item>
+               <Item>ArgumentException.ArgumentException(String)</Item>
+               <Item>The specified mode is not supported</Item>
+              </Issue>
+             </Message>
+             <Message Id="System.IO.IOException.#ctor(System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>DirectoryMap.OpenFile(String, FileMode, String, Int64, Boolean):Stream</Item>
+               <Item>1</Item>
+               <Item>IOException.IOException(String)</Item>
+               <Item>File does not exist</Item>
+              </Issue>
+             </Message>
+             <Message Id="System.String.Format(System.String,System.Object)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>DirectoryMap.OpenFile(String, FileMode, String, Int64, Boolean):Stream</Item>
+               <Item>System.String.Format(System.String,System.Object)</Item>
+               <Item>System.String.Format(System.IFormatProvider,System.String,System.Object[])</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="DirectoryMapData">
+          <Members>
+           <Member Name="HashType">
+            <Accessors>
+             <Accessor Name="set_HashType(QQn.TurtleUtils.Cryptography.HashType):System.Void">
+              <Messages>
+               <Message TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811" Created="2007-08-29 09:35:12Z">
+                <Issue>
+                 <Item>DirectoryMapData.set_HashType(HashType):Void</Item>
+                </Issue>
+               </Message>
+              </Messages>
+             </Accessor>
+            </Accessors>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="DirectoryMapItem">
+          <Members>
+           <Member Name=".ctor()">
+            <Messages>
+             <Message TypeName="DoNotInitializeUnnecessarily" Category="Microsoft.Performance" CheckId="CA1805" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>DirectoryMapItem.DirectoryMapItem()</Item>
+               <Item>_initCompleted</Item>
+               <Item>System.Boolean</Item>
+               <Item>false</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="QQn.TurtleUtils.Tokens.ITokenizerInitialize.BeginInitialize(QQn.TurtleUtils.Tokens.TokenizerEventArgs):System.Void">
+            <Messages>
+             <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>DirectoryMapItem</Item>
+               <Item>ITokenizerInitialize.BeginInitialize(TokenizerEventArgs):Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="QQn.TurtleUtils.Tokens.ITokenizerInitialize.EndInitialize(QQn.TurtleUtils.Tokens.TokenizerEventArgs):System.Void">
+            <Messages>
+             <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>DirectoryMapItem</Item>
+               <Item>ITokenizerInitialize.EndInitialize(TokenizerEventArgs):Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="System.ComponentModel.ISupportInitialize.BeginInit():System.Void">
+            <Messages>
+             <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>DirectoryMapItem</Item>
+               <Item>ISupportInitialize.BeginInit():Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="System.ComponentModel.ISupportInitialize.EndInit():System.Void">
+            <Messages>
+             <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>DirectoryMapItem</Item>
+               <Item>ISupportInitialize.EndInit():Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="DirectoryMapStream">
+          <Members>
+           <Member Name="UseAsync(System.IO.FileMode,System.String):System.Boolean">
+            <Messages>
+             <Message Id="System.ArgumentException.#ctor(System.String,System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 13:01:48Z">
+              <Issue>
+               <Item>DirectoryMapStream.UseAsync(FileMode, String):Boolean</Item>
+               <Item>1</Item>
+               <Item>ArgumentException.ArgumentException(String, String)</Item>
+               <Item>Invalid filemode</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="GZipSubStream">
+          <Members>
+           <Member Name="GetService():T">
+            <Messages>
+             <Message TypeName="GenericMethodsShouldProvideTypeParameter" Category="Microsoft.Design" CheckId="CA1004" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>GZipSubStream.GetService():T</Item>
+               <Item>T</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="MultiStreamArgs">
+          <Messages>
+           <Message Id="Multi" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Created="2007-08-29 09:35:12Z">
+            <Issue Name="Type">
+             <Item>Multi</Item>
+             <Item>QQn.TurtleUtils.IO.MultiStreamArgs</Item>
+            </Issue>
+           </Message>
+          </Messages>
+          <Members>
+           <Member Name="StreamType">
+            <Accessors>
+             <Accessor Name="set_StreamType(System.Int32):System.Void">
+              <Messages>
+               <Message Id="System.ArgumentOutOfRangeException.#ctor(System.String,System.Object,System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+                <Issue>
+                 <Item>MultiStreamArgs.set_StreamType(Int32):Void</Item>
+                 <Item>3</Item>
+                 <Item>ArgumentOutOfRangeException.ArgumentOutOfRangeException(String, Object, String)</Item>
+                 <Item>Value must be between 0 and 16777216</Item>
+                </Issue>
+               </Message>
+              </Messages>
+             </Accessor>
+            </Accessors>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="MultiStreamCreateArgs">
+          <Messages>
+           <Message Id="Multi" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Created="2007-08-29 09:35:12Z">
+            <Issue Name="Type">
+             <Item>Multi</Item>
+             <Item>QQn.TurtleUtils.IO.MultiStreamCreateArgs</Item>
+            </Issue>
+           </Message>
+          </Messages>
+         </Type>
+         <Type Name="MultiStreamItemHeader">
+          <Members>
+           <Member Name=".ctor(System.IO.Stream)">
+            <Messages>
+             <Message TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>MultiStreamItemHeader.MultiStreamItemHeader(Stream)</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="WriteTo(System.IO.Stream):System.Void">
+            <Messages>
+             <Message TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>MultiStreamItemHeader.WriteTo(Stream):Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="MultiStreamReader">
+          <Messages>
+           <Message Id="Multi" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Created="2007-08-29 09:35:12Z">
+            <Issue Name="Type">
+             <Item>Multi</Item>
+             <Item>QQn.TurtleUtils.IO.MultiStreamReader</Item>
+            </Issue>
+           </Message>
+           <Message TypeName="ImplementIDisposableCorrectly" Category="Microsoft.Design" CheckId="CA1063" Created="2007-08-29 09:35:12Z">
+            <Issue Name="ProvideDisposeBool">
+             <Item>QQn.TurtleUtils.IO.MultiStreamReader</Item>
+            </Issue>
+           </Message>
+          </Messages>
+          <Members>
+           <Member Name="_maxCount">
+            <Messages>
+             <Message TypeName="AvoidUnusedPrivateFields" Category="Microsoft.Performance" CheckId="CA1823" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>MultiStreamReader._maxCount</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="System.IDisposable.Dispose():System.Void">
+            <Messages>
+             <Message Id="_reader" TypeName="DisposableFieldsShouldBeDisposed" Category="Microsoft.Usage" CheckId="CA2213" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>QQn.TurtleUtils.IO.MultiStreamReader</Item>
+               <Item>_reader</Item>
+               <Item>QQn.TurtleUtils.IO.QQnBinaryReader</Item>
+              </Issue>
+             </Message>
+             <Message TypeName="ImplementIDisposableCorrectly" Category="Microsoft.Design" CheckId="CA1063" Created="2007-08-29 09:35:12Z">
+              <Issue Name="DisposeImplementation">
+               <Item>MultiStreamReader.System.IDisposable.Dispose():Void</Item>
+              </Issue>
+              <Issue Name="RenameDispose">
+               <Item>MultiStreamReader.System.IDisposable.Dispose():Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="MultiStreamWriter">
+          <Messages>
+           <Message Id="Multi" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Created="2007-08-29 09:35:12Z">
+            <Issue Name="Type">
+             <Item>Multi</Item>
+             <Item>QQn.TurtleUtils.IO.MultiStreamWriter</Item>
+            </Issue>
+           </Message>
+           <Message TypeName="ImplementIDisposableCorrectly" Category="Microsoft.Design" CheckId="CA1063" Created="2007-08-29 09:35:12Z">
+            <Issue Name="ProvideDisposeBool">
+             <Item>QQn.TurtleUtils.IO.MultiStreamWriter</Item>
+            </Issue>
+           </Message>
+          </Messages>
+          <Members>
+           <Member Name=".ctor(System.IO.Stream,QQn.TurtleUtils.IO.MultiStreamCreateArgs)">
+            <Messages>
+             <Message Id="1#e" TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704" Created="2007-08-29 09:35:12Z">
+              <Issue Name="ParameterOneLetter">
+               <Item>MultiStreamWriter.MultiStreamWriter(Stream, MultiStreamCreateArgs)</Item>
+               <Item>e</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="CreateStream(System.Int32):System.IO.Stream">
+            <Messages>
+             <Message Id="System.ArgumentOutOfRangeException.#ctor(System.String,System.Object,System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>MultiStreamWriter.CreateStream(Int32):Stream</Item>
+               <Item>3</Item>
+               <Item>ArgumentOutOfRangeException.ArgumentOutOfRangeException(String, Object, String)</Item>
+               <Item>Value must be between 0 and 16777216</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="System.IDisposable.Dispose():System.Void">
+            <Messages>
+             <Message Id="_writer" TypeName="DisposableFieldsShouldBeDisposed" Category="Microsoft.Usage" CheckId="CA2213" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>QQn.TurtleUtils.IO.MultiStreamWriter</Item>
+               <Item>_writer</Item>
+               <Item>QQn.TurtleUtils.IO.QQnBinaryWriter</Item>
+              </Issue>
+             </Message>
+             <Message TypeName="ImplementIDisposableCorrectly" Category="Microsoft.Design" CheckId="CA1063" Created="2007-08-29 09:35:12Z">
+              <Issue Name="DisposeImplementation">
+               <Item>MultiStreamWriter.System.IDisposable.Dispose():Void</Item>
+              </Issue>
+              <Issue Name="RenameDispose">
+               <Item>MultiStreamWriter.System.IDisposable.Dispose():Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="MultiSubStreamReader">
+          <Members>
+           <Member Name="Header">
+            <Accessors>
+             <Accessor Name="get_Header():QQn.TurtleUtils.IO.MultiStreamItemHeader">
+              <Messages>
+               <Message TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811" Created="2007-08-29 09:35:12Z">
+                <Issue>
+                 <Item>MultiSubStreamReader.get_Header():MultiStreamItemHeader</Item>
+                </Issue>
+               </Message>
+              </Messages>
+             </Accessor>
+            </Accessors>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="QQnPath">
+          <Messages>
+           <Message TypeName="ShortAcronymsShouldBeUppercase" Category="Microsoft.Naming" CheckId="CA1706" Created="2007-08-29 09:35:12Z">
+            <Issue Name="Type">
+             <Item>Qn</Item>
+             <Item>QQn.TurtleUtils.IO.QQnPath</Item>
+            </Issue>
+           </Message>
+          </Messages>
+          <Members>
+           <Member Name="Combine(System.String,System.String[]):System.String">
+            <Messages>
+             <Message TypeName="ValidateArgumentsOfPublicMethods" Category="Microsoft.Design" CheckId="CA1062" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>'items'</Item>
+               <Item>QQnPath.Combine(String, String[]):String</Item>
+              </Issue>
+              <Issue>
+               <Item>'items'</Item>
+               <Item>QQnPath.Combine(String, String[]):String</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="CopyStream(System.IO.Stream,System.IO.Stream,System.Int32):System.Void">
+            <Messages>
+             <Message TypeName="ValidateArgumentsOfPublicMethods" Category="Microsoft.Design" CheckId="CA1062" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>'from'</Item>
+               <Item>QQnPath.CopyStream(Stream, Stream, Int32):Void</Item>
+              </Issue>
+              <Issue>
+               <Item>'to'</Item>
+               <Item>QQnPath.CopyStream(Stream, Stream, Int32):Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="StreamProxy">
+          <Messages>
+           <Message TypeName="AbstractTypesShouldNotHaveConstructors" Category="Microsoft.Design" CheckId="CA1012" Created="2007-08-29 09:35:12Z">
+            <Issue>
+             <Item>StreamProxy</Item>
+            </Issue>
+           </Message>
+           <Message TypeName="IdentifiersShouldHaveCorrectSuffix" Category="Microsoft.Naming" CheckId="CA1710" Created="2007-08-29 09:35:12Z">
+            <Issue>
+             <Item>QQn.TurtleUtils.IO.StreamProxy</Item>
+             <Item>Stream</Item>
+            </Issue>
+           </Message>
+          </Messages>
+          <Members>
+           <Member Name="GetService():T">
+            <Messages>
+             <Message TypeName="GenericMethodsShouldProvideTypeParameter" Category="Microsoft.Design" CheckId="CA1004" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>StreamProxy.GetService():T</Item>
+               <Item>T</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="Seek(System.Int64,System.IO.SeekOrigin):System.Int64">
+            <Messages>
+             <Message Id="System.ArgumentOutOfRangeException.#ctor(System.String,System.Object,System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>StreamProxy.Seek(Int64, SeekOrigin):Int64</Item>
+               <Item>3</Item>
+               <Item>ArgumentOutOfRangeException.ArgumentOutOfRangeException(String, Object, String)</Item>
+               <Item>Invalid origin</Item>
+              </Issue>
+             </Message>
+             <Message Id="System.IO.IOException.#ctor(System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>StreamProxy.Seek(Int64, SeekOrigin):Int64</Item>
+               <Item>1</Item>
+               <Item>IOException.IOException(String)</Item>
+               <Item>Seeking outside substream</Item>
+              </Issue>
+              <Issue>
+               <Item>StreamProxy.Seek(Int64, SeekOrigin):Int64</Item>
+               <Item>1</Item>
+               <Item>IOException.IOException(String)</Item>
+               <Item>Seeking outside substream</Item>
+              </Issue>
+              <Issue>
+               <Item>StreamProxy.Seek(Int64, SeekOrigin):Int64</Item>
+               <Item>1</Item>
+               <Item>IOException.IOException(String)</Item>
+               <Item>Seeking outside substream</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="WebFormWriter">
+          <Messages>
+           <Message TypeName="ImplementIDisposableCorrectly" Category="Microsoft.Design" CheckId="CA1063" Created="2007-08-29 09:35:12Z">
+            <Issue Name="ProvideDisposeBool">
+             <Item>QQn.TurtleUtils.IO.WebFormWriter</Item>
+            </Issue>
+           </Message>
+          </Messages>
+          <Members>
+           <Member Name=".ctor(System.Net.WebRequest,QQn.TurtleUtils.IO.WebRequestPostDataEncoding,System.String)">
+            <Messages>
+             <Message Id="System.ArgumentOutOfRangeException.#ctor(System.String,System.Object,System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>WebFormWriter.WebFormWriter(WebRequest, WebRequestPostDataEncoding, String)</Item>
+               <Item>3</Item>
+               <Item>ArgumentOutOfRangeException.ArgumentOutOfRangeException(String, Object, String)</Item>
+               <Item>Unknown encoding</Item>
+              </Issue>
+             </Message>
+             <Message Id="method" TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801" Created="2007-08-29 09:35:12Z" FixCategory="Breaking">
+              <Issue>
+               <Item>method</Item>
+               <Item>WebFormWriter.WebFormWriter(WebRequest, WebRequestPostDataEncoding, String)</Item>
+              </Issue>
+             </Message>
+             <Message Id="System.String.Format(System.String,System.Object)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>WebFormWriter.WebFormWriter(WebRequest, WebRequestPostDataEncoding, String)</Item>
+               <Item>System.String.Format(System.String,System.Object)</Item>
+               <Item>System.String.Format(System.IFormatProvider,System.String,System.Object[])</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="_subBoundary">
+            <Messages>
+             <Message TypeName="AvoidUnusedPrivateFields" Category="Microsoft.Performance" CheckId="CA1823" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>WebFormWriter._subBoundary</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="AddFile(System.String,System.String,System.IO.Stream,System.String):System.Void">
+            <Messages>
+             <Message Id="System.FormatException.#ctor(System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>WebFormWriter.AddFile(String, String, Stream, String):Void</Item>
+               <Item>1</Item>
+               <Item>FormatException.FormatException(String)</Item>
+               <Item>Invalid character in key</Item>
+              </Issue>
+             </Message>
+             <Message Id="System.String.Format(System.String,System.Object)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>WebFormWriter.AddFile(String, String, Stream, String):Void</Item>
+               <Item>System.String.Format(System.String,System.Object)</Item>
+               <Item>System.String.Format(System.IFormatProvider,System.String,System.Object[])</Item>
+              </Issue>
+             </Message>
+             <Message TypeName="ValidateArgumentsOfPublicMethods" Category="Microsoft.Design" CheckId="CA1062" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>'stream'</Item>
+               <Item>WebFormWriter.AddFile(String, String, Stream, String):Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="AddValue(System.String,System.Byte[]):System.Void">
+            <Messages>
+             <Message Id="System.FormatException.#ctor(System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>WebFormWriter.AddValue(String, Byte[]):Void</Item>
+               <Item>1</Item>
+               <Item>FormatException.FormatException(String)</Item>
+               <Item>Invalid character in key</Item>
+              </Issue>
+             </Message>
+             <Message Id="System.String.Format(System.String,System.Object)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>WebFormWriter.AddValue(String, Byte[]):Void</Item>
+               <Item>System.String.Format(System.String,System.Object)</Item>
+               <Item>System.String.Format(System.IFormatProvider,System.String,System.Object[])</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="AddValue(System.String,System.String):System.Void">
+            <Messages>
+             <Message Id="System.String.Format(System.String,System.Object)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>WebFormWriter.AddValue(String, String):Void</Item>
+               <Item>System.String.Format(System.String,System.Object)</Item>
+               <Item>System.String.Format(System.IFormatProvider,System.String,System.Object[])</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="IsSafeKeyName(System.String):System.Boolean">
+            <Messages>
+             <Message TypeName="MarkMembersAsStatic" Category="Microsoft.Performance" CheckId="CA1822" Created="2007-08-29 09:35:12Z" FixCategory="NonBreaking">
+              <Issue>
+               <Item>WebFormWriter.IsSafeKeyName(String):Boolean</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="System.IDisposable.Dispose():System.Void">
+            <Messages>
+             <Message Id="_streamWriter" TypeName="DisposableFieldsShouldBeDisposed" Category="Microsoft.Usage" CheckId="CA2213" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>QQn.TurtleUtils.IO.WebFormWriter</Item>
+               <Item>_streamWriter</Item>
+               <Item>System.IO.StreamWriter</Item>
+              </Issue>
+             </Message>
+             <Message TypeName="ImplementIDisposableCorrectly" Category="Microsoft.Design" CheckId="CA1063" Created="2007-08-29 09:35:12Z">
+              <Issue Name="DisposeImplementation">
+               <Item>WebFormWriter.System.IDisposable.Dispose():Void</Item>
+              </Issue>
+              <Issue Name="RenameDispose">
+               <Item>WebFormWriter.System.IDisposable.Dispose():Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="WriteBoundary():System.Void">
+            <Messages>
+             <Message Id="System.String.Format(System.String,System.Object)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>WebFormWriter.WriteBoundary():Void</Item>
+               <Item>System.String.Format(System.String,System.Object)</Item>
+               <Item>System.String.Format(System.IFormatProvider,System.String,System.Object[])</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="ZLibSubStream">
+          <Members>
+           <Member Name="GetService():T">
+            <Messages>
+             <Message TypeName="GenericMethodsShouldProvideTypeParameter" Category="Microsoft.Design" CheckId="CA1004" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>ZLibSubStream.GetService():T</Item>
+               <Item>T</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+        </Types>
+       </Namespace>
+       <Namespace Name="QQn.TurtleUtils.Tokens">
+        <Types>
+         <Type Name="ExpandableTokenValue">
+          <Messages>
+           <Message TypeName="CollectionsShouldImplementGenericInterface" Category="Microsoft.Design" CheckId="CA1010" Created="2007-08-29 09:35:12Z">
+            <Issue Certainty="60">
+             <Item>ExpandableTokenValue</Item>
+             <Item>IEnumerable</Item>
+            </Issue>
+           </Message>
+           <Message TypeName="IdentifiersShouldHaveCorrectSuffix" Category="Microsoft.Naming" CheckId="CA1710" Created="2007-08-29 09:35:12Z">
+            <Issue>
+             <Item>QQn.TurtleUtils.Tokens.ExpandableTokenValue</Item>
+             <Item>Collection</Item>
+            </Issue>
+           </Message>
+          </Messages>
+         </Type>
+         <Type Name="PlusMinTokenAttribute">
+          <Messages>
+           <Message TypeName="AvoidUnsealedAttributes" Category="Microsoft.Performance" CheckId="CA1813" Created="2007-08-29 09:35:12Z">
+            <Issue>
+             <Item>QQn.TurtleUtils.Tokens.PlusMinTokenAttribute</Item>
+            </Issue>
+           </Message>
+          </Messages>
+         </Type>
+         <Type Name="PositionTokenAttribute">
+          <Messages>
+           <Message TypeName="AvoidUnsealedAttributes" Category="Microsoft.Performance" CheckId="CA1813" Created="2007-08-29 09:35:12Z">
+            <Issue>
+             <Item>QQn.TurtleUtils.Tokens.PositionTokenAttribute</Item>
+            </Issue>
+           </Message>
+          </Messages>
+          <Members>
+           <Member Name=".ctor(System.Int32)">
+            <Messages>
+             <Message Id="System.ArgumentOutOfRangeException.#ctor(System.String,System.Object,System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>PositionTokenAttribute.PositionTokenAttribute(Int32)</Item>
+               <Item>3</Item>
+               <Item>ArgumentOutOfRangeException.ArgumentOutOfRangeException(String, Object, String)</Item>
+               <Item>Position must be at least 0</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="TokenAttribute">
+          <Messages>
+           <Message TypeName="AvoidUnsealedAttributes" Category="Microsoft.Performance" CheckId="CA1813" Created="2007-08-29 09:35:12Z">
+            <Issue>
+             <Item>QQn.TurtleUtils.Tokens.TokenAttribute</Item>
+            </Issue>
+           </Message>
+           <Message TypeName="DefineAccessorsForAttributeArguments" Category="Microsoft.Design" CheckId="CA1019" Created="2007-08-29 09:35:12Z">
+            <Issue>
+             <Item>alias</Item>
+             <Item>QQn.TurtleUtils.Tokens.TokenAttribute</Item>
+            </Issue>
+            <Issue>
+             <Item>alias1</Item>
+             <Item>QQn.TurtleUtils.Tokens.TokenAttribute</Item>
+            </Issue>
+            <Issue>
+             <Item>alias2</Item>
+             <Item>QQn.TurtleUtils.Tokens.TokenAttribute</Item>
+            </Issue>
+            <Issue>
+             <Item>alias3</Item>
+             <Item>QQn.TurtleUtils.Tokens.TokenAttribute</Item>
+            </Issue>
+            <Issue>
+             <Item>alias4</Item>
+             <Item>QQn.TurtleUtils.Tokens.TokenAttribute</Item>
+            </Issue>
+           </Message>
+          </Messages>
+          <Members>
+           <Member Name="TypeConverter">
+            <Accessors>
+             <Accessor Name="set_TypeConverter(System.Type):System.Void">
+              <Messages>
+               <Message Id="System.ArgumentException.#ctor(System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+                <Issue>
+                 <Item>TokenAttribute.set_TypeConverter(Type):Void</Item>
+                 <Item>1</Item>
+                 <Item>ArgumentException.ArgumentException(String)</Item>
+                 <Item>Typeconverter is no valid typeconverter</Item>
+                </Issue>
+               </Message>
+              </Messages>
+             </Accessor>
+            </Accessors>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="TokenGroupAttribute">
+          <Messages>
+           <Message TypeName="AvoidUnsealedAttributes" Category="Microsoft.Performance" CheckId="CA1813" Created="2007-08-29 09:35:12Z">
+            <Issue>
+             <Item>QQn.TurtleUtils.Tokens.TokenGroupAttribute</Item>
+            </Issue>
+           </Message>
+          </Messages>
+         </Type>
+         <Type Name="Tokenizer">
+          <Members>
+           <Member Name="EnsureItems(System.Collections.Generic.IEnumerable`1&lt;T&gt;,System.String):System.Void">
+            <Messages>
+             <Message Id="System.String.Format(System.String,System.Object,System.Object)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>Tokenizer.EnsureItems(IEnumerable`1&lt;T&gt;, String):Void</Item>
+               <Item>System.String.Format(System.String,System.Object,System.Object)</Item>
+               <Item>System.String.Format(System.IFormatProvider,System.String,System.Object[])</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="UnEscape(System.String,System.Collections.Generic.Dictionary`2&lt;System.Char,System.Char&gt;,System.String[],System.Char,QQn.TurtleUtils.Tokens.EscapeMode,System.Char[]):System.String">
+            <Messages>
+             <Message Id="_groups" TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801" Created="2007-08-29 09:35:12Z" FixCategory="NonBreaking">
+              <Issue>
+               <Item>_groups</Item>
+               <Item>Tokenizer.UnEscape(String, Dictionary`2&lt;System.Char,System.Char&gt;, String[], Char, EscapeMode, Char[]):String</Item>
+              </Issue>
+             </Message>
+             <Message Id="escapeCharacter" TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801" Created="2007-08-29 09:35:12Z" FixCategory="NonBreaking">
+              <Issue>
+               <Item>escapeCharacter</Item>
+               <Item>Tokenizer.UnEscape(String, Dictionary`2&lt;System.Char,System.Char&gt;, String[], Char, EscapeMode, Char[]):String</Item>
+              </Issue>
+             </Message>
+             <Message Id="groups" TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801" Created="2007-08-29 09:35:12Z" FixCategory="NonBreaking">
+              <Issue>
+               <Item>groups</Item>
+               <Item>Tokenizer.UnEscape(String, Dictionary`2&lt;System.Char,System.Char&gt;, String[], Char, EscapeMode, Char[]):String</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+        </Types>
+       </Namespace>
+       <Namespace Name="QQn.TurtleUtils.Tokens.Converters">
+        <Types>
+         <Type Name="TicksDateTimeConverter">
+          <Members>
+           <Member Name="CanConvertTo(System.ComponentModel.ITypeDescriptorContext,System.Type):System.Boolean">
+            <Messages>
+             <Message TypeName="ValidateArgumentsOfPublicMethods" Category="Microsoft.Design" CheckId="CA1062" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>'destinationType'</Item>
+               <Item>TicksDateTimeConverter.CanConvertTo(ITypeDescriptorContext, Type):Boolean</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="ConvertTo(System.ComponentModel.ITypeDescriptorContext,System.Globalization.CultureInfo,System.Object,System.Type):System.Object">
+            <Messages>
+             <Message TypeName="ValidateArgumentsOfPublicMethods" Category="Microsoft.Design" CheckId="CA1062" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>'destinationType'</Item>
+               <Item>TicksDateTimeConverter.ConvertTo(ITypeDescriptorContext, CultureInfo, Object, Type):Object</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="UtcDateTimeConverter">
+          <Members>
+           <Member Name="CanConvertTo(System.ComponentModel.ITypeDescriptorContext,System.Type):System.Boolean">
+            <Messages>
+             <Message TypeName="ValidateArgumentsOfPublicMethods" Category="Microsoft.Design" CheckId="CA1062" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>'destinationType'</Item>
+               <Item>UtcDateTimeConverter.CanConvertTo(ITypeDescriptorContext, Type):Boolean</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="ConvertTo(System.ComponentModel.ITypeDescriptorContext,System.Globalization.CultureInfo,System.Object,System.Type):System.Object">
+            <Messages>
+             <Message Id="System.DateTime.ToString(System.String)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>UtcDateTimeConverter.ConvertTo(ITypeDescriptorContext, CultureInfo, Object, Type):Object</Item>
+               <Item>System.DateTime.ToString(System.String)</Item>
+               <Item>System.DateTime.ToString(System.String,System.IFormatProvider)</Item>
+              </Issue>
+             </Message>
+             <Message TypeName="ValidateArgumentsOfPublicMethods" Category="Microsoft.Design" CheckId="CA1062" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>'destinationType'</Item>
+               <Item>UtcDateTimeConverter.ConvertTo(ITypeDescriptorContext, CultureInfo, Object, Type):Object</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="ToString(System.DateTime):System.String">
+            <Messages>
+             <Message Id="System.DateTime.ToString(System.String)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>UtcDateTimeConverter.ToString(DateTime):String</Item>
+               <Item>System.DateTime.ToString(System.String)</Item>
+               <Item>System.DateTime.ToString(System.String,System.IFormatProvider)</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="VersionConverter">
+          <Members>
+           <Member Name="CanConvertTo(System.ComponentModel.ITypeDescriptorContext,System.Type):System.Boolean">
+            <Messages>
+             <Message TypeName="ValidateArgumentsOfPublicMethods" Category="Microsoft.Design" CheckId="CA1062" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>'destinationType'</Item>
+               <Item>VersionConverter.CanConvertTo(ITypeDescriptorContext, Type):Boolean</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="ConvertTo(System.ComponentModel.ITypeDescriptorContext,System.Globalization.CultureInfo,System.Object,System.Type):System.Object">
+            <Messages>
+             <Message TypeName="ValidateArgumentsOfPublicMethods" Category="Microsoft.Design" CheckId="CA1062" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>'destinationType'</Item>
+               <Item>VersionConverter.ConvertTo(ITypeDescriptorContext, CultureInfo, Object, Type):Object</Item>
+              </Issue>
+              <Issue>
+               <Item>'value'</Item>
+               <Item>VersionConverter.ConvertTo(ITypeDescriptorContext, CultureInfo, Object, Type):Object</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+        </Types>
+       </Namespace>
+       <Namespace Name="QQn.TurtleUtils.Tokens.Definitions">
+        <Types>
+         <Type Name="TokenGroupItem">
+          <Members>
+           <Member Name=".ctor(System.String,QQn.TurtleUtils.Tokens.Definitions.TokenMember,System.Type)">
+            <Messages>
+             <Message Id="System.ArgumentException.#ctor(System.String,System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>TokenGroupItem.TokenGroupItem(String, TokenMember, Type)</Item>
+               <Item>1</Item>
+               <Item>ArgumentException.ArgumentException(String, String)</Item>
+               <Item>valueType must be assignable to datatype of member</Item>
+              </Issue>
+             </Message>
+             <Message Id="System.String.Format(System.String,System.Object)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>TokenGroupItem.TokenGroupItem(String, TokenMember, Type)</Item>
+               <Item>System.String.Format(System.String,System.Object)</Item>
+               <Item>System.String.Format(System.IFormatProvider,System.String,System.Object[])</Item>
+              </Issue>
+             </Message>
+             <Message TypeName="ValidateArgumentsOfPublicMethods" Category="Microsoft.Design" CheckId="CA1062" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>'valueType'</Item>
+               <Item>TokenGroupItem.TokenGroupItem(String, TokenMember, Type)</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="Aliases">
+            <Messages>
+             <Message TypeName="PropertiesShouldNotReturnArrays" Category="Microsoft.Performance" CheckId="CA1819" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>TokenGroupItem.Aliases:String[]</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="TryParseXml(System.Xml.XPath.XPathNavigator,QQn.TurtleUtils.Tokens.TokenizerArgs,System.Object&amp;):System.Boolean">
+            <Messages>
+             <Message Id="System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[])" TypeName="SpecifyCultureInfo" Category="Microsoft.Globalization" CheckId="CA1304" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>TokenGroupItem.TryParseXml(XPathNavigator, TokenizerArgs, Object&amp;):Boolean</Item>
+               <Item>System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[])</Item>
+               <Item>System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[],System.Globalization.CultureInfo)</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="TryWriteXml(System.Xml.XmlWriter,QQn.TurtleUtils.Tokens.TokenizerArgs,System.Object):System.Boolean">
+            <Messages>
+             <Message Id="System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[])" TypeName="SpecifyCultureInfo" Category="Microsoft.Globalization" CheckId="CA1304" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>TokenGroupItem.TryWriteXml(XmlWriter, TokenizerArgs, Object):Boolean</Item>
+               <Item>System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[])</Item>
+               <Item>System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[],System.Globalization.CultureInfo)</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="TokenItem">
+          <Members>
+           <Member Name="AcceptsValue">
+            <Messages>
+             <Message TypeName="MarkMembersAsStatic" Category="Microsoft.Performance" CheckId="CA1822" Created="2007-08-29 09:35:12Z" FixCategory="Breaking">
+              <Issue>
+               <Item>TokenItem.AcceptsValue:Boolean</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="ConvertValue(System.String,QQn.TurtleUtils.Tokens.Definitions.TokenizerState`1&lt;T&gt;):System.Object">
+            <Messages>
+             <Message Id="System.String.Format(System.String,System.Object,System.Object,System.Object)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>TokenItem.ConvertValue(String, TokenizerState`1&lt;T&gt;):Object</Item>
+               <Item>System.String.Format(System.String,System.Object,System.Object,System.Object)</Item>
+               <Item>System.String.Format(System.IFormatProvider,System.String,System.Object[])</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="TokenizerDefinition">
+          <Members>
+           <Member Name="SetRest(QQn.TurtleUtils.Tokens.Definitions.TokenItem):System.Void">
+            <Messages>
+             <Message Id="System.InvalidOperationException.#ctor(System.String)" TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>TokenizerDefinition.SetRest(TokenItem):Void</Item>
+               <Item>1</Item>
+               <Item>InvalidOperationException.InvalidOperationException(String)</Item>
+               <Item>Can only set one rest argument</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="TokenizerState`1">
+          <Messages>
+           <Message TypeName="ICollectionImplementationsHaveStronglyTypedMembers" Category="Microsoft.Design" CheckId="CA1035" Created="2007-08-29 09:35:12Z">
+            <Issue>
+             <Item>TokenizerState`1</Item>
+            </Issue>
+           </Message>
+           <Message TypeName="IdentifiersShouldHaveCorrectSuffix" Category="Microsoft.Naming" CheckId="CA1710" Created="2007-08-29 09:35:12Z">
+            <Issue>
+             <Item>QQn.TurtleUtils.Tokens.Definitions.TokenizerState`1</Item>
+             <Item>Dictionary</Item>
+            </Issue>
+           </Message>
+           <Message TypeName="ImplementIDisposableCorrectly" Category="Microsoft.Design" CheckId="CA1063" Created="2007-08-29 09:35:12Z">
+            <Issue Name="ProvideDisposeBool">
+             <Item>QQn.TurtleUtils.Tokens.Definitions.TokenizerState`1</Item>
+            </Issue>
+           </Message>
+           <Message TypeName="MarkISerializableTypesWithSerializable" Category="Microsoft.Usage" CheckId="CA2237" Created="2007-08-29 09:35:12Z">
+            <Issue Certainty="75" Level="Warning">
+             <Item>TokenizerState`1</Item>
+            </Issue>
+           </Message>
+          </Messages>
+          <Members>
+           <Member Name="Dispose():System.Void">
+            <Messages>
+             <Message TypeName="ImplementIDisposableCorrectly" Category="Microsoft.Design" CheckId="CA1063" Created="2007-08-29 09:35:12Z">
+              <Issue Name="DisposeImplementation">
+               <Item>TokenizerState`1.Dispose():Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="System.ComponentModel.ITypeDescriptorContext.Container">
+            <Accessors>
+             <Accessor Name="System.ComponentModel.ITypeDescriptorContext.get_Container():System.ComponentModel.IContainer">
+              <Messages>
+               <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Created="2007-08-29 09:35:12Z">
+                <Issue>
+                 <Item>TokenizerState`1</Item>
+                 <Item>ITypeDescriptorContext.get_Container():IContainer</Item>
+                </Issue>
+               </Message>
+              </Messages>
+             </Accessor>
+            </Accessors>
+           </Member>
+           <Member Name="System.ComponentModel.ITypeDescriptorContext.OnComponentChanged():System.Void">
+            <Messages>
+             <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>TokenizerState`1</Item>
+               <Item>ITypeDescriptorContext.OnComponentChanged():Void</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="System.ComponentModel.ITypeDescriptorContext.OnComponentChanging():System.Boolean">
+            <Messages>
+             <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>TokenizerState`1</Item>
+               <Item>ITypeDescriptorContext.OnComponentChanging():Boolean</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="System.ComponentModel.ITypeDescriptorContext.PropertyDescriptor">
+            <Accessors>
+             <Accessor Name="System.ComponentModel.ITypeDescriptorContext.get_PropertyDescriptor():System.ComponentModel.PropertyDescriptor">
+              <Messages>
+               <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Created="2007-08-29 09:35:12Z">
+                <Issue>
+                 <Item>TokenizerState`1</Item>
+                 <Item>ITypeDescriptorContext.get_PropertyDescriptor():PropertyDescriptor</Item>
+                </Issue>
+               </Message>
+              </Messages>
+             </Accessor>
+            </Accessors>
+           </Member>
+           <Member Name="System.IServiceProvider.GetService(System.Type):System.Object">
+            <Messages>
+             <Message TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>TokenizerState`1</Item>
+               <Item>IServiceProvider.GetService(Type):Object</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+         <Type Name="TokenMember">
+          <Members>
+           <Member Name="GetMemberValue(QQn.TurtleUtils.Tokens.Definitions.TokenizerState`1&lt;T&gt;):System.Object">
+            <Messages>
+             <Message Id="System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[])" TypeName="SpecifyCultureInfo" Category="Microsoft.Globalization" CheckId="CA1304" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>TokenMember.GetMemberValue(TokenizerState`1&lt;T&gt;):Object</Item>
+               <Item>System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[])</Item>
+               <Item>System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[],System.Globalization.CultureInfo)</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="SetMemberValue(QQn.TurtleUtils.Tokens.Definitions.TokenizerState`1&lt;T&gt;,System.Object):System.Void">
+            <Messages>
+             <Message Id="System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[])" TypeName="SpecifyCultureInfo" Category="Microsoft.Globalization" CheckId="CA1304" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>TokenMember.SetMemberValue(TokenizerState`1&lt;T&gt;, Object):Void</Item>
+               <Item>System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[])</Item>
+               <Item>System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[],System.Globalization.CultureInfo)</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+           <Member Name="SetValue(QQn.TurtleUtils.Tokens.Definitions.TokenizerState`1&lt;T&gt;,System.Object):System.Void">
+            <Messages>
+             <Message Id="System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[])" TypeName="SpecifyCultureInfo" Category="Microsoft.Globalization" CheckId="CA1304" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>TokenMember.SetValue(TokenizerState`1&lt;T&gt;, Object):Void</Item>
+               <Item>System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[])</Item>
+               <Item>System.Type.InvokeMember(System.String,System.Reflection.BindingFlags,System.Reflection.Binder,System.Object,System.Object[],System.Globalization.CultureInfo)</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+        </Types>
+       </Namespace>
+       <Namespace Name="QQn.TurtleUtils.Tokens.Tokenizers">
+        <Types>
+         <Type Name="CommandLineTokenizer`1">
+          <Members>
+           <Member Name="TryParse(System.Collections.Generic.IList`1&lt;System.String&gt;,QQn.TurtleUtils.Tokens.TokenizerArgs,T&amp;):System.Boolean">
+            <Messages>
+             <Message Id="System.String.Format(System.String,System.Object)" TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305" Created="2007-08-29 09:35:12Z">
+              <Issue>
+               <Item>CommandLineTokenizer`1.TryParse(IList`1&lt;System.String&gt;, TokenizerArgs, T&amp;):Boolean</Item>
+               <Item>System.String.Format(System.String,System.Object)</Item>
+               <Item>System.String.Format(System.IFormatProvider,System.String,System.Object[])</Item>
+              </Issue>
+              <Issue>
+               <Item>CommandLineTokenizer`1.TryParse(IList`1&lt;System.String&gt;, TokenizerArgs, T&amp;):Boolean</Item>
+               <Item>System.String.Format(System.String,System.Object)</Item>
+               <Item>System.String.Format(System.IFormatProvider,System.String,System.Object[])</Item>
+              </Issue>
+              <Issue>
+               <Item>CommandLineTokenizer`1.TryParse(IList`1&lt;System.String&gt;, TokenizerArgs, T&amp;):Boolean</Item>
+               <Item>System.String.Format(System.String,System.Object)</Item>
+               <Item>System.String.Format(System.IFormatProvider,System.String,System.Object[])</Item>
+              </Issue>
+             </Message>
+            </Messages>
+           </Member>
+          </Members>
+         </Type>
+        </Types>
+       </Namespace>
+      </Namespaces>
+     </Module>
+    </Modules>
+   </Target>
+  </Targets>
+  <Rules>
+   <Rule TypeName="AbstractTypesShouldNotHaveConstructors" Category="Microsoft.Design" CheckId="CA1012">
+    <Resolution Name="Default">Change the accessibility of all public constructors in '{0}' to protected.</Resolution>
+   </Rule>
+   <Rule TypeName="AvoidNamespacesWithFewTypes" Category="Microsoft.Design" CheckId="CA1020">
+    <Resolution Name="Default">Consider merging the types defined in '{0}' with another namespace.</Resolution>
+   </Rule>
+   <Rule TypeName="AvoidTypeNamesInParameters" Category="Microsoft.Naming" CheckId="CA1720">
+    <Resolution Name="Default">Remove the type identifier from parameter name '{0}'.</Resolution>
+   </Rule>
+   <Rule TypeName="AvoidUncalledPrivateCode" Category="Microsoft.Performance" CheckId="CA1811">
+    <Resolution Name="Default">'{0}' appears to have no upstream public or protected callers.</Resolution>
+   </Rule>
+   <Rule TypeName="AvoidUnsealedAttributes" Category="Microsoft.Performance" CheckId="CA1813">
+    <Resolution Name="Default">Seal '{0}', if possible.</Resolution>
+   </Rule>
+   <Rule TypeName="AvoidUnusedPrivateFields" Category="Microsoft.Performance" CheckId="CA1823">
+    <Resolution Name="Default">It appears that field '{0}' is never used or is only ever assigned to. Use this field or remove it.</Resolution>
+   </Rule>
+   <Rule TypeName="CollectionsShouldImplementGenericInterface" Category="Microsoft.Design" CheckId="CA1010">
+    <Resolution Name="Default">'{0}' appears to be a non-generic, strongly typed collection. Add an implementation to the instance of {1}&lt;T&gt; where T is {0}'s underlying element type.</Resolution>
+   </Rule>
+   <Rule TypeName="DefineAccessorsForAttributeArguments" Category="Microsoft.Design" CheckId="CA1019">
+    <Resolution Name="Default">Add a read-only property accessor for positional argument '{0}' of Attribute '{1}'.</Resolution>
+   </Rule>
+   <Rule TypeName="DisposableFieldsShouldBeDisposed" Category="Microsoft.Usage" CheckId="CA2213">
+    <Resolution Name="Default">'{0}' contains field '{1}' that is of IDisposable type: {2}. Change {0}'s Dispose method to call Dispose or Close on this field.</Resolution>
+   </Rule>
+   <Rule TypeName="DoNotCallOverridableMethodsInConstructors" Category="Microsoft.Usage" CheckId="CA2214">
+    <Resolution Name="Default">'{0}' contains a call chain that results in a call to a virtual method defined by the class. Review the following call stack for unintended consequences: {1}</Resolution>
+   </Rule>
+   <Rule TypeName="DoNotCatchGeneralExceptionTypes" Category="Microsoft.Design" CheckId="CA1031">
+    <Resolution Name="Default">Modify '{0}' to catch a more specific exception than '{1}' or rethrow the exception.</Resolution>
+   </Rule>
+   <Rule TypeName="DoNotInitializeUnnecessarily" Category="Microsoft.Performance" CheckId="CA1805">
+    <Resolution Name="Default">{0} initializes field {1} of type {2} to {3}. Remove this initialization as it will be done automatically by the runtime.</Resolution>
+   </Rule>
+   <Rule TypeName="DoNotPassLiteralsAsLocalizedParameters" Category="Microsoft.Globalization" CheckId="CA1303">
+    <Resolution Name="Default">{0} passes a literal as parameter {1} of a call to {2}. Retrieve the following string argument from a resource table instead: '{3}'</Resolution>
+   </Rule>
+   <Rule TypeName="DoNotRaiseReservedExceptionTypes" Category="Microsoft.Usage" CheckId="CA2201">
+    <Resolution Name="TooGeneric">{0} creates an exception of type '{1}', an exception type that is not sufficiently specific and should never be raised by user code. If this exception instance might be thrown, use a different exception type.</Resolution>
+   </Rule>
+   <Rule TypeName="EnumsShouldHaveZeroValue" Category="Microsoft.Design" CheckId="CA1008">
+    <Resolution Name="FlagsRename">In enum '{0}', change the name of '{1}' to 'None'.</Resolution>
+   </Rule>
+   <Rule TypeName="FlagsEnumsShouldHavePluralNames" Category="Microsoft.Naming" CheckId="CA1714">
+    <Resolution Name="Default">If enumeration name '{0}' is singular, change it to a plural form.</Resolution>
+   </Rule>
+   <Rule TypeName="GenericMethodsShouldProvideTypeParameter" Category="Microsoft.Design" CheckId="CA1004">
+    <Resolution Name="Default">Consider a design where {0} doesn't require explicit type parameter '{1}' in any call to it.</Resolution>
+   </Rule>
+   <Rule TypeName="ICollectionImplementationsHaveStronglyTypedMembers" Category="Microsoft.Design" CheckId="CA1035">
+    <Resolution Name="Default">'{0}' should provide a strongly typed implementation of ICollection.CopyTo.</Resolution>
+   </Rule>
+   <Rule TypeName="IdentifiersShouldBeSpelledCorrectly" Category="Microsoft.Naming" CheckId="CA1704">
+    <Resolution Name="ParameterOneLetter">In method {0}, consider providing a more meaningful name than the one-letter parameter name '{1}'.</Resolution>
+    <Resolution Name="Type">Correct the spelling of the unrecognized token '{0}' in type name '{1}'.</Resolution>
+   </Rule>
+   <Rule TypeName="IdentifiersShouldHaveCorrectSuffix" Category="Microsoft.Naming" CheckId="CA1710">
+    <Resolution Name="Default">Rename '{0}' to end in '{1}'.</Resolution>
+   </Rule>
+   <Rule TypeName="ImplementIDisposableCorrectly" Category="Microsoft.Design" CheckId="CA1063">
+    <Resolution Name="DisposeImplementation">Modify {0} so that it calls Dispose(true), then calls GC.SuppressFinalize on the current object instance ('this' or 'Me' in VB), and then returns.</Resolution>
+    <Resolution Name="DisposeSignature">Ensure that {0} is declared as public and sealed.</Resolution>
+    <Resolution Name="ProvideDisposeBool">Provide an overridable implementation of Dispose(bool) on {0} or mark the type as sealed. A call to Dispose(false) should only clean up native resources. A call to Dispose(true) should clean up both managed and native resources.</Resolution>
+    <Resolution Name="RenameDispose">Rename {0} to 'Dispose' and ensure that it is declared as public and sealed.</Resolution>
+   </Rule>
+   <Rule TypeName="InstantiateArgumentExceptionsCorrectly" Category="Microsoft.Usage" CheckId="CA2208">
+    <Resolution Name="OneArgumentShouldBeParameterName">Calls to {0}'s constructor '{1}' should contain one of the method's parameter names instead of '{2}'. Note that the provided parameter name should have the exact casing as declared on the method.</Resolution>
+   </Rule>
+   <Rule TypeName="InterfaceMethodsShouldBeCallableByChildTypes" Category="Microsoft.Design" CheckId="CA1033">
+    <Resolution Name="Default">Make '{0}' sealed (a breaking change if this class has previously shipped), implement the method non-explicitly, or implement a new method that exposes the functionality of '{1}' and is visible to derived classes.</Resolution>
+   </Rule>
+   <Rule TypeName="LongAcronymsShouldBePascalCased" Category="Microsoft.Naming" CheckId="CA1705">
+    <Resolution Name="Member">Correct the capitalization of member name '{0}'.</Resolution>
+   </Rule>
+   <Rule TypeName="MarkISerializableTypesWithSerializable" Category="Microsoft.Usage" CheckId="CA2237">
+    <Resolution Name="Default">Add [Serializable] to '{0}' as this type implements ISerializable.</Resolution>
+   </Rule>
+   <Rule TypeName="MarkMembersAsStatic" Category="Microsoft.Performance" CheckId="CA1822">
+    <Resolution Name="Default">The 'this' parameter (or 'Me' in VB) of {0} is never used. Mark the member as static (or Shared in VB) or use 'this'/'Me' in the method body or at least one property accessor, if appropriate.</Resolution>
+   </Rule>
+   <Rule TypeName="PropertiesShouldNotReturnArrays" Category="Microsoft.Performance" CheckId="CA1819">
+    <Resolution Name="Default">Change {0} to return a collection or make it a method.</Resolution>
+   </Rule>
+   <Rule TypeName="ReviewUnusedParameters" Category="Microsoft.Usage" CheckId="CA1801">
+    <Resolution Name="Default">Parameter '{0}' of {1} is never used. Remove the parameter or use it in the method body.</Resolution>
+   </Rule>
+   <Rule TypeName="ShortAcronymsShouldBeUppercase" Category="Microsoft.Naming" CheckId="CA1706">
+    <Resolution Name="Namespace">Correct the capitalization of '{0}' in namespace name '{1}'.</Resolution>
+    <Resolution Name="Type">Correct the capitalization of '{0}' in type name '{1}'.</Resolution>
+   </Rule>
+   <Rule TypeName="SpecifyCultureInfo" Category="Microsoft.Globalization" CheckId="CA1304">
+    <Resolution Name="Default">{0} makes a call to {1} that does not explicitly provide a CultureInfo. This should be replaced with a call to {2}.</Resolution>
+   </Rule>
+   <Rule TypeName="SpecifyIFormatProvider" Category="Microsoft.Globalization" CheckId="CA1305">
+    <Resolution Name="Default">{0} makes a call to {1} that does not explicitly provide an IFormatProvider. This should be replaced with a call to {2}.</Resolution>
+   </Rule>
+   <Rule TypeName="ValidateArgumentsOfPublicMethods" Category="Microsoft.Design" CheckId="CA1062">
+    <Resolution Name="Default">Validate parameter {0} passed to externally visible method {1}.</Resolution>
+   </Rule>
+  </Rules>
+ </FxCopReport>
+</FxCopProject>

@@ -13,7 +13,7 @@ namespace QQn.TurtleUtils.Cryptography
 		/// <summary>
 		/// 
 		/// </summary>
-		Null	= 0x00,
+		None	= 0x00,
 
 		/// <summary>
 		/// 

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Globalization;
 using System.IO;
 using QQn.TurtleUtils.Tokens.Definitions;
 
@@ -115,7 +115,7 @@ namespace QQn.TurtleUtils.Tokens.Tokenizers
 
 						if (!File.Exists(file))
 						{
-							args.ErrorMessage = string.Format(TokenizerMessages.ResponseFileXNotFound, file);
+							args.ErrorMessage = string.Format(CultureInfo.InvariantCulture, TokenizerMessages.ResponseFileXNotFound, file);
 							return false;
 						}
 						using (StreamReader sr = File.OpenText(a.Substring(1)))

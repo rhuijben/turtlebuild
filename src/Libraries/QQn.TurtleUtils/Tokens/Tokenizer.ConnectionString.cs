@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Collections.Specialized;
 using QQn.TurtleUtils.Tokens;
 using QQn.TurtleUtils.Tokens.Definitions;
@@ -113,7 +112,7 @@ namespace QQn.TurtleUtils.Tokens
 		/// <param name="args">The args.</param>
 		/// <param name="to">To.</param>
 		/// <returns></returns>
-		public static bool TryParseNameValueCollection<T>(IEnumerable<KeyValuePair<string, string>> collection, TokenizerArgs args, out T to)
+		public static bool TryParseNameValueCollection<T>(IDictionary<string, string> collection, TokenizerArgs args, out T to)
 			where T : class, new()
 		{
 			if (collection == null)
