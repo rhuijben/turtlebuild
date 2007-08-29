@@ -92,7 +92,7 @@ namespace QQn.TurtleUtils.Tokens.Tokenizers
 
 							if (token == null)
 							{
-								args.ErrorMessage = string.Format(TokenizerMessages.UnknownArgumentX, a);
+								args.ErrorMessage = string.Format(CultureInfo.InvariantCulture, TokenizerMessages.UnknownArgumentX, a);
 								return false;
 							}
 
@@ -102,7 +102,7 @@ namespace QQn.TurtleUtils.Tokens.Tokenizers
 									value = cArgs[i++];
 								else
 								{
-									args.ErrorMessage = string.Format(TokenizerMessages.ValueExpectedForArgumentX, a);
+									args.ErrorMessage = string.Format(CultureInfo.InvariantCulture, TokenizerMessages.ValueExpectedForArgumentX, a);
 									return false;
 								}
 							}
@@ -139,8 +139,6 @@ namespace QQn.TurtleUtils.Tokens.Tokenizers
 							}
 						}
 
-						// TODO: Insert contents of response file in cArgs at position i+1
-
 						continue;
 					}
 					else if (!args.AllowNamedBetweenPlaced)
@@ -159,7 +157,7 @@ namespace QQn.TurtleUtils.Tokens.Tokenizers
 						}
 						else
 						{
-							args.ErrorMessage = string.Format(TokenizerMessages.UnknownArgumentX, cArgs[i]);
+							args.ErrorMessage = string.Format(CultureInfo.InvariantCulture, TokenizerMessages.UnknownArgumentX, cArgs[i]);
 							return false;
 						}
 					}

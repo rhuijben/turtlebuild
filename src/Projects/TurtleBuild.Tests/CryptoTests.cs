@@ -70,9 +70,9 @@ namespace TurtleTests
 			SignAndVerify(HashType.SHA384);
 
 			// RipeMD160 requires type, or it is validated against SHA1
-			SignAndVerify(HashType.RIPEMD160 | HashType.PlusType);
+			SignAndVerify(HashType.RipeMD160 | HashType.PlusType);
 
-			string hash = QQnCryptoHelpers.CalculateFileHash(SnkFile, HashType.RIPEMD160);
+			string hash = QQnCryptoHelpers.CalculateFileHash(SnkFile, HashType.RipeMD160);
 			Assert.That(QQnCryptoHelpers.VerifyFileHash(SnkFile, hash), Is.False); // SHA1 hash != RIPEMD160 hash
 
 			SignAndVerify(HashType.SHA1 | HashType.PlusSize);

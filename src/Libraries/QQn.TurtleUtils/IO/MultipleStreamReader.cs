@@ -6,24 +6,24 @@ using System.IO;
 namespace QQn.TurtleUtils.IO
 {
 	/// <summary>
-	/// Allows reading multiple substreams from one parent stream. Reads back the streams created with a <see cref="MultiStreamWriter"/>
+	/// Allows reading multiple substreams from one parent stream. Reads back the streams created with a <see cref="MultipleStreamWriter"/>
 	/// </summary>
-	public class MultiStreamReader : IDisposable
+	public class MultipleStreamReader : IDisposable
 	{
 		readonly VerificationMode _verificationMode;
 		readonly Stream _input;
 		readonly QQnBinaryReader _reader;
-		readonly int _maxCount;
+		//readonly int _maxCount;
 		readonly List<MultiStreamItemHeader> _items = new List<MultiStreamItemHeader>();
-		MultiSubStreamReader _openReader;
+		MultipleSubStreamReader _openReader;
 		int _next = 0;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MultiStreamReader"/> class.
+		/// Initializes a new instance of the <see cref="MultipleStreamReader"/> class.
 		/// </summary>
 		/// <param name="input">The input.</param>
 		/// <param name="args">The args.</param>
-		public MultiStreamReader(Stream input, MultiStreamCreateArgs args)
+		public MultipleStreamReader(Stream input, MultipleStreamCreateArgs args)
 		{
 			if (input == null)
 				throw new ArgumentNullException("input");
@@ -34,7 +34,7 @@ namespace QQn.TurtleUtils.IO
 			_reader = new QQnBinaryReader(_input);
 			_verificationMode = args.VerificationMode;
 
-			_maxCount = _reader.ReadInt32();
+			/*_maxCount =*/ _reader.ReadInt32();
 			int count = _reader.ReadInt32();
 
 			long nextHeader = _reader.ReadInt64();
@@ -46,11 +46,11 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MultiStreamReader"/> class.
+		/// Initializes a new instance of the <see cref="MultipleStreamReader"/> class.
 		/// </summary>
 		/// <param name="input">The input.</param>
-		public MultiStreamReader(Stream input)
-			: this(input, new MultiStreamCreateArgs())
+		public MultipleStreamReader(Stream input)
+			: this(input, new MultipleStreamCreateArgs())
 		{
 		}
 
@@ -105,7 +105,7 @@ namespace QQn.TurtleUtils.IO
 				return null;
 
 			MultiStreamItemHeader header = _items[_next++];
-			MultiSubStreamReader reader = new MultiSubStreamReader(this, BaseStream, header);
+			MultipleSubStreamReader reader = new MultipleSubStreamReader(this, BaseStream, header);
 			Stream s = reader;
 
 			if(0 != (header.ItemType & MultiStreamItemHeader.AssuredFlag))
@@ -156,7 +156,7 @@ namespace QQn.TurtleUtils.IO
 			return true;
 		}
 
-		internal void CloseStream(MultiSubStreamReader multiSubStreamReader)
+		internal void CloseStream(MultipleSubStreamReader multiSubStreamReader)
 		{
 			if (_openReader != multiSubStreamReader)
 				throw new InvalidOperationException();

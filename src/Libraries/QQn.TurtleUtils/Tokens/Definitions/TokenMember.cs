@@ -1,8 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
+using System.Reflection;
 
 namespace QQn.TurtleUtils.Tokens.Definitions
 {
@@ -299,7 +300,7 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 						}
 						else
 						{
-							_listType.InvokeMember("Add", BindingFlags.InvokeMethod, null, l, new object[] { value });
+							_listType.InvokeMember("Add", BindingFlags.InvokeMethod, null, l, new object[] { value }, CultureInfo.InvariantCulture);
 						}
 						break;
 					}
@@ -311,13 +312,13 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 		object GetMemberValue<T>(TokenizerState<T> state)
 			where T : class, new()
 		{
-			return typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.GetProperty : BindingFlags.GetField, null, state.Instance, null);
+			return typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.GetProperty : BindingFlags.GetField, null, state.Instance, null, CultureInfo.InvariantCulture);
 		}
 
 		void SetMemberValue<T>(TokenizerState<T> state, object value)
 			where T : class, new()
 		{
-			typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.SetProperty : BindingFlags.SetField, null, state.Instance, new object[] { value });
+			typeof(T).InvokeMember(Name, _isProperty ? BindingFlags.SetProperty : BindingFlags.SetField, null, state.Instance, new object[] { value }, CultureInfo.InvariantCulture);
 		}
 
 		/// <summary>

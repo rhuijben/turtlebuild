@@ -1,11 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Xml.XPath;
-using System.IO;
-using System.Collections.Specialized;
 using System.Text.RegularExpressions;
-using System.Collections;
 using QQn.TurtleUtils.Tokens.Definitions;
 using QQn.TurtleUtils.Tokens.Tokenizers;
 
@@ -17,19 +18,19 @@ namespace QQn.TurtleUtils.Tokens
 	public enum EscapeMode
 	{
 		/// <summary>
-		/// 
+		/// No escaping
 		/// </summary>
 		None = 0,
 		/// <summary>
-		/// 
+		/// Special characters should be doubled
 		/// </summary>
 		DoubleItem = 1,
 		/// <summary>
-		/// 
+		/// All characters can be escaped with the escape character
 		/// </summary>
 		EscapeCharacter = 2,
 		/// <summary>
-		/// 
+		/// Grouping characters can be escaped with the escape character
 		/// </summary>
 		EscapeGroupOnly = 3,
 	}
@@ -48,7 +49,7 @@ namespace QQn.TurtleUtils.Tokens
 			foreach (T i in items)
 			{
 				if (i == null)
-					throw new ArgumentException(string.Format(TokenizerMessages.XInYIsNull, typeof(T).Name, argumentName), argumentName);
+					throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, TokenizerMessages.XInYIsNull, typeof(T).Name, argumentName), argumentName);
 			}
 		}				
 
@@ -227,28 +228,71 @@ namespace QQn.TurtleUtils.Tokens
 
 		static string UnEscape(string p, Dictionary<char, char> _groups, string[] groups, char escapeCharacter, EscapeMode mode, char[] wordSeparators)
 		{
-			if (mode == EscapeMode.DoubleItem)
+			switch (mode)
 			{
-				if (wordSeparators != null)
-					foreach (char c in wordSeparators)
+				case EscapeMode.DoubleItem:
 					{
-						string cs = c.ToString();
-						p = p.Replace(cs + cs, cs);
-					}
-				else
-				{
-					for (int i = 0; i < p.Length; i++)
-					{
-						if (char.IsWhiteSpace(p, i))
+						if (wordSeparators != null)
+							foreach (char c in wordSeparators)
+							{
+								string cs = c.ToString();
+								p = p.Replace(cs + cs, cs);
+							}
+						else
 						{
-							int j = i + 1;
-							while (j < p.Length && char.IsWhiteSpace(p, j))
-								j++;
+							for (int i = 0; i < p.Length; i++)
+							{
+								if (char.IsWhiteSpace(p, i))
+								{
+									int j = i + 1;
+									while (j < p.Length && char.IsWhiteSpace(p, j))
+										j++;
 
-							p = p.Remove(i + 1, j - i - 1);
+									p = p.Remove(i + 1, j - i - 1);
+								}
+							}
 						}
 					}
-				}
+					break;
+				case EscapeMode.EscapeCharacter:
+					{
+						for (int i = 0; i < p.Length; i++)
+						{
+							if (p[i] == escapeCharacter)
+								p = p.Remove(i, 0); // We automatically skip the next character
+						}
+					}
+					break;
+				case EscapeMode.EscapeGroupOnly:
+					{
+						GC.KeepAlive(_groups);
+						for (int i = 0; i < p.Length; i++)
+						{
+							if (p[i] == escapeCharacter && i+1 < p.Length)
+							{
+								bool found = false;
+								char c = p[i+1];
+
+								foreach(string s in groups)
+								{
+									if(s[1] == c)
+									{
+										found = true;
+										break;
+									}
+								}
+
+								if(found)
+									p = p.Remove(i, 0);
+								// otherwise we just leave the escape and continue
+							}								
+						}
+					}
+					break;
+				case EscapeMode.None:
+					break;
+				default:
+					throw new InvalidOperationException();
 			}
 			return p;
 		}

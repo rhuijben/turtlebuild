@@ -40,6 +40,9 @@ namespace QQn.TurtleUtils.Tokens.Converters
 		/// </returns>
 		public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
 		{
+			if (sourceType == null)
+				throw new ArgumentNullException("sourceType");
+
 			return (sourceType == typeof(string)) || base.CanConvertFrom(context, sourceType);
 		}
 
@@ -54,6 +57,9 @@ namespace QQn.TurtleUtils.Tokens.Converters
 		/// </returns>
 		public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
 		{
+			if (destinationType == null)
+				throw new ArgumentNullException("destinationType");
+
 			return destinationType.IsAssignableFrom(typeof(string)) || base.CanConvertTo(context, destinationType);
 		}
 
@@ -72,7 +78,10 @@ namespace QQn.TurtleUtils.Tokens.Converters
 		/// <exception cref="T:System.NotSupportedException">The conversion cannot be performed. </exception>
 		public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
 		{
-			if (destinationType.IsAssignableFrom(typeof(string)))
+			if (destinationType == null)
+				throw new ArgumentNullException("destinationType");
+			
+			if (value != null && destinationType.IsAssignableFrom(typeof(string)))
 				return ((Version)value).ToString();
 
 			return base.ConvertTo(context, culture, value, destinationType);

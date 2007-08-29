@@ -11,11 +11,6 @@ namespace QQn.TurtleUtils.IO
 		long _length;
 		int _itemType;
 
-		public MultiStreamItemHeader(Stream stream)
-			: this(new QQnBinaryReader(stream))
-		{
-		}
-
 		public MultiStreamItemHeader()
 		{
 		}
@@ -44,11 +39,6 @@ namespace QQn.TurtleUtils.IO
 			}
 			else
 				throw new InvalidOperationException();
-		}
-
-		public void WriteTo(Stream stream)
-		{
-			WriteTo(new QQnBinaryWriter(stream));
 		}
 
 		internal void WriteTo(QQnBinaryWriter writer)

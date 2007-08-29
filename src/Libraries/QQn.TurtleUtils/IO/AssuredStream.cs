@@ -30,7 +30,7 @@ namespace QQn.TurtleUtils.IO
 	/// <summary>
 	/// Stream wrapper with embedded hashing and optionally signing the hash
 	/// </summary>
-	public class AssuredStream : StreamProxy
+	public class AssuredStream : ProxyStream
 	{
 		readonly bool _seekable;
 		readonly bool _creating;

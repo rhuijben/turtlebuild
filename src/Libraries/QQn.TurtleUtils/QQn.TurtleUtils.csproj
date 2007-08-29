@@ -41,11 +41,11 @@
     <Compile Include="Cryptography\StrongNameKey.cs" />
     <Compile Include="IO\GZipSubStream.cs" />
     <Compile Include="IO\VerifyUtils.cs" />
-    <Compile Include="IO\MultiStreamArgs.cs" />
-    <Compile Include="IO\MultiStreamCreateArgs.cs" />
+    <Compile Include="IO\MultipleStreamArgs.cs" />
+    <Compile Include="IO\MultipleStreamCreateArgs.cs" />
     <Compile Include="IO\MultiStreamItemHeader.cs" />
-    <Compile Include="IO\MultiStreamReader.cs" />
-    <Compile Include="IO\MultiStreamWriter.cs" />
+    <Compile Include="IO\MultipleStreamReader.cs" />
+    <Compile Include="IO\MultipleStreamWriter.cs" />
     <Compile Include="IO\MultiSubStreamWriter.cs" />
     <Compile Include="IO\MultiSubStreamReader.cs" />
     <Compile Include="IO\QQnBinaryReader.cs" />

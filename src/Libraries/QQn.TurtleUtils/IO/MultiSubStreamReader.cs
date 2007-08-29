@@ -4,13 +4,13 @@ using System.IO;
 
 namespace QQn.TurtleUtils.IO
 {
-	sealed class MultiSubStreamReader : StreamProxy
+	sealed class MultipleSubStreamReader : ProxyStream
 	{
-		readonly MultiStreamReader _reader;
+		readonly MultipleStreamReader _reader;
 		readonly MultiStreamItemHeader _header;
 		bool _closed;
 
-		public MultiSubStreamReader(MultiStreamReader reader, Stream baseStream, MultiStreamItemHeader header)
+		public MultipleSubStreamReader(MultipleStreamReader reader, Stream baseStream, MultiStreamItemHeader header)
 			: base(baseStream, false)
 		{
 			if (reader == null)
@@ -29,11 +29,6 @@ namespace QQn.TurtleUtils.IO
 			_closed = true;
 			_header.Length = Length;
 			_reader.CloseStream(this);
-		}
-
-		public MultiStreamItemHeader Header
-		{
-			get { return _header; }
 		}
 
 		public override bool CanWrite

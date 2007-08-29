@@ -4,13 +4,13 @@ using System.IO;
 
 namespace QQn.TurtleUtils.IO
 {
-	sealed class MultiSubStreamWriter : StreamProxy
+	sealed class MultipleSubStreamWriter : ProxyStream
 	{
-		readonly MultiStreamWriter _writer;
+		readonly MultipleStreamWriter _writer;
 		readonly MultiStreamItemHeader _header;		
 		bool _closed;
 
-		public MultiSubStreamWriter(MultiStreamWriter writer, Stream baseStream, MultiStreamItemHeader header)
+		public MultipleSubStreamWriter(MultipleStreamWriter writer, Stream baseStream, MultiStreamItemHeader header)
 			: base(baseStream, false)
 		{
 			if (writer == null)

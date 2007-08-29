@@ -126,8 +126,10 @@ namespace QQn.TurtleUtils.IO
 		/// <returns></returns>
 		public static string Combine(string path, params string[] items)
 		{
-			if(string.IsNullOrEmpty(path))
+			if (string.IsNullOrEmpty(path))
 				throw new ArgumentNullException("path");
+			else if (items == null)
+				throw new ArgumentNullException("items");
 
 			foreach (string part in items)
 			{
@@ -287,6 +289,12 @@ namespace QQn.TurtleUtils.IO
 		/// <param name="bufferSize">Size of the buffer.</param>
 		public static void CopyStream(Stream from, Stream to, int bufferSize)
 		{
+			if (from == null)
+				throw new ArgumentNullException("from");
+			else if (to == null)
+				throw new ArgumentNullException("to");
+			else if (bufferSize <= 0)
+				throw new ArgumentOutOfRangeException("bufferSize", bufferSize, "Buffersize must be greater than 0");
 			byte[] buffer = new byte[Math.Max(512, bufferSize)];
 			int nRead;
 
@@ -369,8 +377,8 @@ namespace QQn.TurtleUtils.IO
 		/// <summary>
 		/// Finds the file in the system environment variable path, the current directory, or the directory containing the current application.
 		/// </summary>
-		/// <param name="file">The file.</param>
-		/// <returns></returns>
+		/// <param name="file">the filename of the file to search</param>
+		/// <returns>The full path of the file or <c>null</c> if the file is not found</returns>
 		public static string FindFileInPath(string file)
 		{
 			if (string.IsNullOrEmpty(file))

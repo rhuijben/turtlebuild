@@ -4,18 +4,18 @@ using System.Collections.Generic;
 namespace QQn.TurtleUtils.IO
 {
 	/// <summary>
-	/// Argument for creating a <see cref="MultiStreamReader"/> or <see cref="MultiStreamWriter"/>
+	/// Argument for creating a <see cref="MultipleStreamReader"/> or <see cref="MultipleStreamWriter"/>
 	/// </summary>
-	public class MultiStreamCreateArgs
+	public class MultipleStreamCreateArgs
 	{
 		//bool _streamLayout;
 		int _maxSubStreams;
 		VerificationMode _verification;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MultiStreamCreateArgs"/> class.
+		/// Initializes a new instance of the <see cref="MultipleStreamCreateArgs"/> class.
 		/// </summary>
-		public MultiStreamCreateArgs()
+		public MultipleStreamCreateArgs()
 		{
 			MaximumNumberOfStreams = 32;
 		}

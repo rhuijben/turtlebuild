@@ -1,14 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using QQn.TurtleUtils.Tokens.Definitions;
+
+[module: SuppressMessage("Microsoft.Performance", "CA1813:AvoidUnsealedAttributes", Scope = "type", Target = "QQn.TurtleUtils.Tokens.TokenGroupAttribute")]
 
 namespace QQn.TurtleUtils.Tokens
 {
 	/// <summary>
 	/// Tokenizer group
 	/// </summary>
-	[AttributeUsage(TokenAttributeBase.TokenTargets, AllowMultiple = true)]
-	public class TokenGroupAttribute : TokenAttributeBase
+	[AttributeUsage(BaseTokenAttribute.TokenTargets, AllowMultiple = true)]
+	public class TokenGroupAttribute : BaseTokenAttribute
 	{
 		readonly string _name;
 		readonly Type _type;

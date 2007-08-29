@@ -6,7 +6,7 @@ namespace QQn.TurtleUtils.IO
 	/// <summary>
 	/// Create argument of a substream within a MultiStream
 	/// </summary>
-	public class MultiStreamArgs
+	public class MultipleStreamArgs
 	{
 		bool _assured;
 		bool _zipped;
@@ -14,9 +14,9 @@ namespace QQn.TurtleUtils.IO
 		long _fixedLength;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MultiStreamArgs"/> class.
+		/// Initializes a new instance of the <see cref="MultipleStreamArgs"/> class.
 		/// </summary>
-		public MultiStreamArgs()
+		public MultipleStreamArgs()
 		{
 			_fixedLength = -1;
 		}
@@ -37,7 +37,7 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		/// <summary>
-		/// Gets or sets a value indicating whether this <see cref="MultiStreamArgs"/> is assured.
+		/// Gets or sets a value indicating whether this <see cref="MultipleStreamArgs"/> is assured.
 		/// </summary>
 		/// <value><c>true</c> if assured; otherwise, <c>false</c>.</value>
 		/// <remarks>Assured streams are seekable if the parent stream is seekable</remarks>

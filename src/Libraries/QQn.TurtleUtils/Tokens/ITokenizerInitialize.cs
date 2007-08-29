@@ -1,5 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+
+
+[module: SuppressMessage("Microsoft.Design", "CA1040:AvoidEmptyInterfaces", Scope = "type", Target = "QQn.TurtleUtils.Tokens.ITokenizerExpandCollection")]
 
 namespace QQn.TurtleUtils.Tokens
 {
@@ -37,12 +41,19 @@ namespace QQn.TurtleUtils.Tokens
 		/// Called when initialization via the tokenizer starts
 		/// </summary>
 		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
-		void BeginInitialize(TokenizerEventArgs e);
+		void OnBeginInitialize(TokenizerEventArgs e);
 
 		/// <summary>
 		/// Called when initialization via the tokenizer completed
 		/// </summary>
 		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
-		void EndInitialize(TokenizerEventArgs e);
+		void OnEndInitialize(TokenizerEventArgs e);
+	}
+
+	/// <summary>
+	/// Marker interface for tokenizer values which should be expanded while tokenizing
+	/// </summary>
+	public interface ITokenizerExpandCollection : System.Collections.IEnumerable
+	{
 	}
 }

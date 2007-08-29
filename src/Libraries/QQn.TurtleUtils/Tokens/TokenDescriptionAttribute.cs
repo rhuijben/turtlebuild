@@ -6,8 +6,8 @@ namespace QQn.TurtleUtils.Tokens
 	/// <summary>
 	/// 
 	/// </summary>
-	[AttributeUsage(TokenAttributeBase.TokenTargets, AllowMultiple=false)]
-	public sealed class TokenDescriptionAttribute : TokenAttributeBase
+	[AttributeUsage(BaseTokenAttribute.TokenTargets, AllowMultiple=false)]
+	public sealed class TokenDescriptionAttribute : BaseTokenAttribute
 	{
 		readonly string _description;
 

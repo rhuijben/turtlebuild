@@ -15,7 +15,7 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 				if ((mi.MemberType != MemberTypes.Field) && (mi.MemberType != MemberTypes.Property))
 					continue;
 
-				if(null == GetFirstAttribute<TokenAttributeBase>(mi))
+				if(null == GetFirstAttribute<BaseTokenAttribute>(mi))
 					continue;
 
 				TokenMember token = new TokenMember(mi);

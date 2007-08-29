@@ -10,10 +10,16 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// </summary>
 	public class TBLogAssembly
 	{
+		string _assemblyName;
+
 		/// <summary>
 		/// The full assembly name of the produced assembly
 		/// </summary>
 		[Token("assemblyName")]
-		public string AssemblyName;
+		public string AssemblyName
+		{
+			get { return _assemblyName; }
+			set { _assemblyName = value; }
+		}
 	}
 }

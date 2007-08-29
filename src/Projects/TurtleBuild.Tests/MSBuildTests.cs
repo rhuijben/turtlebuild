@@ -270,9 +270,9 @@ namespace TurtleTests
 			Assert.That(PackUtils.TryCreatePack(log, out pack));
 
 			string path = Path.Combine(PackagePath, "QQn.TurtleMSBuild.tbPkg");
-			TurtlePackage.Create(Path.Combine(PackagePath, "QQn.TurtleMSBuild.tbPkg"), pack, log.Project.Path);
+			TPack.Create(Path.Combine(PackagePath, "QQn.TurtleMSBuild.tbPkg"), pack);
 
-			using (TurtlePackage pkg = TurtlePackage.OpenFrom(path, VerificationMode.Full))
+			using (TPack pkg = TPack.OpenFrom(path, VerificationMode.Full))
 			using(DirectoryMap dm = DirectoryMap.Get(ExtractPath))
 			{
 				Assert.That(pkg, Is.Not.Null);
@@ -280,7 +280,7 @@ namespace TurtleTests
 				pkg.ExtractTo(dm);
 			}
 
-			using (TurtlePackage pkg = TurtlePackage.OpenFrom(path, VerificationMode.Full))
+			using (TPack pkg = TPack.OpenFrom(path, VerificationMode.Full))
 			using (DirectoryMap dm = DirectoryMap.Get(ExtractPath))
 			{
 				Assert.That(pkg, Is.Not.Null);

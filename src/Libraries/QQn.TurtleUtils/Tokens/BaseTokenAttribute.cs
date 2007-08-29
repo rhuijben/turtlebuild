@@ -6,14 +6,14 @@ namespace QQn.TurtleUtils
 	/// <summary>
 	/// 
 	/// </summary>
-	public abstract class TokenAttributeBase : Attribute
+	public abstract class BaseTokenAttribute : Attribute
 	{
 		internal const AttributeTargets TokenTargets = AttributeTargets.Field | AttributeTargets.Property;
 
 		/// <summary>
-		/// When overridden initializes a new instance of the <see cref="TokenAttributeBase"/> class.
+		/// When overridden initializes a new instance of the <see cref="BaseTokenAttribute"/> class.
 		/// </summary>
-		protected TokenAttributeBase()
+		protected BaseTokenAttribute()
 		{
 		}
 	}

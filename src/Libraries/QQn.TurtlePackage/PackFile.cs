@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using QQn.TurtleUtils.IO;
 using QQn.TurtleUtils.Tokens;
+using System.Diagnostics.CodeAnalysis;
 
 namespace QQn.TurtlePackage
 {
@@ -115,6 +116,7 @@ namespace QQn.TurtlePackage
 
 		string IVerifiableFile.Filename
 		{
+			[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
 			get 
 			{
 				string basePath = BaseDir;
@@ -151,6 +153,7 @@ namespace QQn.TurtlePackage
 		/// <param name="fileHash">The file hash.</param>
 		/// <param name="size">The size.</param>
 		/// <param name="lastWriteTimeUtc">The last write time UTC.</param>
+		[SuppressMessage("Microsoft.Design", "CA1033:InterfaceMethodsShouldBeCallableByChildTypes")]
 		void IUpdatableVerifiableFile.UpdateVerifyData(string fileHash, long? size, DateTime? lastWriteTimeUtc)
 		{
 			EnsureWritable();

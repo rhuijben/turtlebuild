@@ -6,7 +6,7 @@ namespace QQn.TurtleUtils.Tokens
 	/// <summary>
 	/// 
 	/// </summary>
-	[AttributeUsage(TokenAttributeBase.TokenTargets, AllowMultiple=false)]
+	[AttributeUsage(BaseTokenAttribute.TokenTargets, AllowMultiple=false)]
 	public sealed class RestTokenAttribute : PositionTokenAttribute
 	{
 		/// <summary>

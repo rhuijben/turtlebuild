@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 
 namespace QQn.TurtleUtils.Tokens.Definitions
@@ -86,7 +87,7 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 		/// Token allows a value ('-source=banana')
 		/// </summary>
 		/// <value><c>true</c> if [accepts value]; otherwise, <c>false</c>.</value>
-		public bool AcceptsValue
+		public virtual bool AcceptsValue
 		{
 			get { return true; }
 		}
@@ -170,10 +171,10 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 			
 			if((v != null) && DataType.IsAssignableFrom(v.GetType()))
 				return v;
-			else if (v is ExpandableTokenCollection) // FileSystemInfo converted star object
+			else if (v is ITokenizerExpandCollection) // FileSystemInfo converted star object
 				return v;
 
-			throw new InvalidOperationException(string.Format("The typeconverter of type {0} (A {1} instance) can't convert a string into a {0}", DataType.FullName, tc.GetType().FullName, DataType.Name));
+			throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "The typeconverter of type {0} (A {1} instance) can't convert a string into a {0}", DataType.FullName, tc.GetType().FullName, DataType.Name));
 		}
 
 		internal string GetStringValue<T>(object value, TokenizerState<T> state)
@@ -210,8 +211,8 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 
 			object RawValue = ConvertValue(value, state);
 
-			
-			ExpandableTokenCollection expandable = RawValue as ExpandableTokenCollection;
+
+			ITokenizerExpandCollection expandable = RawValue as ITokenizerExpandCollection;
 
 			if (expandable != null)
 			{

@@ -137,10 +137,6 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 			}
 		}
 
-		#region ITokenizerInitialize Members
-
-		#endregion
-
 		#region IHasFullPath Members
 
 		string _fullPath;
@@ -162,15 +158,33 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 
 		#region ITokenizerInitialize Members
 
-		void ITokenizerInitialize.BeginInitialize(TokenizerEventArgs e)
+		void ITokenizerInitialize.OnBeginInitialize(TokenizerEventArgs e)
 		{
+			OnBeginInitialize(e);
 			
 		}
 
-		void ITokenizerInitialize.EndInitialize(TokenizerEventArgs e)
+		/// <summary>
+		/// Called when initialization via the tokenizer starts
+		/// </summary>
+		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
+		protected virtual void OnBeginInitialize(TokenizerEventArgs e)
 		{
+		}
+
+		void ITokenizerInitialize.OnEndInitialize(TokenizerEventArgs e)
+		{
+			OnEndInitialize(e);
 			_completed = true;
-			_fullPath = Project.Path;
+		}
+
+		/// <summary>
+		/// Called when initialization via the tokenizer completed
+		/// </summary>
+		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
+		protected virtual void OnEndInitialize(TokenizerEventArgs e)
+		{
+ 			_fullPath = Project.Path;
 			ProjectOutput.Parent = this;
 			Content.Parent = this;
 			Scripts.Parent = this;

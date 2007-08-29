@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
-using QQn.TurtleUtils.Tokens;
-using System.Collections.ObjectModel;
-using QQn.TurtleUtils.Cryptography;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Collections.ObjectModel;
 using System.Xml.XPath;
 using System.Xml;
+using QQn.TurtleUtils.Cryptography;
+using QQn.TurtleUtils.Tokens;
 
 namespace QQn.TurtleUtils.IO
 {
@@ -46,6 +47,8 @@ namespace QQn.TurtleUtils.IO
 		public HashType HashType
 		{
 			get { return _hashType; }
+
+			[SuppressMessage("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")] // Used by tokenizer
 			set { _hashType = value; }
 		}
 

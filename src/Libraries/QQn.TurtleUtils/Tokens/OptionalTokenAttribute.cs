@@ -6,8 +6,8 @@ namespace QQn.TurtleUtils.Tokens
 	/// <summary>
 	/// 
 	/// </summary>
-	[AttributeUsage(TokenAttributeBase.TokenTargets, AllowMultiple=false)]
-	public sealed class OptionalTokenAttribute : TokenAttributeBase
+	[AttributeUsage(BaseTokenAttribute.TokenTargets, AllowMultiple=false)]
+	public sealed class OptionalTokenAttribute : BaseTokenAttribute
 	{
 		bool _notOptional;
 

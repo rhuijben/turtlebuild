@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Cache;
@@ -15,7 +16,7 @@ namespace QQn.TurtlePackage
 	/// <summary>
 	/// 
 	/// </summary>
-	public class TurtlePackage : IDisposable
+	public class TPack : IDisposable
 	{
 		/// <summary>
 		/// 
@@ -24,11 +25,11 @@ namespace QQn.TurtlePackage
 		//readonly FileInfo _package;
 		//readonly IXPathNavigable _manifest;
 		readonly List<IDisposable> _disposeAtClose;
-		readonly MultiStreamReader _reader;
-		MultiStreamReader _contentReader;
+		readonly MultipleStreamReader _reader;
+		MultipleStreamReader _contentReader;
 		readonly Pack _pack;
 
-		internal TurtlePackage(Stream baseStream, params IDisposable[] disposeAtClose)
+		internal TPack(Stream baseStream, params IDisposable[] disposeAtClose)
 		{
 			if (baseStream == null)
 				throw new ArgumentNullException("baseStream");
@@ -37,10 +38,10 @@ namespace QQn.TurtlePackage
 			if (disposeAtClose == null)
 				_disposeAtClose.AddRange(disposeAtClose);
 
-			MultiStreamCreateArgs msa = new MultiStreamCreateArgs();
+			MultipleStreamCreateArgs msa = new MultipleStreamCreateArgs();
 			msa.VerificationMode = VerificationMode.Full;
 
-			_reader = new MultiStreamReader(baseStream, msa);
+			_reader = new MultipleStreamReader(baseStream, msa);
 
 			Pack pack;
 			using (Stream r = _reader.GetNextStream(0x01))
@@ -64,21 +65,21 @@ namespace QQn.TurtlePackage
 		/// Gets the content reader.
 		/// </summary>
 		/// <value>The content reader.</value>
-		protected MultiStreamReader ContentReader
+		protected MultipleStreamReader ContentReader
 		{
 			get
 			{
 				if (_contentReader == null)
 				{
 					_reader.Reset();
-					_contentReader = _contentReader = new MultiStreamReader(_reader.GetNextStream(0x02));
+					_contentReader = _contentReader = new MultipleStreamReader(_reader.GetNextStream(0x02));
 				}
 
 				return _contentReader;
 			}
 		}
 
-		internal TurtlePackage()
+		internal TPack()
 		{
 		}
 
@@ -90,6 +91,8 @@ namespace QQn.TurtlePackage
 			Dispose(true);
 		}
 
+
+		[SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")]
 		void IDisposable.Dispose()
 		{
 			Dispose(true);
@@ -100,7 +103,7 @@ namespace QQn.TurtlePackage
 		/// Releases unmanaged and - optionally - managed resources
 		/// </summary>
 		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
-		private void Dispose(bool disposing)
+		protected virtual void Dispose(bool disposing)
 		{
 			if (_disposed)
 				return;
@@ -123,9 +126,8 @@ namespace QQn.TurtlePackage
 		/// </summary>
 		/// <param name="fileName">Name of the file.</param>
 		/// <param name="definition">The definition.</param>
-		/// <param name="basePath">The base path.</param>
 		/// <returns></returns>
-		public static TurtlePackage Create(string fileName, Pack definition, string basePath)
+		public static TPack Create(string fileName, Pack definition)
 		{
 			if (fileName == null)
 				throw new ArgumentNullException("fileName");
@@ -139,19 +141,19 @@ namespace QQn.TurtlePackage
 
 			args.FileType = PackageFileType;
 
-			MultiStreamArgs fileCreateArgs = new MultiStreamArgs();
+			MultipleStreamArgs fileCreateArgs = new MultipleStreamArgs();
 			fileCreateArgs.StreamType = 0x04;
 			fileCreateArgs.Assured = true;
 			fileCreateArgs.GZipped = true;
 
-			MultiStreamCreateArgs msca = new MultiStreamCreateArgs();
+			MultipleStreamCreateArgs msca = new MultipleStreamCreateArgs();
 			msca.MaximumNumberOfStreams = 8;
 
 			using (FileStream fs = File.Create(fileName, 16384))
 			using (AssuredStream assurance = new AssuredStream(fs, args))
-			using (MultiStreamWriter msw = new MultiStreamWriter(assurance))
+			using (MultipleStreamWriter msw = new MultipleStreamWriter(assurance))
 			{
-				MultiStreamArgs msa = new MultiStreamArgs();
+				MultipleStreamArgs msa = new MultipleStreamArgs();
 				msa.StreamType = 0x01;
 				msa.Assured = true;
 				using (XmlWriter xw = new XmlTextWriter(msw.CreateStream(msa), Encoding.UTF8))
@@ -162,15 +164,15 @@ namespace QQn.TurtlePackage
 					xw.WriteEndDocument();
 				}
 
-				MultiStreamCreateArgs zipcArgs = new MultiStreamCreateArgs();
+				MultipleStreamCreateArgs zipcArgs = new MultipleStreamCreateArgs();
 				zipcArgs.MaximumNumberOfStreams = definition.Containers.Count;
-				using (MultiStreamWriter zipBase = new MultiStreamWriter(msw.CreateStream(0x02), zipcArgs))
+				using (MultipleStreamWriter zipBase = new MultipleStreamWriter(msw.CreateStream(0x02), zipcArgs))
 				{
 					foreach (PackContainer container in definition.Containers)
 					{
-						MultiStreamCreateArgs ccArgs = new MultiStreamCreateArgs();
+						MultipleStreamCreateArgs ccArgs = new MultipleStreamCreateArgs();
 						ccArgs.MaximumNumberOfStreams = container.Files.Count;
-						using (MultiStreamWriter containerWriter = new MultiStreamWriter(zipBase.CreateStream(0x03), ccArgs))
+						using (MultipleStreamWriter containerWriter = new MultipleStreamWriter(zipBase.CreateStream(0x03), ccArgs))
 						{
 							foreach (PackFile file in container.Files)
 							{
@@ -193,7 +195,7 @@ namespace QQn.TurtlePackage
 		/// <param name="file">The file.</param>
 		/// <param name="verificationMode">The verification mode.</param>
 		/// <returns></returns>
-		public static TurtlePackage OpenFrom(string file, VerificationMode verificationMode)
+		public static TPack OpenFrom(string file, VerificationMode verificationMode)
 		{
 			if (string.IsNullOrEmpty(file))
 				throw new ArgumentNullException("file");
@@ -232,7 +234,7 @@ namespace QQn.TurtlePackage
 		/// <param name="uri">The URI.</param>
 		/// <param name="verificationMode">The verification mode.</param>
 		/// <returns></returns>
-		public static TurtlePackage OpenFrom(Uri uri, VerificationMode verificationMode)
+		public static TPack OpenFrom(Uri uri, VerificationMode verificationMode)
 		{
 			return OpenFrom(uri, verificationMode, null);
 		}
@@ -244,7 +246,7 @@ namespace QQn.TurtlePackage
 		/// <param name="verificationMode">The verification mode.</param>
 		/// <param name="credentials">The credentials.</param>
 		/// <returns></returns>
-		public static TurtlePackage OpenFrom(Uri uri, VerificationMode verificationMode, ICredentials credentials)
+		public static TPack OpenFrom(Uri uri, VerificationMode verificationMode, ICredentials credentials)
 		{
 			if (uri == null)
 				throw new ArgumentNullException("uri");
@@ -301,11 +303,11 @@ namespace QQn.TurtlePackage
 		/// <param name="stream">The stream.</param>
 		/// <param name="verificationMode">The verification mode.</param>
 		/// <returns></returns>
-		static TurtlePackage Open(Stream stream, VerificationMode verificationMode)
+		static TPack Open(Stream stream, VerificationMode verificationMode)
 		{
 			AssuredStream rootStream = new AssuredStream(stream, verificationMode);
 
-			return new TurtlePackage(rootStream, stream);
+			return new TPack(rootStream, stream);
 		}
 
 		delegate void Extractor(PackFile file, Stream fileStream);
@@ -345,7 +347,7 @@ namespace QQn.TurtlePackage
 					if (!args.ExtractContainer(container.Name))
 						continue;
 
-					using(MultiStreamReader fr = new MultiStreamReader(s))
+					using(MultipleStreamReader fr = new MultipleStreamReader(s))
 					{
 						foreach (PackFile pf in container.Files)
 						{
@@ -405,6 +407,8 @@ namespace QQn.TurtlePackage
 		{
 			if (string.IsNullOrEmpty(directory))
 				throw new ArgumentNullException("directory");
+			else if (args == null)
+				throw new ArgumentNullException("args");
 
 			if(args.UseDirectoryMap)
 			{

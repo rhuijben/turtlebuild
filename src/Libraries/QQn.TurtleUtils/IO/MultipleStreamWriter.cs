@@ -1,14 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 
 namespace QQn.TurtleUtils.IO
 {
 	/// <summary>
-	/// Allows writing multiple substreams to one parent stream. The individual substream can be read with a <see cref="MultiStreamReader"/>
+	/// Allows writing multiple substreams to one parent stream. The individual substream can be read with a <see cref="MultipleStreamReader"/>
 	/// </summary>
-	public class MultiStreamWriter : IDisposable
+	public class MultipleStreamWriter : IDisposable
 	{
 		readonly Stream _output;
 		readonly QQnBinaryWriter _writer;
@@ -19,31 +20,31 @@ namespace QQn.TurtleUtils.IO
 		Stream _openStream;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MultiStreamWriter"/> class.
+		/// Initializes a new instance of the <see cref="MultipleStreamWriter"/> class.
 		/// </summary>
 		/// <param name="output">The output.</param>
-		/// <param name="e">The e.</param>
-		public MultiStreamWriter(Stream output, MultiStreamCreateArgs e)
+		/// <param name="args">The args.</param>
+		public MultipleStreamWriter(Stream output, MultipleStreamCreateArgs args)
 		{
 			if (output == null)
 				throw new ArgumentNullException("output");
 
 			_output = output;
 			_writer = new QQnBinaryWriter(BaseStream);
-			_maxCount = e.MaximumNumberOfStreams;
+			_maxCount = args.MaximumNumberOfStreams;
 
 			// sizeof(_maxCount) + sizeof(_items) + sizeof(_nextHeaderPosition) + sizeof(item)*maxItems
-			_startPosition = 4 + 4 + 8 + MultiStreamItemHeader.ItemSize * _maxCount; 
+			_startPosition = 4 + 4 + 8 + MultiStreamItemHeader.ItemSize * _maxCount;
 
 			WriteHeader();
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="MultiStreamWriter"/> class.
+		/// Initializes a new instance of the <see cref="MultipleStreamWriter"/> class.
 		/// </summary>
 		/// <param name="output">The output.</param>
-		public MultiStreamWriter(Stream output)
-			: this(output, new MultiStreamCreateArgs())
+		public MultipleStreamWriter(Stream output)
+			: this(output, new MultipleStreamCreateArgs())
 		{
 		}
 
@@ -60,11 +61,11 @@ namespace QQn.TurtleUtils.IO
 				_items[i].WriteTo(_writer);
 			}
 
-			if(BaseStream.Length < _startPosition)
+			if (BaseStream.Length < _startPosition)
 			{
 				BaseStream.SetLength(_startPosition);
 				BaseStream.Position = _startPosition;
-			}			
+			}
 		}
 
 		/// <summary>
@@ -76,9 +77,20 @@ namespace QQn.TurtleUtils.IO
 			get { return _output; }
 		}
 
+		[SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")]
 		void IDisposable.Dispose()
 		{
-			Close();
+			Dispose(true);
+		}
+
+		/// <summary>
+		/// Releases unmanaged and - optionally - managed resources
+		/// </summary>
+		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if (disposing)
+				Close();
 		}
 
 		/// <summary>
@@ -100,7 +112,7 @@ namespace QQn.TurtleUtils.IO
 			if ((type < 0) || (type > 0xFFFFFF))
 				throw new ArgumentOutOfRangeException("type", type, "Value must be between 0 and 16777216");
 
-			MultiStreamArgs args = new MultiStreamArgs();
+			MultipleStreamArgs args = new MultipleStreamArgs();
 			args.StreamType = type;
 			return CreateStream(args);
 		}
@@ -110,7 +122,7 @@ namespace QQn.TurtleUtils.IO
 		/// </summary>
 		/// <param name="args">The args.</param>
 		/// <returns></returns>
-		public Stream CreateStream(MultiStreamArgs args)
+		public Stream CreateStream(MultipleStreamArgs args)
 		{
 			if (_openStream != null)
 				throw new InvalidOperationException("Only one substream can be open at a time");
@@ -127,7 +139,7 @@ namespace QQn.TurtleUtils.IO
 			header.ItemType = args.StreamType << 4;
 			_updated = true;
 
-			MultiSubStreamWriter innerStream = new MultiSubStreamWriter(this, BaseStream, header);
+			MultipleSubStreamWriter innerStream = new MultipleSubStreamWriter(this, BaseStream, header);
 			Stream result = innerStream;
 
 			if (args.Assured)
@@ -154,12 +166,14 @@ namespace QQn.TurtleUtils.IO
 			if (_updated)
 				WriteHeader();
 
+			_writer.Close();
+
 			BaseStream.Close();
 		}
 
-		internal void CloseStream(MultiSubStreamWriter multiSubStream)
+		internal void CloseStream(MultipleSubStreamWriter multiSubStream)
 		{
-			if(_openStream != multiSubStream)
+			if (_openStream != multiSubStream)
 				throw new InvalidOperationException();
 
 			_items.Add(multiSubStream.Header);
