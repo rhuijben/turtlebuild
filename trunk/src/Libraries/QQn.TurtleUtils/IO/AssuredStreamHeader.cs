@@ -19,10 +19,10 @@ namespace QQn.TurtleUtils.IO
 		long _hashPosition;
 		long _bodyLength;
 
-		public AssuredStreamHeader(Stream source)
+		/*public AssuredStreamHeader(Stream source)
 			: this(source, VerificationMode.Full)
 		{
-		}
+		}*/
 
 		public AssuredStreamHeader(Stream source, VerificationMode mode)
 		{
@@ -98,6 +98,7 @@ namespace QQn.TurtleUtils.IO
 				_snk = args.StrongNameKey;
 				_fileHash = new byte[_snk.HashLength];
 				_hashSignature = new byte[_snk.SignatureLength];
+				_hashType = _snk.HashType;
 			}
 			_guid = args.NullGuid ? Guid.Empty : Guid.NewGuid();
 		}

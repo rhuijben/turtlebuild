@@ -5,7 +5,7 @@ using System.ComponentModel;
 using QQn.TurtleUtils.Tokens.Definitions;
 
 [module: SuppressMessage("Microsoft.Design", "CA1019:DefineAccessorsForAttributeArguments", Scope = "type", Target = "QQn.TurtleUtils.Tokens.TokenAttribute")]
-
+[module: SuppressMessage("Microsoft.Performance", "CA1813:AvoidUnsealedAttributes", Scope = "type", Target = "QQn.TurtleUtils.Tokens.TokenAttribute")]
 namespace QQn.TurtleUtils.Tokens
 {
 	
@@ -13,8 +13,8 @@ namespace QQn.TurtleUtils.Tokens
 	/// <summary>
 	/// 
 	/// </summary>
-	[AttributeUsage(TokenAttributeBase.TokenTargets, AllowMultiple=true)]
-	public class TokenAttribute : TokenAttributeBase
+	[AttributeUsage(BaseTokenAttribute.TokenTargets, AllowMultiple=true)]
+	public class TokenAttribute : BaseTokenAttribute
 	{
 		readonly string _name;
 		IList<string> _aliases;

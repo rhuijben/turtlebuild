@@ -10,7 +10,7 @@ namespace QQn.TurtleUtils.IO
 	/// <summary>
 	/// 
 	/// </summary>
-	public sealed class DirectoryMapStream : StreamProxy
+	public sealed class DirectoryMapStream : ProxyStream
 	{
 		readonly DirectoryMapItem _file;
 		readonly HashType _hashType;

@@ -363,7 +363,7 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 			AppendRegexIfNotNull(builder, EnumRegex);
 		}
 
-		internal void AppendRegexIfNotNull(StringBuilder builder, string value)
+		internal static void AppendRegexIfNotNull(StringBuilder builder, string value)
 		{
 			if (!string.IsNullOrEmpty(value))
 			{

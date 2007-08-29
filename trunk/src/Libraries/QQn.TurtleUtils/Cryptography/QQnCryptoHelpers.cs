@@ -78,7 +78,7 @@ namespace QQn.TurtleUtils.Cryptography
 					return SHA512.Create();
 				case HashType.SHA384:
 					return SHA384.Create();
-				case HashType.RIPEMD160:
+				case HashType.RipeMD160:
 					return RIPEMD160.Create();
 				default:
 					throw new ArgumentException("Invalid hashtype", "hashType");
@@ -106,7 +106,7 @@ namespace QQn.TurtleUtils.Cryptography
 			{
 				case HashType.MD5:
 					return 128;
-				case HashType.RIPEMD160:
+				case HashType.RipeMD160:
 					return 160;
 				case HashType.SHA1:
 					return 160;
@@ -429,16 +429,16 @@ namespace QQn.TurtleUtils.Cryptography
 		/// <summary>
 		/// Calculates a unique guid based on baseGuid and stringToHash
 		/// </summary>
-		/// <param name="baseGuid"></param>
-		/// <param name="stringToHash"></param>
+		/// <param name="baseGuid">The guid to use as seed for generating</param>
+		/// <param name="value">The value to hash into the generated guid</param>
 		/// <returns></returns>
 		/// <remarks>Uses the UTF-8 representation of stringToHash with <see cref="GuidFromHash"/></remarks>
-		public static Guid GuidFromString(Guid baseGuid, string stringToHash)
+		public static Guid GuidFromString(Guid baseGuid, string value)
 		{
-			if (stringToHash == null)
-				throw new ArgumentNullException("stringToHash");
+			if (value == null)
+				throw new ArgumentNullException("value");
 
-			return GuidFromHash(baseGuid, Encoding.UTF8.GetBytes(stringToHash));
+			return GuidFromHash(baseGuid, Encoding.UTF8.GetBytes(value));
 		}
 
 		private static byte[] ToHostOrder(byte[] a)

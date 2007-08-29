@@ -10,7 +10,7 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 	/// Contains the parser state while tokanizing
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class TokenizerState<T> : Hashtable, IDisposable, ITypeDescriptorContext
+	public sealed class TokenizerState<T> : IDisposable, ITypeDescriptorContext
 		where T : class, new()
 	{
 		readonly T _instance;
@@ -102,6 +102,7 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 		/// <remarks>Calls <see cref="ISupportInitialize.EndInit"/> if the instance implements <see cref="ISupportInitialize"/></remarks>
 		public void Dispose()
 		{
+
 			ITokenizerInitialize init = _init;
 			if (init != null)
 			{
@@ -109,7 +110,7 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 
 				TokenizerEventArgs e = new TokenizerEventArgs();
 				e.Context = _args.Context;
-				init.EndInitialize(e);
+				init.OnEndInitialize(e);
 			}
 		}
 

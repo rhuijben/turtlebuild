@@ -186,12 +186,12 @@ namespace QQn.TurtlePackage
 
 		#region ITokenizerInitialize Members
 
-		void ITokenizerInitialize.BeginInitialize(TokenizerEventArgs e)
+		void ITokenizerInitialize.OnBeginInitialize(TokenizerEventArgs e)
 		{
 			OnBeginInitialize(e);
 		}
 
-		void ITokenizerInitialize.EndInitialize(TokenizerEventArgs e)
+		void ITokenizerInitialize.OnEndInitialize(TokenizerEventArgs e)
 		{
 			OnEndInitialize(e);
 		}

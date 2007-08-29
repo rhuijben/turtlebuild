@@ -11,16 +11,17 @@ namespace QQn.TurtleUtils.IO
 	/// </summary>
 	/// <remarks>The public key of a parent <see cref="AssuredStream"/> is used for signing the substream. 
 	/// All between streams must implement <see cref="IServiceProvider"/> to allow finding a parent <see cref="AssuredStream"/></remarks>
-	public class AssuredSubStream : StreamProxy
+	public class AssuredSubStream : ProxyStream
 	{
 		readonly StrongNameKey _snk;
+		readonly HashType _hashType;
 		long _headerPosition;
 		long _hashPosition;
 		byte[] _streamHash;
 		byte[] _hashSignature;
 		long _hashLength;
 		bool _updating;
-		readonly HashType _hashType;
+		
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AssuredSubStream"/> class.
@@ -31,16 +32,18 @@ namespace QQn.TurtleUtils.IO
 			: base(parentStream, true)
 		{
 			AssuredStream signedParent = GetService<AssuredStream>();
-			
+
 			if (signedParent != null)
 			{
 				_snk = signedParent.AssemblyStrongNameKey;
 				_hashType = signedParent.HashType;
-			}				
+			}
+			else
+				_hashType = HashType.SHA1;
 			
 			_headerPosition = parentStream.Position;
 
-			_streamHash = new byte[(_snk != null) ? _snk.HashLength : 256 / 8]; // 256 = Bits of SHA256
+			_streamHash = new byte[QQnCryptoHelpers.GetHashBits(_hashType) / 8];
 			_hashSignature = new byte[(_snk != null) ? _snk.SignatureLength : 0];
 
 			if (parentStream.CanWrite && parentStream.CanSeek && parentStream.Position == parentStream.Length)
@@ -107,7 +110,7 @@ namespace QQn.TurtleUtils.IO
 		/// </summary>
 		/// <param name="parentPosition">The parent position.</param>
 		/// <returns></returns>
-		protected override long PositionToSubStream(long parentPosition)
+		protected sealed override long PositionToSubStream(long parentPosition)
 		{
 			return parentPosition - _hashPosition;
 		}
@@ -117,7 +120,7 @@ namespace QQn.TurtleUtils.IO
 		/// </summary>
 		/// <param name="subStreamPosition">The sub stream position.</param>
 		/// <returns></returns>
-		protected override long PositionToParent(long subStreamPosition)
+		protected sealed override long PositionToParent(long subStreamPosition)
 		{
 			return subStreamPosition + _hashPosition;
 		}
@@ -209,11 +212,11 @@ namespace QQn.TurtleUtils.IO
 		byte[] CalculateHash(bool create)
 		{
 			if (create)
-				_hashLength = Length;
+				_hashLength = PositionToSubStream(BaseStream.Length);
 
 			long oldPos = Position;
 			Position = 0;
-			using (HashAlgorithm hasher = (_snk != null) ? _snk.CreateHasher() : SHA256.Create())
+			using (HashAlgorithm hasher = QQnCryptoHelpers.CreateHashAlgorithm(_hashType))
 			{
 				byte[] buffer;
 				using (MemoryStream ms = new MemoryStream(16)) // Use memorystream and writer to resolve endian-issues
@@ -240,7 +243,71 @@ namespace QQn.TurtleUtils.IO
 					Position = oldPos;
 
 				return hasher.Hash;
-			}			
+			}
 		}
+
+		#region Sealed overrides. They are called indirectly from the constructor; see fxcop report if unsealed
+		/// <summary>
+		/// Gets the length in bytes of the stream.
+		/// </summary>
+		/// <value></value>
+		/// <returns>A long value representing the length of the stream in bytes.</returns>
+		/// <exception cref="T:System.NotSupportedException">A class derived from Stream does not support seeking. </exception>
+		/// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
+		public sealed override long Length
+		{
+			get { return base.Length; }
+		}
+
+		/// <summary>
+		/// Gets or sets the position within the current stream.
+		/// </summary>
+		/// <value></value>
+		/// <returns>The current position within the stream.</returns>
+		/// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
+		/// <exception cref="T:System.NotSupportedException">The stream does not support seeking. </exception>
+		/// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
+		public sealed override long Position
+		{
+			get
+			{
+				return base.Position;
+			}
+			set
+			{
+				base.Position = value;
+			}
+		}
+
+		/// <summary>
+		/// Reads a sequence of bytes from the current stream and advances the position within the stream by the number of bytes read.
+		/// </summary>
+		/// <param name="buffer">An array of bytes. When this method returns, the buffer contains the specified byte array with the values between offset and (offset + count - 1) replaced by the bytes read from the current source.</param>
+		/// <param name="offset">The zero-based byte offset in buffer at which to begin storing the data read from the current stream.</param>
+		/// <param name="count">The maximum number of bytes to be read from the current stream.</param>
+		/// <returns>
+		/// The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many bytes are not currently available, or zero (0) if the end of the stream has been reached.
+		/// </returns>
+		/// <exception cref="T:System.ArgumentException">The sum of offset and count is larger than the buffer length. </exception>
+		/// <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
+		/// <exception cref="T:System.NotSupportedException">The stream does not support reading. </exception>
+		/// <exception cref="T:System.ArgumentNullException">buffer is null. </exception>
+		/// <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
+		/// <exception cref="T:System.ArgumentOutOfRangeException">offset or count is negative. </exception>
+		public sealed override int Read(byte[] buffer, int offset, int count)
+		{
+			return base.Read(buffer, offset, count);
+		}
+
+		/// <summary>
+		/// Gets a value indicating whether the current stream supports seeking.
+		/// </summary>
+		/// <value></value>
+		/// <returns>true if the stream supports seeking; otherwise, false.</returns>
+		public sealed override bool CanSeek
+		{
+			get { return base.CanSeek; }
+		}
+		#endregion
 	}
 }

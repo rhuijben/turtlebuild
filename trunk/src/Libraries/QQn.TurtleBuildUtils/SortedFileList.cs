@@ -4,6 +4,10 @@ using System.Text;
 using System.Collections.ObjectModel;
 using System.IO;
 using QQn.TurtleUtils.IO;
+using System.Diagnostics.CodeAnalysis;
+
+[module: SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Scope = "type", Target = "QQn.TurtleBuildUtils.SortedFileList")]
+[module: SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Scope = "type", Target = "QQn.TurtleBuildUtils.SortedFileList`1")]
 
 namespace QQn.TurtleBuildUtils
 {

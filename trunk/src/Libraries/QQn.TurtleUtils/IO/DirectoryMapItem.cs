@@ -11,7 +11,7 @@ namespace QQn.TurtleUtils.IO
 	/// <summary>
 	/// 
 	/// </summary>
-	public class DirectoryMapItem : IVerifiableFile, ITokenizerInitialize, ISupportInitialize
+	public class DirectoryMapItem : IVerifiableFile, ITokenizerInitialize
 	{
 		bool _initCompleted;
 		string _fileName;
@@ -29,7 +29,7 @@ namespace QQn.TurtleUtils.IO
 
 		internal DirectoryMapItem()
 		{
-			_initCompleted = false;
+			//_initCompleted = false;
 			_size = -1;
 		}
 
@@ -119,24 +119,45 @@ namespace QQn.TurtleUtils.IO
 
 		#region ITokenizerInit Members
 
-		void ITokenizerInitialize.BeginInitialize(TokenizerEventArgs e)
+		/// <summary>
+		/// Called when initialization via the tokenizer starts
+		/// </summary>
+		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
+		void ITokenizerInitialize.OnBeginInitialize(TokenizerEventArgs e)
 		{
-			
+			OnBeginInitialize(e);			
+		}
+
+		/// <summary>
+		/// Raises the <see cref="E:BeginInitialize"/> event.
+		/// </summary>
+		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
+		protected virtual void OnBeginInitialize(TokenizerEventArgs e)
+		{
 		}
 		/// <summary>
 		/// Ends the init.
 		/// </summary>
 		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
-		void ITokenizerInitialize.EndInitialize(TokenizerEventArgs e)
+		void ITokenizerInitialize.OnEndInitialize(TokenizerEventArgs e)
 		{
+			OnEndInitialize(e);
 			_initCompleted = true;
+		}
+
+		/// <summary>
+		/// Raises the <see cref="E:EndInitialize"/> event.
+		/// </summary>
+		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
+		protected virtual void OnEndInitialize(TokenizerEventArgs e)
+		{
 		}
 
 		#endregion
 
 		internal class Initializer : IDisposable
 		{
-			readonly ISupportInitialize _file;
+			readonly DirectoryMapItem _file;
 			public Initializer(DirectoryMapItem file)
 			{
 				_file = file;
@@ -150,20 +171,24 @@ namespace QQn.TurtleUtils.IO
 			}
 		}
 
-		internal Initializer Updater()
+		/// <summary>
+		/// Temporarily allows updating this instance
+		/// </summary>
+		/// <returns></returns>
+		protected internal IDisposable Updater()
 		{
 			return new Initializer(this);
 		}
 
 		#region ISupportInitialize Members
 
-		void ISupportInitialize.BeginInit()
+		internal void BeginInit()
 		{
 			_initCompleted = false;
 			_map.Dirty = true;
 		}
 
-		void ISupportInitialize.EndInit()
+		internal void EndInit()
 		{
 			_initCompleted = true;
 		}

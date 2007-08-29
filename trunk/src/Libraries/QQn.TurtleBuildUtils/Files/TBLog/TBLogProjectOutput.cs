@@ -38,7 +38,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		IHasFullPath _parent;
 		string IHasFullPath.FullPath
 		{
-			get { return (_parent != null) ? _parent.FullPath : null; }
+			get { return (Parent != null) ? Parent.FullPath : null; }
 		}
 
 		internal IHasFullPath Parent

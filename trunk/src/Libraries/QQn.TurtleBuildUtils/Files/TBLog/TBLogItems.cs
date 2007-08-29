@@ -15,18 +15,28 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	public class TBLogItem
 	{
 		IHasFullPath _parent;
+		string _src;
+		string _fromSrc;
 
 		/// <summary>
 		/// 
 		/// </summary>
 		[Token("src")]
-		public string Src;
+		public string Src
+		{
+			get { return _src; }
+			set { _src = value; }
+		}
 
 		/// <summary>
 		/// 
 		/// </summary>
 		[Token("fromSrc")]
-		public string FromSrc;
+		public string FromSrc
+		{
+			get { return _fromSrc; }
+			set { _fromSrc = value; }
+		}
 
 		/// <summary>
 		/// Gets a value indicating whether this instance is shared.

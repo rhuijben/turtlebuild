@@ -17,7 +17,7 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 		/// Gets the default instance of this class.
 		/// </summary>
 		/// <value>The default.</value>
-		protected internal static T Default
+		internal static T Default
 		{
 			get { return _instance ?? (_instance = new T()); }
 		}

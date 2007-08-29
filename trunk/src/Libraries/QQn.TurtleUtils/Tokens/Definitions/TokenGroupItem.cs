@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Xml;
 using QQn.TurtleUtils.Tokens.Tokenizers;
@@ -35,7 +36,7 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 
 			ConstructorInfo ci = _groupType.GetConstructor(Type.EmptyTypes);
 			if (ci == null || !ci.IsPublic || _groupType.IsAbstract)
-				throw new ArgumentException(string.Format(TokenizerMessages.CantUseTypeXAsTokenGroupBecauseItHasNoPublicParameterlessConstructor, valueType.FullName), "memberType");
+				throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, TokenizerMessages.CantUseTypeXAsTokenGroupBecauseItHasNoPublicParameterlessConstructor, _groupType.FullName), "memberType");
 
 			if (valueType != null && !_member.DataType.IsAssignableFrom(valueType))
 				throw new ArgumentException("valueType must be assignable to datatype of member", "valueType");
@@ -45,7 +46,7 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 		/// Gets the aliases.
 		/// </summary>
 		/// <value>The aliases.</value>
-		public string[] Aliases
+		public ICollection<string> Aliases
 		{
 			get { return new string[] { _name }; }
 		}
@@ -56,7 +57,7 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 
 			object[] arguments = new object[] { nav, args, null };
 
-			bool ok = (bool)xmlTokenizer.InvokeMember("TryParse", BindingFlags.Static | BindingFlags.InvokeMethod |BindingFlags.NonPublic, null, null, arguments);
+			bool ok = (bool)xmlTokenizer.InvokeMember("TryParse", BindingFlags.Static | BindingFlags.InvokeMethod | BindingFlags.NonPublic, null, null, arguments, CultureInfo.InvariantCulture);
 
 			value = arguments[2];
 
@@ -70,7 +71,7 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 			MethodInfo[] mi = xmlTokenizer.GetMethods(BindingFlags.Static | BindingFlags.InvokeMethod | BindingFlags.NonPublic);
 			object[] arguments = new object[] { writer, value, args };
 
-			return (bool)xmlTokenizer.InvokeMember("TryWrite", BindingFlags.Static | BindingFlags.InvokeMethod | BindingFlags.NonPublic, null, null, arguments);
+			return (bool)xmlTokenizer.InvokeMember("TryWrite", BindingFlags.Static | BindingFlags.InvokeMethod | BindingFlags.NonPublic, null, null, arguments, CultureInfo.InvariantCulture);
 		}
 
 		/// <summary>

@@ -11,7 +11,7 @@ namespace QQn.TurtlePackage
 	/// <summary>
 	/// 
 	/// </summary>
-	public class PackUtils
+	public static class PackUtils
 	{
 		/// <summary>
 		/// Tries the create pack.

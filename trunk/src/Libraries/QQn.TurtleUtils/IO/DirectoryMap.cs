@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using QQn.TurtleUtils.Tokens;
+using System.Globalization;
 using System.IO;
+using System.Security.AccessControl;
 using System.Xml;
 using System.Xml.XPath;
-using System.Security.AccessControl;
+using QQn.TurtleUtils.Tokens;
 
 namespace QQn.TurtleUtils.IO
 {
@@ -14,7 +15,7 @@ namespace QQn.TurtleUtils.IO
 	/// </summary>
 	public class DirectoryMap : IDisposable
 	{
-		readonly DirectoryInfo _dirInfo;
+		//readonly DirectoryInfo _dirInfo;
 		readonly string _directory;
 		DirectoryMapData _data;
 
@@ -29,8 +30,8 @@ namespace QQn.TurtleUtils.IO
 			else if (!dirInfo.Exists)
 				throw new DirectoryNotFoundException("Directory does not exist");
 
-			_dirInfo = dirInfo;
-			_directory = Path.GetFullPath(dirInfo.FullName); // Gets directory with separator
+			//_dirInfo = dirInfo;
+			_directory = dirInfo.FullName;
 
 			string mapFile = Path.Combine(dirInfo.FullName, DirectoryMapData.DirMapFile);
 
@@ -65,7 +66,7 @@ namespace QQn.TurtleUtils.IO
 		/// </summary>
 		/// <param name="path">The path.</param>
 		/// <returns></returns>
-		public bool Exists(string path)
+		public static bool Exists(string path)
 		{
 			if (string.IsNullOrEmpty(path))
 				throw new ArgumentNullException("path");
@@ -73,11 +74,6 @@ namespace QQn.TurtleUtils.IO
 			path = Path.GetFullPath(path);
 
 			return Directory.Exists(path) && File.Exists(Path.Combine(path, ".tDirMap"));
-		}
-
-		private void Merge(DirectoryMapData mapData)
-		{
-			throw new Exception("The method or operation is not implemented.");
 		}
 
 		DirectoryMapFile DoGetFile(string name)
@@ -119,7 +115,7 @@ namespace QQn.TurtleUtils.IO
 			if (string.IsNullOrEmpty(path))
 				throw new ArgumentNullException("path");
 
-			string fullPath = Path.GetFullPath(Path.Combine(_directory, path));
+			string fullPath = QQnPath.CombineFullPath(_directory, path);
 			path = QQnPath.MakeRelativePath(_directory, fullPath);
 
 			switch(fileMode)
@@ -127,7 +123,7 @@ namespace QQn.TurtleUtils.IO
 				case FileMode.CreateNew:
 				case FileMode.Create:
 					if (!allowExternal && File.Exists(fullPath))
-						throw new IOException(string.Format("Unmanaged file {0} exists", path));
+						throw new IOException(string.Format(CultureInfo.InvariantCulture, "Unmanaged file {0} exists", path));
 					break;
 				case FileMode.Open:
 				case FileMode.Truncate:
@@ -212,7 +208,7 @@ namespace QQn.TurtleUtils.IO
 			directory = Path.GetFullPath(Path.Combine(_directory, directory)); // Gets directory with separator
 
 			if(!directory.StartsWith(_directory))
-				throw new ArgumentException(string.Format("Directory {0} is not below root", directory), "directory");
+				throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "Directory {0} is not below root", directory), "directory");
 
 			if(Directory.Exists(directory))
 				return;

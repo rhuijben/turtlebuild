@@ -42,8 +42,9 @@ namespace QQn.TurtlePackage
 		/// <summary>
 		/// Ensures the writability of the node
 		/// </summary>
-		protected internal override void EnsureWritable()
+		protected internal sealed override void EnsureWritable()
 		{
+			// Called indirectly from constructor
 			if (_readOnly)
 				throw new InvalidOperationException();
 		}
@@ -96,6 +97,16 @@ namespace QQn.TurtlePackage
 				EnsureWritable();
 				_strongNameKey = value;
 			}
+		}
+
+		/// <summary>
+		/// Raises the <see cref="E:PackChanged"/> event.
+		/// </summary>
+		/// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
+		protected sealed override void OnPackChanged(EventArgs e)
+		{
+			// Called indirectly from constructor
+			base.OnPackChanged(e);
 		}
 	}
 }

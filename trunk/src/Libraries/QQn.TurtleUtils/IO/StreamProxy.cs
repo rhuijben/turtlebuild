@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics.CodeAnalysis;
 
-[module: SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Scope = "member", Target = "QQn.TurtleUtils.IO.StreamProxy.GetService():T")]
+[module: SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Scope = "member", Target = "QQn.TurtleUtils.IO.ProxyStream.GetService():T")]
 
 namespace QQn.TurtleUtils.IO
 {
@@ -11,7 +11,7 @@ namespace QQn.TurtleUtils.IO
 	/// Generic proxy class over an existing stream; forwards all calls to a parent <see cref="Stream"/> and leaves
 	/// translation of the location to implementers of this abstract class
 	/// </summary>
-	public abstract class StreamProxy : Stream, IServiceProvider
+	public abstract class ProxyStream : Stream, IServiceProvider
 	{
 		readonly Stream _parentStream;
 		readonly bool _closeParent;
@@ -19,12 +19,12 @@ namespace QQn.TurtleUtils.IO
 		readonly bool _proxyAsyncRequests;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="StreamProxy"/> class.
+		/// Initializes a new instance of the <see cref="ProxyStream"/> class.
 		/// </summary>
 		/// <param name="parentStream">The parent stream.</param>
 		/// <param name="closeParent">if set to <c>true</c> close parent when closing this stream.</param>
 		/// <param name="proxyAsyncRequest">if set to <c>true</c> [proxy async request].</param>
-		public StreamProxy(Stream parentStream, bool closeParent, bool proxyAsyncRequest)
+		protected ProxyStream(Stream parentStream, bool closeParent, bool proxyAsyncRequest)
 		{
 			if (parentStream == null)
 				throw new ArgumentNullException("parentStream");
@@ -35,20 +35,20 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="StreamProxy"/> class.
+		/// Initializes a new instance of the <see cref="ProxyStream"/> class.
 		/// </summary>
 		/// <param name="parentStream">The parent stream.</param>
 		/// <param name="closeParent">if set to <c>true</c> [close parent].</param>
-		public StreamProxy(Stream parentStream, bool closeParent)
+		protected ProxyStream(Stream parentStream, bool closeParent)
 			: this(parentStream, closeParent, false)
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="StreamProxy"/> class.
+		/// Initializes a new instance of the <see cref="ProxyStream"/> class.
 		/// </summary>
 		/// <param name="parentStream">The parent stream.</param>
-		public StreamProxy(Stream parentStream)
+		protected ProxyStream(Stream parentStream)
 			: this(parentStream, true, false)
 		{
 		}
@@ -81,7 +81,7 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		/// <summary>
-		/// When overridden in a derived class, gets a value indicating whether the current stream supports seeking.
+		/// Gets a value indicating whether the current stream supports seeking.
 		/// </summary>
 		/// <value></value>
 		/// <returns>true if the stream supports seeking; otherwise, false.</returns>
@@ -421,7 +421,7 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		/// <summary>
-		/// When overridden in a derived class, gets the length in bytes of the stream.
+		/// Gets the length in bytes of the stream.
 		/// </summary>
 		/// <value></value>
 		/// <returns>A long value representing the length of the stream in bytes.</returns>

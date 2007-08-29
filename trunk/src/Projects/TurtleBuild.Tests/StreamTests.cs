@@ -21,7 +21,7 @@ namespace TurtleTests
 		{
 			string fileName = Path.GetTempFileName() + "q";
 			using (FileStream fs = File.Create(fileName))
-			using (MultiStreamWriter writer = new MultiStreamWriter(fs))
+			using (MultipleStreamWriter writer = new MultipleStreamWriter(fs))
 			{
 				for (int i = 0; i < 10; i++)
 				{
@@ -34,7 +34,7 @@ namespace TurtleTests
 					}
 				}
 
-				using (MultiStreamWriter subWriter = new MultiStreamWriter(writer.CreateStream()))
+				using (MultipleStreamWriter subWriter = new MultipleStreamWriter(writer.CreateStream()))
 				{
 					for (int i = 0; i < 10; i++)
 					{
@@ -50,7 +50,7 @@ namespace TurtleTests
 			}
 
 			using (FileStream fs = File.OpenRead(fileName))
-			using(MultiStreamReader reader = new MultiStreamReader(fs))
+			using(MultipleStreamReader reader = new MultipleStreamReader(fs))
 			{
 				for (int i = 0; i < 10; i++)
 				{

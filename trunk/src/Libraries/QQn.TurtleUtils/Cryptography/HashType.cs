@@ -1,6 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
+
+[module: SuppressMessage("Microsoft.Naming", "CA1714:FlagsEnumsShouldHavePluralNames", Scope = "type", Target = "QQn.TurtleUtils.Cryptography.HashType")]
 
 namespace QQn.TurtleUtils.Cryptography
 {
@@ -38,16 +39,16 @@ namespace QQn.TurtleUtils.Cryptography
 		SHA384	= 0x05,
 
 		/// <summary>
-		/// 
+		/// Ripe's extended version of MD5. Autodetect of the hashvalue does not work for this type
 		/// </summary>
-		RIPEMD160 = 0x06,
+		RipeMD160 = 0x06,
 
 		/// <summary>
-		/// 
+		/// Flag in addition to the type which appends the number of hashed bytes to the hash in strings
 		/// </summary>
 		PlusSize = 0x100,
 		/// <summary>
-		/// 
+		/// Flag in addition to the type which appends the number of hashtype to the hash in strings
 		/// </summary>
 		PlusType = 0x200,
 	}

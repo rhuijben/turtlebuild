@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Net;
 using System.IO;
 using System.Text;
@@ -33,7 +34,7 @@ namespace QQn.TurtleUtils.IO
 		StreamWriter _streamWriter;
 
 		static readonly string _topBoundary = Guid.NewGuid().ToString("N");
-		static readonly string _subBoundary = Guid.NewGuid().ToString("N");
+		//static readonly string _subBoundary = Guid.NewGuid().ToString("N");
 		const string NetworkEol = "\r\n";
 
 		bool _nextField;
@@ -60,7 +61,7 @@ namespace QQn.TurtleUtils.IO
 				throw new ArgumentNullException("request");
 
 			_request = request;
-			_request.Method = "POST";
+			_request.Method = method;
 			_encoding = encoding;
 
 			switch(encoding)
@@ -69,7 +70,7 @@ namespace QQn.TurtleUtils.IO
 					request.ContentType = "application/x-www-form-urlencoded";
 					break;
 				case WebRequestPostDataEncoding.MultipartFormData:
-					request.ContentType = string.Format("multipart/form-data; boundary={0}", _topBoundary);
+					request.ContentType = string.Format(CultureInfo.InvariantCulture, "multipart/form-data; boundary={0}", _topBoundary);
 					break;
 				default:
 					throw new ArgumentOutOfRangeException("encoding", encoding, "Unknown encoding");
@@ -92,7 +93,7 @@ namespace QQn.TurtleUtils.IO
 					_streamWriter.Write(NetworkEol);
 					break;
 				default:
-					throw new InvalidOperationException(string.Format("WriteBoundary() is not supported for encoding {0}", _encoding));
+					throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "WriteBoundary() is not supported for encoding {0}", _encoding));
 			}
 		}
 
@@ -126,7 +127,7 @@ namespace QQn.TurtleUtils.IO
 					break;
 
 				default:
-					throw new InvalidOperationException(string.Format("AddFile(String, String) is not supported for encoding {0}", _encoding));
+					throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "AddFile(String, String) is not supported for encoding {0}", _encoding));
 			}
 		}
 
@@ -157,14 +158,11 @@ namespace QQn.TurtleUtils.IO
 					_streamWriter.Write(NetworkEol);
 					break;
 				default:
-					throw new InvalidOperationException(string.Format("AddValue(String, Byte[]) is not supported for encoding {0}", _encoding));
+					throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "AddValue(String, Byte[]) is not supported for encoding {0}", _encoding));
 			}
-
-			
 		}
 
-
-		bool IsSafeKeyName(string key)
+		static bool IsSafeKeyName(string key)
 		{
 			foreach (char c in key)
 			{
@@ -205,6 +203,11 @@ namespace QQn.TurtleUtils.IO
 		/// <param name="filename">The filename.</param>
 		public void AddFile(string key, string filename)
 		{
+			if (string.IsNullOrEmpty(key))
+				throw new ArgumentNullException("key");
+			else if (string.IsNullOrEmpty(filename))
+				throw new ArgumentNullException("filename");
+
 			AddFile(key, filename, "application/octet-stream");
 		}
 
@@ -244,6 +247,8 @@ namespace QQn.TurtleUtils.IO
 				throw new ArgumentNullException("filename");
 			else if (string.IsNullOrEmpty(contentType))
 				throw new ArgumentNullException("contentType");
+			else if (stream == null)
+				throw new ArgumentNullException("stream");
 
 			filename = Path.GetFileName(filename);
 
@@ -271,7 +276,7 @@ namespace QQn.TurtleUtils.IO
 					_streamWriter.Write(NetworkEol);
 					break;
 				default:
-					throw new InvalidOperationException(string.Format("AddFile is not supported for encoding {0}", _encoding));
+					throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "AddFile is not supported for encoding {0}", _encoding));
 			}
 		}
 
@@ -293,12 +298,18 @@ namespace QQn.TurtleUtils.IO
 				Close();
 		}
 
+		bool _closed;
 		/// <summary>
 		/// Closes the writer and the RequestStream of the <see cref="WebRequest"/>
 		/// </summary>
 		public virtual void Close()
 		{
-			_streamWriter = null;
+			if (_closed)
+				return;
+
+			_closed = true;
+			_streamWriter.Dispose();
+
 			if (_webRequestStream != null)
 			{
 				_webRequestStream.Close();

@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Diagnostics.CodeAnalysis;
+using System.Collections.ObjectModel;
 
 namespace QQn.TurtleUtils.Tokens
 {
@@ -17,7 +19,7 @@ namespace QQn.TurtleUtils.Tokens
 			{
 				if (name.IndexOfAny(new char[] { '*', '?' }) >= 0)
 				{
-					List<FileSystemInfo> fsi = new List<FileSystemInfo>();
+					TokenizerExpandCollection<FileSystemInfo> fsi = new TokenizerExpandCollection<FileSystemInfo>();
 					List<string> items = new List<string>();
 					items.Add(name);
 
@@ -41,7 +43,7 @@ namespace QQn.TurtleUtils.Tokens
 							fsi.Add(new FileInfo(file));
 						}
 
-					return new ExpandableTokenCollection(fsi);
+					return fsi;
 				}
 				else if (File.Exists(name))
 					return new FileInfo(name);
@@ -67,7 +69,7 @@ namespace QQn.TurtleUtils.Tokens
 			{
 				if (name.IndexOfAny(new char[] { '*', '?' }) >= 0)
 				{
-					List<FileInfo> fsi = new List<FileInfo>();
+					TokenizerExpandCollection<FileInfo> fsi = new TokenizerExpandCollection<FileInfo>();
 					List<string> items = new List<string>();
 					items.Add(name);
 
@@ -80,7 +82,7 @@ namespace QQn.TurtleUtils.Tokens
 							fsi.Add(new FileInfo(file));
 						}
 
-					return new ExpandableTokenCollection(fsi);
+					return fsi;
 				}
 				else
 					return new FileInfo(name);
@@ -104,7 +106,7 @@ namespace QQn.TurtleUtils.Tokens
 			{
 				if (name.IndexOfAny(new char[] { '*', '?' }) >= 0)
 				{
-					List<DirectoryInfo> fsi = new List<DirectoryInfo>();
+					TokenizerExpandCollection<DirectoryInfo> fsi = new TokenizerExpandCollection<DirectoryInfo>();
 					List<string> items = new List<string>();
 					items.Add(name);
 
@@ -119,7 +121,7 @@ namespace QQn.TurtleUtils.Tokens
 							fsi.Add(new DirectoryInfo(directory));
 						}
 
-					return new ExpandableTokenCollection(fsi);
+					return fsi;
 				}
 				else
 					return new DirectoryInfo(name);
@@ -137,31 +139,26 @@ namespace QQn.TurtleUtils.Tokens
 	/// <summary>
 	/// 
 	/// </summary>
-	public sealed class ExpandableTokenCollection : System.Collections.IEnumerable
+	public sealed class TokenizerExpandCollection<T> : Collection<T>, ITokenizerExpandCollection
 	{
-		readonly System.Collections.IEnumerable _collection;
-
 		/// <summary>
-		/// Initializes a new instance of the <see cref="ExpandableTokenValue"/> class.
+		/// Initializes a new instance of the <see cref="TokenizerExpandCollection&lt;T&gt;"/> class.
 		/// </summary>
-		/// <param name="collection">The collection.</param>
-		public ExpandableTokenCollection(System.Collections.IEnumerable collection)
+		/// <param name="collection">a collection to copy</param>
+		public TokenizerExpandCollection(IEnumerable<T> collection)
 		{
 			if (collection == null)
 				throw new ArgumentNullException("collection");
 
-			_collection = collection;
+			foreach(T i in collection)
+				Add(i);
 		}
 
 		/// <summary>
-		/// Returns an enumerator that iterates through the collection.
+		/// Initializes a new instance of the <see cref="TokenizerExpandCollection&lt;T&gt;"/> class.
 		/// </summary>
-		/// <returns>
-		/// An <see cref="T:System.Collections.IEnumerator"></see> object that can be used to iterate through the collection.
-		/// </returns>
-		public System.Collections.IEnumerator GetEnumerator()
+		public TokenizerExpandCollection()
 		{
-			return _collection.GetEnumerator();
 		}
 	}
 }

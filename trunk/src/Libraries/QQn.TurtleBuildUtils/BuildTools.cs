@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
+using System.Text;
 using Microsoft.Win32;
+using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleBuildUtils
 {
@@ -30,12 +32,11 @@ namespace QQn.TurtleBuildUtils
 						{
 							string primary = null;
 							string fallback = null;
-							string myVersion = ("sdkInstallRoot" + typeof(BuildTools).Assembly.ImageRuntimeVersion).ToLower();
+							string myVersion = ("sdkInstallRoot" + typeof(BuildTools).Assembly.ImageRuntimeVersion);
 
-							foreach (string vn in rk.GetValueNames())
+							foreach (string name in rk.GetValueNames())
 							{
-								string name = vn.ToLower();
-								if (name.StartsWith("sdkinstallroot"))
+								if (name.StartsWith("sdkinstallroot", StringComparison.InvariantCultureIgnoreCase))
 								{
 									if (fallback == null)
 									{
@@ -47,7 +48,7 @@ namespace QQn.TurtleBuildUtils
 										}
 									}
 
-									if (myVersion.StartsWith(name))
+									if (myVersion.StartsWith(name, StringComparison.InvariantCultureIgnoreCase))
 									{
 										string value = (string)rk.GetValue(name);
 
@@ -79,7 +80,7 @@ namespace QQn.TurtleBuildUtils
 		/// Gets the sn.exe path.
 		/// </summary>
 		/// <value>The sn exe path.</value>
-		public static string SnExePath
+		static string StrongNameToolPath
 		{
 			get
 			{
@@ -89,6 +90,9 @@ namespace QQn.TurtleBuildUtils
 
 					if (File.Exists(sn))
 						_snExe = sn;
+					else
+						_snExe = QQnPath.FindFileInPath("sn.exe");
+
 				}
 				return _snExe;
 			}
@@ -100,7 +104,7 @@ namespace QQn.TurtleBuildUtils
 		/// <param name="assembly">The assembly.</param>
 		/// <param name="strongNameFile">The strong name file.</param>
 		/// <returns></returns>
-		public static bool ReSignAssemblyWithFile(string assembly, string strongNameFile)
+		public static bool ResignAssemblyWithFile(string assembly, string strongNameFile)
 		{
 			if (string.IsNullOrEmpty(assembly))
 				throw new ArgumentNullException("assembly");
@@ -109,9 +113,9 @@ namespace QQn.TurtleBuildUtils
 			else if (!File.Exists(assembly))
 				throw new FileNotFoundException("Assembly not found", assembly);
 			else if(!File.Exists(strongNameFile))
-				throw new FileNotFoundException(string.Format("StrongNameFile not found: {0}", strongNameFile), strongNameFile);
+				throw new FileNotFoundException(string.Format(CultureInfo.InvariantCulture, "StrongNameFile not found: {0}", strongNameFile), strongNameFile);
 
-			ProcessStartInfo psi = new ProcessStartInfo(SnExePath, string.Format("-Ra \"{0}\" \"{1}\"", assembly, strongNameFile));
+			ProcessStartInfo psi = new ProcessStartInfo(StrongNameToolPath, string.Format(CultureInfo.InvariantCulture, "-Ra \"{0}\" \"{1}\"", assembly, strongNameFile));
 			psi.UseShellExecute = false;
 			psi.WindowStyle = ProcessWindowStyle.Hidden;
 			psi.CreateNoWindow = true;
@@ -129,7 +133,7 @@ namespace QQn.TurtleBuildUtils
 		/// <param name="assembly">The assembly.</param>
 		/// <param name="container">The container.</param>
 		/// <returns></returns>
-		public static bool ReSignAssemblyWithContainer(string assembly, string container)
+		public static bool ResignAssemblyWithContainer(string assembly, string container)
 		{
 			if (string.IsNullOrEmpty(assembly))
 				throw new ArgumentNullException("assembly");
@@ -138,7 +142,7 @@ namespace QQn.TurtleBuildUtils
 			else if (!File.Exists(assembly))
 				throw new FileNotFoundException("Assembly not found", assembly);
 
-			ProcessStartInfo psi = new ProcessStartInfo(SnExePath, string.Format("-Rca \"{0}\" \"{1}\"", assembly, container));
+			ProcessStartInfo psi = new ProcessStartInfo(StrongNameToolPath, string.Format(CultureInfo.InvariantCulture, "-Rca \"{0}\" \"{1}\"", assembly, container));
 			psi.UseShellExecute = false;
 			psi.WindowStyle = ProcessWindowStyle.Hidden;
 			psi.CreateNoWindow = true;
@@ -150,12 +154,12 @@ namespace QQn.TurtleBuildUtils
 			}
 		}
 
-		internal static bool ReSignAssemblyWithFileOrContainer(string assembly, string keyFile, string keyContainer)
+		internal static bool ResignAssemblyWithFileOrContainer(string assembly, string keyFile, string keyContainer)
 		{
 			if (!string.IsNullOrEmpty(keyFile))
-				return ReSignAssemblyWithFile(assembly, keyFile);
+				return ResignAssemblyWithFile(assembly, keyFile);
 			else if (!string.IsNullOrEmpty(keyContainer))
-				return ReSignAssemblyWithContainer(assembly, keyContainer);
+				return ResignAssemblyWithContainer(assembly, keyContainer);
 			else
 				throw new ArgumentException("keyFile or keyContainer must be non-null");			
 		}

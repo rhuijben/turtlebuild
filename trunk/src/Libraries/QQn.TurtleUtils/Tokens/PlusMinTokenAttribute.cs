@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using QQn.TurtleUtils.Tokens.Definitions;
+
+[module: SuppressMessage("Microsoft.Performance", "CA1813:AvoidUnsealedAttributes", Scope = "type", Target = "QQn.TurtleUtils.Tokens.PlusMinTokenAttribute")]
 
 namespace QQn.TurtleUtils.Tokens
 {
 	/// <summary>
 	/// 
 	/// </summary>
-	[AttributeUsage(TokenAttributeBase.TokenTargets, AllowMultiple = true)]
+	[AttributeUsage(BaseTokenAttribute.TokenTargets, AllowMultiple = true)]
 	public class PlusMinTokenAttribute : TokenAttribute
 	{
 		/// <summary>
