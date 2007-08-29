@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.IO;
+using System.Text;
 
 namespace QQn.TurtleUtils.IO
 {
@@ -276,9 +277,20 @@ namespace QQn.TurtleUtils.IO
 
 		#region IDisposable Members
 
+		[SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")]
 		void IDisposable.Dispose()
 		{
-			Close();
+			Dispose(true);
+		}
+
+		/// <summary>
+		/// Releases resources
+		/// </summary>
+		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if(disposing)
+				Close();
 		}
 
 		/// <summary>

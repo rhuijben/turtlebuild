@@ -16,6 +16,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QQn.TurtleMSBuild.Distribut
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QQn.TurtleBuildUtils", "Libraries\QQn.TurtleBuildUtils\QQn.TurtleBuildUtils.csproj", "{4FB6CAEF-DEF4-46FA-A118-DB35B373C397}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{12A65F62-8C26-445E-B669-26B504468B5F}"
+	ProjectSection(SolutionItems) = preProject
+		TurtleBuild.fxcop = TurtleBuild.fxcop
+	EndProjectSection
+	ProjectSection(FolderStartupServices) = postProject
+		{B4F97281-0DBD-4835-9ED8-7DFB966E87FF} = {B4F97281-0DBD-4835-9ED8-7DFB966E87FF}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(TextTemplating) = postSolution
 		TextTemplating = 1

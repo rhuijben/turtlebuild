@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.Compression;
 using System.IO;
+
+[module: SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter", Scope = "member", Target = "QQn.TurtleUtils.IO.GZipSubStream.GetService():T")]
 
 namespace QQn.TurtleUtils.IO
 {

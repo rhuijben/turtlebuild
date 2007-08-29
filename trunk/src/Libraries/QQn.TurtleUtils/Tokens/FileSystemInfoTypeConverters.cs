@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.ComponentModel;
 using System.IO;
 
@@ -42,7 +41,7 @@ namespace QQn.TurtleUtils.Tokens
 							fsi.Add(new FileInfo(file));
 						}
 
-					return new ExpandableTokenValue(fsi);
+					return new ExpandableTokenCollection(fsi);
 				}
 				else if (File.Exists(name))
 					return new FileInfo(name);
@@ -81,7 +80,7 @@ namespace QQn.TurtleUtils.Tokens
 							fsi.Add(new FileInfo(file));
 						}
 
-					return new ExpandableTokenValue(fsi);
+					return new ExpandableTokenCollection(fsi);
 				}
 				else
 					return new FileInfo(name);
@@ -120,7 +119,7 @@ namespace QQn.TurtleUtils.Tokens
 							fsi.Add(new DirectoryInfo(directory));
 						}
 
-					return new ExpandableTokenValue(fsi);
+					return new ExpandableTokenCollection(fsi);
 				}
 				else
 					return new DirectoryInfo(name);
@@ -138,7 +137,7 @@ namespace QQn.TurtleUtils.Tokens
 	/// <summary>
 	/// 
 	/// </summary>
-	public sealed class ExpandableTokenValue : System.Collections.IEnumerable
+	public sealed class ExpandableTokenCollection : System.Collections.IEnumerable
 	{
 		readonly System.Collections.IEnumerable _collection;
 
@@ -146,7 +145,7 @@ namespace QQn.TurtleUtils.Tokens
 		/// Initializes a new instance of the <see cref="ExpandableTokenValue"/> class.
 		/// </summary>
 		/// <param name="collection">The collection.</param>
-		public ExpandableTokenValue(System.Collections.IEnumerable collection)
+		public ExpandableTokenCollection(System.Collections.IEnumerable collection)
 		{
 			if (collection == null)
 				throw new ArgumentNullException("collection");

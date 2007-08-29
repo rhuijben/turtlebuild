@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Globalization;
 using System.IO;
-using System.Security.Cryptography;
 using System.Net;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace QQn.TurtleUtils.Cryptography
 {
@@ -152,7 +152,7 @@ namespace QQn.TurtleUtils.Cryptography
 			if (stream == null)
 				throw new ArgumentNullException("stream");
 
-			if (hashType == HashType.Null)
+			if (hashType == HashType.None)
 				hashType = DefaultHashType | HashType.PlusType | HashType.PlusSize;
 
 			long length;
@@ -281,7 +281,7 @@ namespace QQn.TurtleUtils.Cryptography
 			int len = parts[0].Length;
 
 
-			hashType = HashType.Null;
+			hashType = HashType.None;
 			length = -1;
 			hashValue = parts[0];
 
@@ -294,11 +294,11 @@ namespace QQn.TurtleUtils.Cryptography
 						hashType = GetHashType((HashType)Enum.Parse(typeof(HashType), p.Substring(5), true));
 
 						if (!Enum.IsDefined(typeof(HashType), hashType))
-							hashType = HashType.Null;
+							hashType = HashType.None;
 					}
-					catch
+					catch(ArgumentException)
 					{
-						hashType = HashType.Null;
+						hashType = HashType.None;
 					}
 				}
 				else if (p.StartsWith("size=", StringComparison.InvariantCultureIgnoreCase))
@@ -315,7 +315,7 @@ namespace QQn.TurtleUtils.Cryptography
 				}
 			}
 
-			if (hashType == HashType.Null)
+			if (hashType == HashType.None)
 			{
 				switch (len)
 				{
@@ -436,7 +436,7 @@ namespace QQn.TurtleUtils.Cryptography
 		public static Guid GuidFromString(Guid baseGuid, string stringToHash)
 		{
 			if (stringToHash == null)
-				throw new ArgumentNullException("bytesToHash");
+				throw new ArgumentNullException("stringToHash");
 
 			return GuidFromHash(baseGuid, Encoding.UTF8.GetBytes(stringToHash));
 		}

@@ -189,6 +189,8 @@ namespace TurtleTests
 
 			Assert.That(file, Is.Not.Null);
 
+			Assert.That(file.ProjectOutput.Items.Count, Is.GreaterThan(1));
+
 			using (StringWriter sw = new StringWriter())
 			{
 				using (XmlWriter xw = new XmlTextWriter(sw))

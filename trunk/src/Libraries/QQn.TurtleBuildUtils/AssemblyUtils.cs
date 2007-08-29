@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using Microsoft.Win32;
 using System.Globalization;
+using System.Diagnostics;
 
 namespace QQn.TurtleBuildUtils
 {

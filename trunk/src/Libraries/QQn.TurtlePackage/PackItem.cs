@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using QQn.TurtleUtils.Tokens;
 using System.IO;
 using QQn.TurtleUtils.IO;
@@ -169,7 +168,7 @@ namespace QQn.TurtlePackage
 			if (value == null)
 				throw new ArgumentNullException("value");
 
-			return value.Replace(Path.DirectorySeparatorChar, '/').Replace(Path.AltDirectorySeparatorChar, '/');
+			return QQnPath.NormalizeUnixPath(value);
 		}
 
 		/// <summary>
@@ -179,12 +178,10 @@ namespace QQn.TurtlePackage
 		/// <returns></returns>
 		protected static string NormalizeDirectory(string value)
 		{
-			value = NormalizePath(value);
-
-			if (value.Length > 0 && value[value.Length - 1] != '/')
-				value += '/';
-
-			return value;
+			if (value == null)
+				throw new ArgumentNullException("value");
+			
+			return QQnPath.NormalizeUnixPath(value, true);
 		}
 
 		#region ITokenizerInitialize Members

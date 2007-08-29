@@ -57,7 +57,7 @@ namespace TurtleTests
 		[Test]
 		public void TestSign()
 		{
-			Assert.That(QQnCryptoHelpers.CalculateFileHash(SnkFile, HashType.Null), Is.EqualTo("dcd59a19afe007b2a7e706d100f8fcdeb4e4e1e9,type=SHA1,size=596"), "SHA256++Hash matches");
+			Assert.That(QQnCryptoHelpers.CalculateFileHash(SnkFile, HashType.None), Is.EqualTo("dcd59a19afe007b2a7e706d100f8fcdeb4e4e1e9,type=SHA1,size=596"), "SHA256++Hash matches");
 			Assert.That(QQnCryptoHelpers.CalculateFileHash(SnkFile, HashType.SHA256), Is.EqualTo("31a02f23fb06dc6326428843782c049d14e90fb14f74704909e6e6ba1a2592c0"), "SHA256 hash matches");
 			Assert.That(QQnCryptoHelpers.CalculateFileHash(SnkFile, HashType.SHA1), Is.EqualTo("dcd59a19afe007b2a7e706d100f8fcdeb4e4e1e9"), "SHA1 hash matches");
 			Assert.That(QQnCryptoHelpers.CalculateFileHash(SnkFile, HashType.MD5), Is.EqualTo("2b19ab067c03e05d55f62702c4a79864"), "MD5 hash matches");

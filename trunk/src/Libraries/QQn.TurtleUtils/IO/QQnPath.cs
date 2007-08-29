@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Reflection;
 
 namespace QQn.TurtleUtils.IO
 {
@@ -68,7 +69,7 @@ namespace QQn.TurtleUtils.IO
 			if (string.IsNullOrEmpty(originDirectory))
 				throw new ArgumentNullException("originDirectory");
 			else if (string.IsNullOrEmpty(itemPath))
-				throw new ArgumentNullException("originPath");
+				throw new ArgumentNullException("itemPath");
 
 			itemPath = Path.GetFullPath(itemPath);
 			originDirectory = Path.GetFullPath(originDirectory);
@@ -140,6 +141,135 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		/// <summary>
+		/// Combines the specified path parts to a full path
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <param name="items">The items.</param>
+		/// <returns></returns>
+		public static string CombineFullPath(string path, params string[] items)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+			else if(items == null)
+				throw new ArgumentNullException("items");
+
+
+			foreach (string part in items)
+			{
+				if (part == null)
+					continue;
+
+				path = Path.Combine(path, part);
+			}
+
+			return Path.GetFullPath(path);
+		}
+
+		/// <summary>
+		/// Combines the specified path parts to a full path
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <param name="path2">The path2.</param>
+		/// <returns></returns>
+		public static string CombineFullPath(string path, string path2)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			return Path.GetFullPath(Path.Combine(path, path2));
+		}
+
+		/// <summary>
+		/// Normalizes the path.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <param name="addEndSlash">if set to <c>true</c> adds a path separator at the end.</param>
+		/// <returns></returns>
+		public static string NormalizePath(string path, bool addEndSlash)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
+
+			if (Path.IsPathRooted(path))
+			{
+				path = Path.GetFullPath(path);
+				string root = Path.GetPathRoot(path);
+
+				path = root + RemoveDoubleSlash(path.Substring(root.Length), addEndSlash);
+			}
+			else
+				path = RemoveDoubleSlash(path, addEndSlash);
+
+			return path;
+		}
+
+		/// <summary>
+		/// Normalizes the path.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <returns></returns>
+		public static string NormalizePath(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			return NormalizePath(path, false);
+		}
+
+		/// <summary>
+		/// Removes the double slash.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <param name="addEndSlash">if set to <c>true</c> adds a path separator at the end.</param>
+		/// <returns></returns>
+		static string RemoveDoubleSlash(string path, bool addEndSlash)
+		{
+			string doubleSlash = string.Concat(Path.DirectorySeparatorChar, Path.DirectorySeparatorChar);
+			int n;
+			while(0 <= (n = path.IndexOf(doubleSlash)))
+				path = path.Remove(n,1); // Remove the first slash
+
+			if (addEndSlash != (path[path.Length - 1] == Path.DirectorySeparatorChar))
+			{
+				if (addEndSlash)
+					path += Path.DirectorySeparatorChar;
+				else
+					path = path.Substring(0, path.Length - 1);
+			}
+
+			return path;				
+		}
+
+		/// <summary>
+		/// Normalizes the unix path.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <param name="addEndSlash">if set to <c>true</c> adds a path separator at the end.</param>
+		/// <returns></returns>
+		public static string NormalizeUnixPath(string path, bool addEndSlash)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			return NormalizePath(path, addEndSlash).Replace(Path.DirectorySeparatorChar, '/');
+		}
+
+		/// <summary>
+		/// Normalizes the unix path.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <returns></returns>
+		public static string NormalizeUnixPath(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			return NormalizeUnixPath(path, false);
+		}
+
+		/// <summary>
 		/// Copies the stream.
 		/// </summary>
 		/// <param name="from">From.</param>
@@ -205,6 +335,90 @@ namespace QQn.TurtleUtils.IO
 				return path;
 			else
 				return MakeRelativePath(origin, Path.Combine(origin, path));
+		}
+
+		/// <summary>
+		/// Finds the specified file in the provided path.
+		/// </summary>
+		/// <param name="file">The file.</param>
+		/// <param name="pathList">The path list, separated by <see cref="Path.PathSeparator"/> characters</param>
+		/// <returns></returns>
+		public static string FindFileInPath(string file, string pathList)
+		{
+			if (string.IsNullOrEmpty(file))
+				throw new ArgumentNullException("file");
+			else if (string.IsNullOrEmpty(pathList))
+				throw new ArgumentNullException("pathList");
+
+			string[] paths = pathList.Split(Path.PathSeparator);
+
+			foreach (string i in paths)
+			{
+				if (string.IsNullOrEmpty(i))
+					continue;
+
+				string fullPath = CombineFullPath(i, file);
+
+				if (File.Exists(fullPath))
+					return fullPath;
+			}
+
+			return null;
+		}
+
+		/// <summary>
+		/// Finds the file in the system environment variable path, the current directory, or the directory containing the current application.
+		/// </summary>
+		/// <param name="file">The file.</param>
+		/// <returns></returns>
+		public static string FindFileInPath(string file)
+		{
+			if (string.IsNullOrEmpty(file))
+				throw new ArgumentNullException("file");
+
+			string path = Environment.GetEnvironmentVariable("PATH");
+
+			string result;
+			if (!string.IsNullOrEmpty(path))
+			{
+				result = FindFileInPath(file, path);
+
+				if (!string.IsNullOrEmpty(result))
+					return result;
+			}
+				
+			result = FindFileInPath(file, ".");
+
+			if (!string.IsNullOrEmpty(result))
+				return result;
+
+			Assembly asm = Assembly.GetEntryAssembly();
+
+			if (asm == null)
+				asm = Assembly.GetCallingAssembly();
+
+			if(asm != null)
+				result = FindFileNextToAssembly(result, asm);
+
+			return result;
+		}
+
+		private static string FindFileNextToAssembly(string file, Assembly assembly)
+		{
+			if (string.IsNullOrEmpty(file))
+				throw new ArgumentNullException("file");
+			else if (assembly == null)
+				throw new ArgumentNullException("assembly");
+
+			if (assembly.CodeBase == null)
+				return null;
+
+			Uri uri = new Uri(assembly.CodeBase);
+
+			if (uri.IsFile || uri.IsUnc)
+				return FindFileInPath(file, Path.GetDirectoryName(uri.LocalPath));
+
+			return null;
 		}
 	}
 }

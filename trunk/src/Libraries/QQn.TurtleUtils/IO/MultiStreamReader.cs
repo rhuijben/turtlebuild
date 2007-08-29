@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace QQn.TurtleUtils.IO
@@ -63,9 +63,20 @@ namespace QQn.TurtleUtils.IO
 			get { return _input; }
 		}
 
+		[SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")]
 		void IDisposable.Dispose()
 		{
-			Close();
+			Dispose(true);
+		}
+
+		/// <summary>
+		/// Releases unmanaged and - optionally - managed resources
+		/// </summary>
+		/// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+		protected virtual void Dispose(bool disposing)
+		{
+			if(disposing)
+				Close();
 		}
 
 		/// <summary>
@@ -73,8 +84,12 @@ namespace QQn.TurtleUtils.IO
 		/// </summary>
 		public virtual void Close()
 		{
-			BaseStream.Close();
-			
+			if (_openReader != null)
+				_openReader.Close();
+
+			_reader.Close();
+
+			BaseStream.Close();			
 		}
 
 		/// <summary>

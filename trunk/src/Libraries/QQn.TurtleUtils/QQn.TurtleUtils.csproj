@@ -26,7 +26,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\QQn.TurtleUtils.xml</DocumentationFile>
@@ -80,7 +80,7 @@
     </Compile>
     <Compile Include="Tokens\OptionalTokenAttribute.cs" />
     <Compile Include="Tokens\TokenAttribute.cs" />
-    <Compile Include="Tokens\TokenAttributeBase.cs" />
+    <Compile Include="Tokens\BaseTokenAttribute.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tokens\TokenDescriptionAttribute.cs" />
     <Compile Include="Tokens\Tokenizer.cs" />
@@ -97,6 +97,7 @@
   <ItemGroup>
     <None Include="QQn.TurtleUtils.snk" />
     <Compile Include="Cryptography\QQnHashComparer.cs" />
+    <Compile Include="Globalization\QQnDateUtils.cs" />
     <Compile Include="IO\DirectoryMap.cs" />
     <Compile Include="IO\DirectoryMapData.cs" />
     <Compile Include="IO\DirectoryMapDirectory.cs" />
@@ -106,7 +107,7 @@
     <Compile Include="IO\ZLibSubStream.cs" />
     <Compile Include="IO\QQnPath.cs" />
     <Compile Include="IO\SeekableStream.cs" />
-    <Compile Include="IO\TempStream.cs" />
+    <Compile Include="IO\DeleteOnCloseStream.cs" />
     <Compile Include="Tokens\Converters\UtcDateTimeConverter.cs" />
     <Compile Include="Tokens\Converters\VersionConverter.cs" />
     <Compile Include="Tokens\ITokenizerInitialize.cs" />

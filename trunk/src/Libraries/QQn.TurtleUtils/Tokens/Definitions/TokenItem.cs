@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.ComponentModel;
 using System.IO;
 
@@ -171,7 +170,7 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 			
 			if((v != null) && DataType.IsAssignableFrom(v.GetType()))
 				return v;
-			else if (v is ExpandableTokenValue) // FileSystemInfo converted star object
+			else if (v is ExpandableTokenCollection) // FileSystemInfo converted star object
 				return v;
 
 			throw new InvalidOperationException(string.Format("The typeconverter of type {0} (A {1} instance) can't convert a string into a {0}", DataType.FullName, tc.GetType().FullName, DataType.Name));
@@ -211,7 +210,8 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 
 			object RawValue = ConvertValue(value, state);
 
-			ExpandableTokenValue expandable = RawValue as ExpandableTokenValue;
+			
+			ExpandableTokenCollection expandable = RawValue as ExpandableTokenCollection;
 
 			if (expandable != null)
 			{

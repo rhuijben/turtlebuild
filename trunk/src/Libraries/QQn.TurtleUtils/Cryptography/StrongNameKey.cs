@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using System.Security.Cryptography;
 using System.Reflection;
@@ -220,7 +219,7 @@ namespace QQn.TurtleUtils.Cryptography
 		{
 			get
 			{
-				if (_hashType == HashType.Null)
+				if (_hashType == HashType.None)
 					_hashType = (HashType)Enum.Parse(typeof(HashType), HashAlgorithmName, true);
 				return _hashType;
 			}

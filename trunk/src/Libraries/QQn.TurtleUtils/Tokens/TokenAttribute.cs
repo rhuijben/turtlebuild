@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel;
 using QQn.TurtleUtils.Tokens.Definitions;
 
+[module: SuppressMessage("Microsoft.Design", "CA1019:DefineAccessorsForAttributeArguments", Scope = "type", Target = "QQn.TurtleUtils.Tokens.TokenAttribute")]
+
 namespace QQn.TurtleUtils.Tokens
 {
+	
+
 	/// <summary>
 	/// 
 	/// </summary>
