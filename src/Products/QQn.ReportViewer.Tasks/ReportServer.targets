@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<UsingTask TaskName="QQn.ReportViewer.Tasks.PublishDataSources" AssemblyFile="QQn.ReportViewer.Tasks.dll"/>
+	<UsingTask TaskName="QQn.ReportViewer.Tasks.PublishReports" AssemblyFile="QQn.ReportViewer.Tasks.dll"/>
+	<PropertyGroup>
+		<BuildDependsOn Condition="'$(BuildDependsOn)' == ''"></BuildDependsOn>
+		<OutputPath Condition="'$(OutputPath)' == ''">bin\</OutputPath>
+	</PropertyGroup>
+	<Target Name="Build" 
+			Inputs="@(Content)" 
+			Outputs="@(Content->'$(OutputPath)%(filename)%extension')"
+			DependsOnTargets="$(BuildDependsOn)">
+		<Copy
+				  SourceFiles="@(Content)"
+				  DestinationFiles="@(Content->'$(OutputPath)%(filename)%extension')" />
+			  
+		<Message Text="Ignoring ReportServer Project" />
+	</Target>
+</Project>

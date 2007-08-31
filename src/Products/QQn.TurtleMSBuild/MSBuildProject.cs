@@ -71,7 +71,7 @@ namespace QQn.TurtleMSBuild
 			_buildItems = buildItems;
 
 			// Clear properties
-			OutDir = GetProperty("OutDir");
+			OutputDir = GetProperty("OutputDir");
 			Configuration = GetProperty("Configuration");
 
 			TargetName = GetProperty("TargetName");
@@ -94,7 +94,7 @@ namespace QQn.TurtleMSBuild
 
 			Refresh();
 
-			if (OutDir == null)
+			if (string.IsNullOrEmpty(TargetName))
 				return;
 
 			ParseProjectOutput();
@@ -129,21 +129,21 @@ namespace QQn.TurtleMSBuild
 					copyKeys.Add(v, true);
 			}
 
-			string primaryTarget = Path.Combine(OutDir, TargetName + TargetExt);
+			string primaryTarget = Path.Combine(OutputDir, TargetName + TargetExt);
 			string itemTarget = primaryTarget;
 			items.Add(new TargetItem(itemTarget, Path.Combine(IntermediateOutputPath, TargetName + TargetExt), TargetType.Item));
 
 			if (BuildProperties.ContainsKey("_SGenDllCreated") && GetProperty("_SGenDllCreated") == "true" && BuildProperties.ContainsKey("_SGenDllName"))
 			{
 				string dllName = GetProperty("_SGenDllName");
-				itemTarget = Path.Combine(OutDir, dllName);
+				itemTarget = Path.Combine(OutputDir, dllName);
 				items.Add(new TargetItem(itemTarget, Path.Combine(IntermediateOutputPath, dllName), TargetType.Item));
 			}
 
 			if (BuildProperties.ContainsKey("_DebugSymbolsProduced") && GetProperty("_DebugSymbolsProduced") == "true")
 			{
 				string pdbName = GetProperty("TargetName") + ".pdb";
-				itemTarget = Path.Combine(OutDir, pdbName);
+				itemTarget = Path.Combine(OutputDir, pdbName);
 				items.Add(new TargetItem(itemTarget, Path.Combine(IntermediateOutputPath, pdbName), TargetType.Item));
 			}
 
@@ -240,11 +240,11 @@ namespace QQn.TurtleMSBuild
 			string destinationSubDirectory;
 
 			if (pi.TryGetMetaData("TargetPath", out target))
-				return Path.Combine(OutDir, target);
+				return Path.Combine(OutputDir, target);
 			else if (pi.TryGetMetaData("DestinationSubDirectory", out destinationSubDirectory))
-				return Path.Combine(Path.Combine(OutDir, destinationSubDirectory), pi.Filename);
+				return Path.Combine(Path.Combine(OutputDir, destinationSubDirectory), pi.Filename);
 			else
-				return Path.Combine(OutDir, pi.Filename);
+				return Path.Combine(OutputDir, pi.Filename);
 		}
 
 		string _intermediateOutputPath;
