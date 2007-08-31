@@ -53,6 +53,7 @@ namespace QQn.TurtleMSBuild
 			//eventSource.CustomEventRaised += new CustomBuildEventHandler(eventSource_CustomEventRaised);
 		}
 
+#if NOT
 		void eventSource_CustomEventRaised(object sender, CustomBuildEventArgs e)
 		{
 			ExternalProjectStartedEventArgs projectStarted = e as ExternalProjectStartedEventArgs;
@@ -80,6 +81,7 @@ namespace QQn.TurtleMSBuild
 		{
 			GC.KeepAlive(projectStarted);
 		}
+#endif
 
 		void ProjectTaskFinished(object sender, TaskFinishedEventArgs e)
 		{

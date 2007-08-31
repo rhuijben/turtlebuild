@@ -106,7 +106,7 @@ namespace QQn.TurtleMSBuild
 		/// Gets or sets the out dir.
 		/// </summary>
 		/// <value>The out dir.</value>
-		public string OutDir
+		public string OutputDir
 		{
 			get { return _outDir; }
 			protected set 
@@ -159,14 +159,14 @@ namespace QQn.TurtleMSBuild
 		{
 			get 
 			{
-				if (OutDir == null)
+				if (OutputDir == null)
 					return null;
 				else if (TargetName == null)
 					return null;
 				else if (TargetExt == null)
 					return null;
  
-				return Path.Combine(OutDir, TargetName + TargetExt);
+				return Path.Combine(OutputDir, TargetName + TargetExt);
 			}
 		}
 
@@ -236,12 +236,12 @@ namespace QQn.TurtleMSBuild
 
 		public void WriteTBLog()
 		{
-			string outDir = OutDir;
-
-			if (outDir == null)
+			if (TargetName == null)
 				return;
 
-			outDir = Parameters.OutputDir ?? Path.Combine(ProjectPath, OutDir);
+			string outDir = OutputDir;
+
+			outDir = Parameters.OutputDir ?? Path.Combine(ProjectPath, OutputDir);
 
 			if (!Directory.Exists(outDir))
 				Directory.CreateDirectory(outDir);
@@ -324,7 +324,7 @@ namespace QQn.TurtleMSBuild
 			xw.WriteAttributeString("name", ProjectName);
 			xw.WriteAttributeString("path", ProjectPath);
 			xw.WriteAttributeString("configuration", Configuration);
-			xw.WriteAttributeString("outputDir", OutDir);
+			xw.WriteAttributeString("outputDir", OutputDir);
 
 			xw.WriteAttributeString("file", Path.GetFileName(ProjectFile));
 		}
@@ -341,23 +341,28 @@ namespace QQn.TurtleMSBuild
 			else if (!string.IsNullOrEmpty(KeyContainer))
 				xw.WriteElementString("keyContainer", KeyContainer);
 
-			DebugReference reference = AssemblyUtils.GetDebugReference(Path.Combine(ProjectPath, TargetPath));
+			string targetFile = Path.Combine(ProjectPath, TargetPath);
 
-			if (reference != null)
-			{
-				string pdbSrc = EnsureRelativePath(QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), reference.PdbFile));
-				FileInfo pdbTarget = new FileInfo(Path.GetFullPath(QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), Path.GetFileName(pdbSrc))));
+			if(File.Exists(targetFile))
+			{				
+				DebugReference reference = AssemblyUtils.GetDebugReference(targetFile);
 
-				if(pdbTarget.Exists)
+				if (reference != null)
 				{
-					FileInfo pdbFrom = new FileInfo(Path.Combine(ProjectPath, pdbSrc));
+					string pdbSrc = EnsureRelativePath(QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), reference.PdbFile));
+					FileInfo pdbTarget = new FileInfo(Path.GetFullPath(QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), Path.GetFileName(pdbSrc))));
 
-					if(!pdbFrom.Exists || ((pdbFrom.Length == pdbTarget.Length) && (pdbFrom.LastWriteTime == pdbTarget.LastWriteTime)))
-						pdbSrc = EnsureRelativePath(pdbTarget.FullName);
+					if (pdbTarget.Exists)
+					{
+						FileInfo pdbFrom = new FileInfo(Path.Combine(ProjectPath, pdbSrc));
+
+						if (!pdbFrom.Exists || ((pdbFrom.Length == pdbTarget.Length) && (pdbFrom.LastWriteTime == pdbTarget.LastWriteTime)))
+							pdbSrc = EnsureRelativePath(pdbTarget.FullName);
+					}
+
+					xw.WriteAttributeString("debugSrc", pdbSrc);
+					xw.WriteAttributeString("debugId", reference.DebugId);
 				}
-
-				xw.WriteAttributeString("debugSrc", pdbSrc);
-				xw.WriteAttributeString("debugId", reference.DebugId);
 			}
 		}
 

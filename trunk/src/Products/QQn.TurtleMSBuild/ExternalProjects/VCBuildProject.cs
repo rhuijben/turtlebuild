@@ -60,7 +60,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 				return;
 
 			string targetFile = Path.GetFullPath(output[0].ItemSpec);
-			OutDir = Path.GetDirectoryName(targetFile);
+			OutputDir = Path.GetDirectoryName(targetFile);
 			TargetName = Path.GetFileNameWithoutExtension(targetFile);
 			TargetExt = Path.GetExtension(targetFile);
 
