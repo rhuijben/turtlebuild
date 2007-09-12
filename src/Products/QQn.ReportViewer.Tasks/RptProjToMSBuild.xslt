@@ -8,19 +8,19 @@
 			<xsl:call-template name="compiles" />
 			<ms:Import Project="$(MSBuildExtensionsPath)\QQn\TurtleBuild\1.0\ReportServer.targets" />
 			<ms:ProjectExtensions>
-				<xsl:copy-of  select="."/>
+				<xsl:copy-of select="."/>
 			</ms:ProjectExtensions>
 		</ms:Project>
 	</xsl:template>
 	<xsl:template match="/ms:Project">
-		<xsl:copy-of  select="."/>
+		<xsl:copy-of select="."/>
 	</xsl:template>
 	<xsl:template name="configurations">
-		<ms:PropertyGroup>			
+		<ms:PropertyGroup>
 			<TargetName>ReportServerData</TargetName>
 			<ReportServerState>
 				<xsl:value-of select="/Project/State"/>
-				</ReportServerState>
+			</ReportServerState>
 		</ms:PropertyGroup>
 		<xsl:for-each select="/Project/Configurations/Configuration">
 			<ms:PropertyGroup>

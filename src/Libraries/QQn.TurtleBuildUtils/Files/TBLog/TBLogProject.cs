@@ -6,15 +6,17 @@ using QQn.TurtleUtils.Tokens;
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
 	/// <summary>
-	/// 
+	/// Project information container
 	/// </summary>
-	public class TBLogProject
+	public class TBLogProject : ITokenizerInitialize
 	{
 		string _name;
 		string _path;
 		string _configuration;
 		string _outputDir;
+		string _platform;
 		string _file;
+		bool _completed;
 
 		/// <summary>
 		/// The name of the project (= file name of project without extension)
@@ -23,7 +25,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string Name
 		{
 			get { return _name; }
-			set { _name = value; }
+			set { EnsureWritable(); _name = value; }
 		}
 
 		/// <summary>
@@ -33,7 +35,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string Path
 		{
 			get { return _path; }
-			set { _path = value; }
+			set { EnsureWritable(); _path = value; }
 		}
 
 		/// <summary>
@@ -43,7 +45,17 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string Configuration
 		{
 			get { return _configuration; }
-			set { _configuration = value; }
+			set { EnsureWritable(); _configuration = value; }
+		}
+
+		/// <summary>
+		/// The configuration used to build the project
+		/// </summary>
+		[Token("platform")]
+		public string Platform
+		{
+			get { return _platform; }
+			set { EnsureWritable(); _platform = value; }
 		}
 		
 		/// <summary>
@@ -53,7 +65,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string OutputDir
 		{
 			get { return _outputDir; }
-			set { _outputDir = value; }
+			set { EnsureWritable(); _outputDir = value; }
 		}
 
 		/// <summary>
@@ -63,7 +75,27 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string File
 		{
 			get { return _file; }
-			set { _file = value; }
+			set { EnsureWritable();  _file = value; }
 		}
+
+		void EnsureWritable()
+		{
+			if (_completed)
+				throw new InvalidOperationException();
+		}
+
+		#region ITokenizerInitialize Members
+
+		void ITokenizerInitialize.OnBeginInitialize(TokenizerEventArgs e)
+		{
+			//throw new Exception("The method or operation is not implemented.");
+		}
+
+		void ITokenizerInitialize.OnEndInitialize(TokenizerEventArgs e)
+		{
+			_completed = true;
+		}
+
+		#endregion
 	}
 }

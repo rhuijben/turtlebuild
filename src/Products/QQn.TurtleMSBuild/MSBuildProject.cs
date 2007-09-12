@@ -70,9 +70,14 @@ namespace QQn.TurtleMSBuild
 			_buildProperties = buildProperties;
 			_buildItems = buildItems;
 
-			// Clear properties
+			// Default properties, set from Solution
+			ProjectConfiguration = GetProperty("Configuration");
+			ProjectPlatform = GetProperty("Platform");
+
+			// Common properties
 			OutputDir = GetProperty("OutputDir");
-			Configuration = GetProperty("Configuration");
+			TargetPlatform = GetProperty("PlatformTarget");
+			ProcessorArchitecture = GetProperty("ProcessorArchitecture");			
 
 			TargetName = GetProperty("TargetName");
 			TargetExt = GetProperty("TargetExt");

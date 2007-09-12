@@ -101,6 +101,9 @@ namespace QQn.TurtleMSBuild
 		}
 
 		string _outDir;
+		string _projectPlatform;
+		string _targetPlatform;
+		string _processorArchitecture;
 
 		/// <summary>
 		/// Gets or sets the out dir.
@@ -119,13 +122,43 @@ namespace QQn.TurtleMSBuild
 		}
 
 		/// <summary>
-		/// Gets the configuration.
+		/// Gets or sets the project configuration.
 		/// </summary>
 		/// <value>The configuration.</value>
-		public string Configuration
+		public string ProjectConfiguration
 		{
 			get { return _configuration; }
 			set { _configuration = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the project platform.
+		/// </summary>
+		/// <value>The platform.</value>
+		public string ProjectPlatform
+		{
+			get { return _projectPlatform; }
+			protected set { _projectPlatform = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the target platform.
+		/// </summary>
+		/// <value>The target platform.</value>
+		public string TargetPlatform
+		{
+			get { return _targetPlatform; }
+			protected set { _targetPlatform = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the processor architecture.
+		/// </summary>
+		/// <value>The processor architecture.</value>
+		public string ProcessorArchitecture
+		{
+			get { return _processorArchitecture; }
+			protected set { _processorArchitecture = value; }
 		}
 
 		string _targetName;
@@ -323,7 +356,8 @@ namespace QQn.TurtleMSBuild
 		{
 			xw.WriteAttributeString("name", ProjectName);
 			xw.WriteAttributeString("path", ProjectPath);
-			xw.WriteAttributeString("configuration", Configuration);
+			xw.WriteAttributeString("configuration", ProjectConfiguration);
+			xw.WriteAttributeString("platform", ProjectPlatform);
 			xw.WriteAttributeString("outputDir", OutputDir);
 
 			xw.WriteAttributeString("file", Path.GetFileName(ProjectFile));
@@ -340,6 +374,11 @@ namespace QQn.TurtleMSBuild
 				xw.WriteAttributeString("keySrc", KeyFile);
 			else if (!string.IsNullOrEmpty(KeyContainer))
 				xw.WriteElementString("keyContainer", KeyContainer);
+
+			if (!string.IsNullOrEmpty(ProcessorArchitecture))
+				xw.WriteAttributeString("processorArchitecture", ProcessorArchitecture);
+			if (!string.IsNullOrEmpty(TargetPlatform))
+				xw.WriteAttributeString("platform", TargetPlatform);
 
 			string targetFile = Path.Combine(ProjectPath, TargetPath);
 

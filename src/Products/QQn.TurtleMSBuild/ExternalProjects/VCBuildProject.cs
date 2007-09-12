@@ -106,14 +106,14 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 						ScriptFiles.AddUnique(file);
 				}
 
-				XPathNavigator n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + Configuration + "'] and @Name='VCLinkerTool' and @KeyFile!='']");
+				XPathNavigator n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + ProjectConfiguration + "'] and @Name='VCLinkerTool' and @KeyFile!='']");
 
 				if(n != null)
 				{
 					KeyFile = EnsureRelativePath(n.GetAttribute("KeyFile", ""));
 				}
 
-				n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + Configuration + "'] and @Name='VCLinkerTool' and @KeyContainer!='']");
+				n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + ProjectConfiguration + "'] and @Name='VCLinkerTool' and @KeyContainer!='']");
 
 				if (n != null)
 				{
@@ -125,7 +125,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 		
 		private ITaskItem[] GetProjectOutput(string solutionFile)
 		{
-			SetTaskParameter(ResolverTask, "Configuration", Configuration);
+			SetTaskParameter(ResolverTask, "Configuration", ProjectConfiguration);
 			SetTaskParameter(ResolverTask, "SolutionFile", new SimpleTaskItem(solutionFile));
 			SetTaskParameter(ResolverTask, "ProjectReferences", new ITaskItem[] { new SimpleTaskItem(ProjectFile) });
 

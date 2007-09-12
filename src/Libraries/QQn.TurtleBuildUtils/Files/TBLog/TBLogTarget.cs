@@ -6,17 +6,20 @@ using QQn.TurtleUtils.Tokens;
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
 	/// <summary>
-	/// 
+	/// Target information container
 	/// </summary>
-	public class TBLogTarget
+	public class TBLogTarget : ITokenizerInitialize
 	{
 		string _src;
 		string _targetName;
 		string _targetExt;
 		string _keySrc;
 		string _keyContainer;
+		string _processorArchitecture;
+		string _targetPlatform;
 		string _debugSrc;
 		string _debugReference;
+		bool _completed;
 
 		/// <summary>
 		/// A src reference to the primary target file
@@ -25,7 +28,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string Src
 		{
 			get { return _src; }
-			set { _src = value; }
+			set { EnsureWritable(); _src = value; }
 		}
 
 		/// <summary>
@@ -35,7 +38,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string TargetName
 		{
 			get { return _targetName; }
-			set { _targetName = value; }
+			set { EnsureWritable(); _targetName = value; }
 		}
 
 		/// <summary>
@@ -45,7 +48,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string Extension
 		{
 			get { return _targetExt; }
-			set { _targetExt = value; }
+			set { EnsureWritable(); _targetExt = value; }
 		}
 
 		/// <summary>
@@ -55,7 +58,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string KeySrc
 		{
 			get { return _keySrc; }
-			set { _keySrc = value; }
+			set { EnsureWritable(); _keySrc = value; }
 		}
 
 		/// <summary>
@@ -65,7 +68,29 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string KeyContainer
 		{
 			get { return _keyContainer; }
-			set { _keyContainer = value; }
+			set { EnsureWritable(); _keyContainer = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the processor architecture.
+		/// </summary>
+		/// <value>The processor architecture.</value>
+		[Token("processorArchitecture")]
+		public string ProcessorArchitecture
+		{
+			get { return _processorArchitecture; }
+			set { EnsureWritable(); _processorArchitecture = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the target platform.
+		/// </summary>
+		/// <value>The target platform.</value>
+		[Token("platform")]
+		public string TargetPlatform
+		{
+			get { return _targetPlatform; }
+			set { EnsureWritable(); _targetPlatform = value; }
 		}
 
 		/// <summary>
@@ -75,7 +100,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string DebugSrc
 		{
 			get { return _debugSrc; }
-			set { _debugSrc = value; }
+			set { EnsureWritable(); _debugSrc = value; }
 		}
 
 		/// <summary>
@@ -86,7 +111,26 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public string DebugId
 		{
 			get { return _debugReference; }
-			set { _debugReference = value; }
+			set { EnsureWritable(); _debugReference = value; }
 		}
+
+		#region ITokenizerInitialize Members
+
+		void EnsureWritable()
+		{
+			if (_completed)
+				throw new InvalidOperationException();
+		}
+
+		void ITokenizerInitialize.OnBeginInitialize(TokenizerEventArgs e)
+		{
+		}
+
+		void ITokenizerInitialize.OnEndInitialize(TokenizerEventArgs e)
+		{
+			_completed = true;
+		}
+
+		#endregion
 	}
 }
