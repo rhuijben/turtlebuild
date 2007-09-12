@@ -34,7 +34,7 @@ namespace QQn.TurtleMSBuild
 
 					if (node != null)
 					{
-						ep.Configuration = node.InnerText;
+						ep.ProjectConfiguration = node.InnerText;
 					}
 				}
 			}
