@@ -76,6 +76,10 @@ namespace QQn.TurtleMSBuild
 
 			// Common properties
 			OutputDir = GetProperty("OutputDir");
+			
+			if(string.IsNullOrEmpty(OutputDir))
+				OutputDir = GetProperty("OutDir");
+
 			TargetPlatform = GetProperty("PlatformTarget");
 			ProcessorArchitecture = GetProperty("ProcessorArchitecture");			
 
