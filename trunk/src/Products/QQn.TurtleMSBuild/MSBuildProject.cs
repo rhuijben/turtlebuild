@@ -75,10 +75,10 @@ namespace QQn.TurtleMSBuild
 			ProjectPlatform = GetProperty("Platform");
 
 			// Common properties
-			OutputDir = GetProperty("OutputDir");
+			OutputPath = GetProperty("OutputPath");
 			
-			if(string.IsNullOrEmpty(OutputDir))
-				OutputDir = GetProperty("OutDir");
+			if(string.IsNullOrEmpty(OutputPath))
+				OutputPath = GetProperty("OutDir");
 
 			TargetPlatform = GetProperty("PlatformTarget");
 			ProcessorArchitecture = GetProperty("ProcessorArchitecture");			
@@ -103,7 +103,7 @@ namespace QQn.TurtleMSBuild
 
 			Refresh();
 
-			if (string.IsNullOrEmpty(TargetName))
+			if (string.IsNullOrEmpty(TargetName) || string.IsNullOrEmpty(OutputPath))
 				return;
 
 			ParseProjectOutput();
@@ -138,21 +138,21 @@ namespace QQn.TurtleMSBuild
 					copyKeys.Add(v, true);
 			}
 
-			string primaryTarget = Path.Combine(OutputDir, TargetName + TargetExt);
+			string primaryTarget = Path.Combine(OutputPath, TargetName + TargetExt);
 			string itemTarget = primaryTarget;
 			items.Add(new TargetItem(itemTarget, Path.Combine(IntermediateOutputPath, TargetName + TargetExt), TargetType.Item));
 
 			if (BuildProperties.ContainsKey("_SGenDllCreated") && GetProperty("_SGenDllCreated") == "true" && BuildProperties.ContainsKey("_SGenDllName"))
 			{
 				string dllName = GetProperty("_SGenDllName");
-				itemTarget = Path.Combine(OutputDir, dllName);
+				itemTarget = Path.Combine(OutputPath, dllName);
 				items.Add(new TargetItem(itemTarget, Path.Combine(IntermediateOutputPath, dllName), TargetType.Item));
 			}
 
 			if (BuildProperties.ContainsKey("_DebugSymbolsProduced") && GetProperty("_DebugSymbolsProduced") == "true")
 			{
 				string pdbName = GetProperty("TargetName") + ".pdb";
-				itemTarget = Path.Combine(OutputDir, pdbName);
+				itemTarget = Path.Combine(OutputPath, pdbName);
 				items.Add(new TargetItem(itemTarget, Path.Combine(IntermediateOutputPath, pdbName), TargetType.Item));
 			}
 
@@ -249,11 +249,11 @@ namespace QQn.TurtleMSBuild
 			string destinationSubDirectory;
 
 			if (pi.TryGetMetaData("TargetPath", out target))
-				return Path.Combine(OutputDir, target);
+				return Path.Combine(OutputPath, target);
 			else if (pi.TryGetMetaData("DestinationSubDirectory", out destinationSubDirectory))
-				return Path.Combine(Path.Combine(OutputDir, destinationSubDirectory), pi.Filename);
+				return Path.Combine(Path.Combine(OutputPath, destinationSubDirectory), pi.Filename);
 			else
-				return Path.Combine(OutputDir, pi.Filename);
+				return Path.Combine(OutputPath, pi.Filename);
 		}
 
 		string _intermediateOutputPath;

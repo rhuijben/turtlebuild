@@ -60,7 +60,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 				return;
 
 			string targetFile = Path.GetFullPath(output[0].ItemSpec);
-			OutputDir = Path.GetDirectoryName(targetFile);
+			OutputPath = Path.GetDirectoryName(targetFile);
 			TargetName = Path.GetFileNameWithoutExtension(targetFile);
 			TargetExt = Path.GetExtension(targetFile);
 
@@ -119,7 +119,8 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 				{
 					KeyContainer = n.GetAttribute("KeyContainer", "");
 				}
-				
+
+				// TODO: Find processor architecture				
 			}
 		}		
 		

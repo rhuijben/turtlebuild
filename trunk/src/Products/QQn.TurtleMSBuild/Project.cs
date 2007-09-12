@@ -100,24 +100,24 @@ namespace QQn.TurtleMSBuild
 			}
 		}
 
-		string _outDir;
+		string _outputPath;
 		string _projectPlatform;
 		string _targetPlatform;
 		string _processorArchitecture;
 
 		/// <summary>
-		/// Gets or sets the out dir.
+		/// Gets or sets the output path, relative from the project root
 		/// </summary>
-		/// <value>The out dir.</value>
-		public string OutputDir
+		/// <value>The output path.</value>
+		public string OutputPath
 		{
-			get { return _outDir; }
+			get { return _outputPath; }
 			protected set 
 			{
 				if (value == null)
-					_outDir = null;
+					_outputPath = null;
 				else
-					_outDir = QQnPath.EnsureRelativePath(ProjectPath, value).TrimEnd(Path.DirectorySeparatorChar);
+					_outputPath = QQnPath.EnsureRelativePath(ProjectPath, value).TrimEnd(Path.DirectorySeparatorChar);
 			}
 		}
 
@@ -192,14 +192,14 @@ namespace QQn.TurtleMSBuild
 		{
 			get 
 			{
-				if (OutputDir == null)
+				if (OutputPath == null)
 					return null;
 				else if (TargetName == null)
 					return null;
 				else if (TargetExt == null)
 					return null;
  
-				return Path.Combine(OutputDir, TargetName + TargetExt);
+				return Path.Combine(OutputPath, TargetName + TargetExt);
 			}
 		}
 
@@ -272,9 +272,9 @@ namespace QQn.TurtleMSBuild
 			if (TargetName == null)
 				return;
 
-			string outDir = OutputDir;
+			string outDir = OutputPath;
 
-			outDir = Parameters.OutputDir ?? Path.Combine(ProjectPath, OutputDir);
+			outDir = Parameters.OutputDir ?? Path.Combine(ProjectPath, OutputPath);
 
 			if (!Directory.Exists(outDir))
 				Directory.CreateDirectory(outDir);
@@ -358,7 +358,7 @@ namespace QQn.TurtleMSBuild
 			xw.WriteAttributeString("path", ProjectPath);
 			xw.WriteAttributeString("configuration", ProjectConfiguration);
 			xw.WriteAttributeString("platform", ProjectPlatform);
-			xw.WriteAttributeString("outputDir", OutputDir);
+			xw.WriteAttributeString("outputDir", OutputPath);
 
 			xw.WriteAttributeString("file", Path.GetFileName(ProjectFile));
 		}
@@ -375,10 +375,8 @@ namespace QQn.TurtleMSBuild
 			else if (!string.IsNullOrEmpty(KeyContainer))
 				xw.WriteElementString("keyContainer", KeyContainer);
 
-			if (!string.IsNullOrEmpty(ProcessorArchitecture))
-				xw.WriteAttributeString("processorArchitecture", ProcessorArchitecture);
-			if (!string.IsNullOrEmpty(TargetPlatform))
-				xw.WriteAttributeString("platform", TargetPlatform);
+			xw.WriteAttributeString("processorArchitecture", ProcessorArchitecture);
+			xw.WriteAttributeString("platform", TargetPlatform);
 
 			string targetFile = Path.Combine(ProjectPath, TargetPath);
 
