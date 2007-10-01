@@ -287,7 +287,7 @@ namespace QQn.TurtleUtils.Cryptography
 
 			foreach (string p in parts)
 			{
-				if (p.StartsWith("type=", StringComparison.InvariantCultureIgnoreCase))
+				if (p.StartsWith("type=", StringComparison.OrdinalIgnoreCase))
 				{
 					try
 					{
@@ -301,14 +301,14 @@ namespace QQn.TurtleUtils.Cryptography
 						hashType = HashType.None;
 					}
 				}
-				else if (p.StartsWith("size=", StringComparison.InvariantCultureIgnoreCase))
+				else if (p.StartsWith("size=", StringComparison.OrdinalIgnoreCase))
 				{
 					if (!long.TryParse(p.Substring(5), NumberStyles.None, CultureInfo.InvariantCulture, out length))
 						length = -1;
 					else if (length < 0)
 						length = -1;
 				}
-				else if (p.StartsWith("hash=", StringComparison.InvariantCultureIgnoreCase))
+				else if (p.StartsWith("hash=", StringComparison.OrdinalIgnoreCase))
 				{
 					hashValue = p.Substring(5);
 					len = hashValue.Length;
@@ -366,7 +366,7 @@ namespace QQn.TurtleUtils.Cryptography
 			if(length >= 0 && new FileInfo(filename).Length != length)
 				return false;
 
-			return string.Equals(CalculateFileHash(filename, hashType), hashValue, StringComparison.InvariantCultureIgnoreCase);
+			return string.Equals(CalculateFileHash(filename, hashType), hashValue, StringComparison.OrdinalIgnoreCase);
 		}
 
 		/// <summary>
@@ -390,7 +390,7 @@ namespace QQn.TurtleUtils.Cryptography
 			if (length >= 0 && stream.Length != length)
 				return false;
 
-			return string.Equals(CalculateStreamHash(stream, hashType), hashValue, StringComparison.InvariantCultureIgnoreCase);
+			return string.Equals(CalculateStreamHash(stream, hashType), hashValue, StringComparison.OrdinalIgnoreCase);
 		}
 
 		/// <summary>

@@ -20,7 +20,7 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 		/// </returns>
 		public override bool HandlesExtension(string extension)
 		{
-			return ".cs".Equals(extension, StringComparison.InvariantCultureIgnoreCase);
+			return ".cs".Equals(extension, StringComparison.OrdinalIgnoreCase);
 		}
 
 		// The csharp parser is +- the default parser implemented in AttributeParser, so almost no overrides are necessary

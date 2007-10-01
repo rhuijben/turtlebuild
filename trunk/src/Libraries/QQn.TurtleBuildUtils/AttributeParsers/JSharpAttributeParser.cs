@@ -18,7 +18,7 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 		/// </returns>
 		public override bool HandlesExtension(string extension)
 		{
-			return ".jsl".Equals(extension, StringComparison.InvariantCultureIgnoreCase);
+			return ".jsl".Equals(extension, StringComparison.OrdinalIgnoreCase);
 		}
 
 		/// <summary>

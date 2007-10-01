@@ -36,7 +36,7 @@ namespace QQn.TurtleBuildUtils
 
 							foreach (string name in rk.GetValueNames())
 							{
-								if (name.StartsWith("sdkinstallroot", StringComparison.InvariantCultureIgnoreCase))
+								if (name.StartsWith("sdkinstallroot", StringComparison.OrdinalIgnoreCase))
 								{
 									if (fallback == null)
 									{
@@ -48,7 +48,7 @@ namespace QQn.TurtleBuildUtils
 										}
 									}
 
-									if (myVersion.StartsWith(name, StringComparison.InvariantCultureIgnoreCase))
+									if (myVersion.StartsWith(name, StringComparison.OrdinalIgnoreCase))
 									{
 										string value = (string)rk.GetValue(name);
 
