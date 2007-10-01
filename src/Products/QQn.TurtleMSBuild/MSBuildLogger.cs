@@ -147,7 +147,7 @@ namespace QQn.TurtleMSBuild
 			{
 				if (string.IsNullOrEmpty(target))
 					isBuild = true;
-				else if (string.Equals(target, "build", StringComparison.InvariantCultureIgnoreCase))
+				else if (string.Equals(target, "build", StringComparison.OrdinalIgnoreCase))
 					isBuild = true;
 
 				if (isBuild)

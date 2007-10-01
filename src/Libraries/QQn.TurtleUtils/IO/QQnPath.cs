@@ -39,7 +39,7 @@ namespace QQn.TurtleUtils.IO
 			string pathRoot = Path.GetPathRoot(path);
 			string relRoot = Path.GetPathRoot(relativeFrom);
 
-			if (!string.Equals(pathRoot, relRoot, StringComparison.InvariantCultureIgnoreCase))
+			if (!string.Equals(pathRoot, relRoot, StringComparison.OrdinalIgnoreCase))
 				return path;
 
 			const int FILE_ATTRIBUTE_FILE = 0x00000000;

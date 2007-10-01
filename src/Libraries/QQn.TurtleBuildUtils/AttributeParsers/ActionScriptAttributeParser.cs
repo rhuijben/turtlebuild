@@ -30,9 +30,9 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 		public override bool HandlesExtension(string extension)
 		{
 			return
-				".as".Equals(extension, StringComparison.InvariantCultureIgnoreCase) ||
-				".as2".Equals(extension, StringComparison.InvariantCultureIgnoreCase) ||
-				".hx".Equals(extension, StringComparison.InvariantCultureIgnoreCase);
+				".as".Equals(extension, StringComparison.OrdinalIgnoreCase) ||
+				".as2".Equals(extension, StringComparison.OrdinalIgnoreCase) ||
+				".hx".Equals(extension, StringComparison.OrdinalIgnoreCase);
 		}
 
 		/// <summary>

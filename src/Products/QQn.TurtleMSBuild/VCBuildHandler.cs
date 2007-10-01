@@ -45,7 +45,7 @@ namespace QQn.TurtleMSBuild
 
 				foreach (ProjectItem pi in solution.BuildItems)
 				{
-					if (pi.Name.StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase))
+					if (pi.Name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
 					{
 						ep.BuildItems.Add(pi);
 					}
