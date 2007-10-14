@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using QQn.TurtleUtils.Tokens;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
 using System.IO;
 using System.Xml;
 using QQn.TurtleUtils.Tokens.Converters;

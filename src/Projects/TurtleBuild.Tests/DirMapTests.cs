@@ -4,7 +4,6 @@ using System.Text;
 using NUnit.Framework;
 using System.IO;
 using QQn.TurtleUtils.IO;
-using NUnit.Framework.SyntaxHelpers;
 
 namespace TurtleTests
 {
