@@ -406,7 +406,7 @@ namespace QQn.TurtleUtils.IO
 				asm = Assembly.GetCallingAssembly();
 
 			if(asm != null)
-				result = FindFileNextToAssembly(result, asm);
+				result = FindFileNextToAssembly(file, asm);
 
 			return result;
 		}

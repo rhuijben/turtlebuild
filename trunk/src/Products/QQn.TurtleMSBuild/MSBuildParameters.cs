@@ -13,8 +13,8 @@ namespace QQn.TurtleMSBuild
 		/// <summary>
 		/// The directory to write the tbLog's to
 		/// </summary>
-		[Token("OutputDir")]
-		public string OutputDir;
+		[Token("OutputPath", "OutputDir")]
+		public string OutputPath;
 
 		/// <summary>
 		/// Indent the files for readability
@@ -67,7 +67,7 @@ namespace QQn.TurtleMSBuild
 		/// <summary>
 		/// If set to true the unmanaged version resource is replaced with the managed information in the assembly attributes
 		/// </summary>
-		[Token("VC-UpdateVersionInformation")]
+        [Token("VC-UpdateVersionInformation")]
 		public bool UpdateVCVersionInfo;
 	}
 }

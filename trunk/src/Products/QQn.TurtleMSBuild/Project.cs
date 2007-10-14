@@ -274,7 +274,7 @@ namespace QQn.TurtleMSBuild
 
 			string outDir = OutputPath;
 
-			outDir = Parameters.OutputDir ?? Path.Combine(ProjectPath, OutputPath);
+			outDir = Parameters.OutputPath ?? Path.Combine(ProjectPath, OutputPath);
 
 			if (!Directory.Exists(outDir))
 				Directory.CreateDirectory(outDir);

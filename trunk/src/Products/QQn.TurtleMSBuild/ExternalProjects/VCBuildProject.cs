@@ -70,7 +70,12 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 			if (Parameters.UpdateVCVersionInfo)
 			{
-				AssemblyUtils.RefreshVersionInfoFromAttributes(targetFile, KeyFile, KeyContainer);
+                string keyFile = KeyFile;
+
+                if(!string.IsNullOrEmpty(keyFile))
+                    keyFile = Path.Combine(ProjectPath, keyFile);
+
+				AssemblyUtils.RefreshVersionInfoFromAttributes(targetFile, keyFile, KeyContainer);
 			}
 		}		
 

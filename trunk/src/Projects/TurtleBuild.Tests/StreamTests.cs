@@ -6,7 +6,6 @@ using QQn.TurtlePackage;
 using System.IO;
 using System.Reflection;
 using System.Xml;
-using NUnit.Framework.SyntaxHelpers;
 using QQn.TurtleUtils.IO;
 using System.Net;
 using System.Net.Cache;
