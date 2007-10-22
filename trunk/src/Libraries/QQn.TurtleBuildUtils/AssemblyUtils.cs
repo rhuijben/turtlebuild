@@ -143,40 +143,73 @@ namespace QQn.TurtleBuildUtils
 
 			// Load source assembly for reflection
 			Assembly srcAssembly = Assembly.ReflectionOnlyLoad(File.ReadAllBytes(file));
+			Assembly mscorlib = Assembly.ReflectionOnlyLoad(typeof(int).Assembly.FullName);
+			Assembly system = Assembly.ReflectionOnlyLoad(typeof(Uri).Assembly.FullName);
 
-			foreach (CustomAttributeData attr in CustomAttributeData.GetCustomAttributes(srcAssembly))
+			AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += new ResolveEventHandler(OnReflectionOnlyAssemblyResolve);
+			try
 			{
-				if ((attr.NamedArguments.Count > 0) || (attr.Constructor == null))
+				try
 				{
-					// We don't use named arguments at this time; not needed for the version resources
-					continue;
+					Assembly systemAssembly = Assembly.ReflectionOnlyLoad(typeof(int).Assembly.FullName);
+
+					foreach (CustomAttributeData attr in CustomAttributeData.GetCustomAttributes(srcAssembly))
+					{
+						if ((attr.NamedArguments.Count > 0) || (attr.Constructor == null))
+						{
+							// We don't use named arguments at this time; not needed for the version resources
+							continue;
+						}
+
+						Type type = attr.Constructor.ReflectedType;
+
+						if (type.Assembly != typeof(AssemblyVersionAttribute).Assembly)
+						{
+							continue;
+						}
+
+						List<object> values = new List<object>();
+						object value = null;
+						foreach (CustomAttributeTypedArgument arg in attr.ConstructorArguments)
+						{
+							if (value == null)
+								value = arg.Value;
+							values.Add(arg.Value);
+						}
+
+						CustomAttributeBuilder cb = new CustomAttributeBuilder(attr.Constructor, values.ToArray());
+
+						newAssembly.SetCustomAttribute(cb);
+					}
+				}
+				finally
+				{
+					AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= new ResolveEventHandler(OnReflectionOnlyAssemblyResolve);
 				}
 
-				Type type = attr.Constructor.ReflectedType;
+				GC.KeepAlive(system);
+				GC.KeepAlive(mscorlib);
 
-				if (type.Assembly != typeof(AssemblyVersionAttribute).Assembly)
-				{
-					continue;
-				}
+				newAssembly.DefineVersionInfoResource();
+				newAssembly.Save(tmpFile);
 
-				List<object> values = new List<object>();
-				object value = null;
-				foreach (CustomAttributeTypedArgument arg in attr.ConstructorArguments)
-				{
-					if (value == null)
-						value = arg.Value;
-					values.Add(arg.Value);
-				}
-
-				CustomAttributeBuilder cb = new CustomAttributeBuilder(attr.Constructor, values.ToArray());
-
-				newAssembly.SetCustomAttribute(cb);
+				return Path.Combine(outputDirectory, tmpFile);
 			}
+			catch (FileLoadException)
+			{
+				return null;
+			}
+		}
 
-			newAssembly.DefineVersionInfoResource();
-			newAssembly.Save(tmpFile);
-
-			return Path.Combine(outputDirectory, tmpFile);
+		/// <summary>
+		/// Called when [reflection only assembly resolve].
+		/// </summary>
+		/// <param name="sender">The sender.</param>
+		/// <param name="args">The <see cref="System.ResolveEventArgs"/> instance containing the event data.</param>
+		/// <returns></returns>
+		static Assembly OnReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
+		{
+			return Assembly.ReflectionOnlyLoad(args.Name);
 		}
 
 		static bool _enfDebugReference;
