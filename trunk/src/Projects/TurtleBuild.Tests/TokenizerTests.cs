@@ -6,6 +6,7 @@ using NUnit.Framework;
 using System.IO;
 using System.Xml;
 using QQn.TurtleUtils.Tokens.Converters;
+using NUnit.Framework.SyntaxHelpers;
 
 namespace TurtleTests
 {
