@@ -131,24 +131,25 @@ namespace QQn.TurtleBuildUtils
 			if (srcName == null || string.IsNullOrEmpty(srcName.Name))
 				return null;
 
-			// Prepare dynamic assembly for resources
-			AssemblyName asmName = new AssemblyName(srcName.FullName);
-			asmName.Name = "Tmp." + srcName.Name;
-
-			AssemblyBuilder newAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.RunAndSave, outputDirectory);
-
-			string extension = Path.GetExtension(file);
-			string tmpFile = Path.GetFileNameWithoutExtension(file) + ".resTmp" + extension;
-			newAssembly.DefineDynamicModule(asmName.Name, tmpFile);
-
-			// Load source assembly for reflection
-			Assembly srcAssembly = Assembly.ReflectionOnlyLoad(File.ReadAllBytes(file));
-			Assembly mscorlib = Assembly.ReflectionOnlyLoad(typeof(int).Assembly.FullName);
-			Assembly system = Assembly.ReflectionOnlyLoad(typeof(Uri).Assembly.FullName);
-
-			AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += new ResolveEventHandler(OnReflectionOnlyAssemblyResolve);
 			try
 			{
+				// Prepare dynamic assembly for resources
+				AssemblyName asmName = new AssemblyName(srcName.FullName);
+				asmName.Name = "Tmp." + srcName.Name;
+
+				AssemblyBuilder newAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.RunAndSave, outputDirectory);
+
+				string extension = Path.GetExtension(file);
+				string tmpFile = Path.GetFileNameWithoutExtension(file) + ".resTmp" + extension;
+				newAssembly.DefineDynamicModule(asmName.Name, tmpFile);
+
+				// Load source assembly for reflection
+				Assembly srcAssembly = Assembly.ReflectionOnlyLoad(File.ReadAllBytes(file));
+				Assembly mscorlib = Assembly.ReflectionOnlyLoad(typeof(int).Assembly.FullName);
+				Assembly system = Assembly.ReflectionOnlyLoad(typeof(Uri).Assembly.FullName);
+
+
+				AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += new ResolveEventHandler(OnReflectionOnlyAssemblyResolve);
 				try
 				{
 					Assembly systemAssembly = Assembly.ReflectionOnlyLoad(typeof(int).Assembly.FullName);
@@ -196,6 +197,10 @@ namespace QQn.TurtleBuildUtils
 				return Path.Combine(outputDirectory, tmpFile);
 			}
 			catch (FileLoadException)
+			{
+				return null;
+			}
+			catch (IOException)
 			{
 				return null;
 			}
