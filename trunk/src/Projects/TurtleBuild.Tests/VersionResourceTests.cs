@@ -21,5 +21,12 @@ namespace TurtleTests
 			File.Copy(file, tmpFile, true);
 			Assert.That(AssemblyUtils.RefreshVersionInfoFromAttributes(tmpFile, Path.GetFullPath("..\\..\\..\\..\\Libraries\\QQn.TurtleBuildUtils\\QQn.TurtleBuildUtils.snk"), null));
 		}
+
+
+		[Test]
+		public void LoadThem()
+		{
+			AssemblyUtils.RefreshVersionInfoFromAttributes("f:\\Tcg.Windows.Forms.Html.dll", null, null);
+		}
 	}
 }
