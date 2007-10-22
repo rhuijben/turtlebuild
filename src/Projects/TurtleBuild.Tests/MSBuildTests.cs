@@ -14,6 +14,7 @@ using QQn.TurtleBuildUtils.Files.TBLog;
 using QQn.TurtlePackage;
 using QQn.TurtleUtils.IO;
 using QQn.TurtleBuildUtils;
+using NUnit.Framework.SyntaxHelpers;
 
 namespace TurtleTests
 {

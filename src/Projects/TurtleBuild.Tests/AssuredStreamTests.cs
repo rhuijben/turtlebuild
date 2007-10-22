@@ -6,6 +6,7 @@ using System.IO;
 
 using QQn.TurtleUtils.IO;
 using QQn.TurtleUtils.Cryptography;
+using NUnit.Framework.SyntaxHelpers;
 
 namespace TurtleTests
 {
