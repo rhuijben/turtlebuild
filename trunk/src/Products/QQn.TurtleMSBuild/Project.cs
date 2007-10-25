@@ -405,7 +405,6 @@ namespace QQn.TurtleMSBuild
 		{
 			xw.WriteAttributeString("name", ProjectName);
 			xw.WriteAttributeString("path", ProjectPath);
-			xw.WriteAttributeString("configuration", ProjectConfiguration);			
 
 			xw.WriteAttributeString("file", Path.GetFileName(ProjectFile));
 		}

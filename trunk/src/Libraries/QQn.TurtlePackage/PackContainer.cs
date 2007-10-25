@@ -28,7 +28,7 @@ namespace QQn.TurtlePackage
 		/// Gets or sets the container dir.
 		/// </summary>
 		/// <value>The container dir.</value>
-		[Token("containerDir"), DefaultValue(null)]
+		[Token("containerPath"), DefaultValue(null)]
 		public string ContainerDir
 		{
 			get { return _containerDir; }
