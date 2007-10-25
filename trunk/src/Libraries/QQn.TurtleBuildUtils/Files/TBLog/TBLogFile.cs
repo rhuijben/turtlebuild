@@ -12,7 +12,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// <summary>
 	/// 
 	/// </summary>
-	public class TBLogFile : IHasFullPath, ITokenizerInitialize
+	public class TBLogFile : ITokenizerInitialize
 	{
 		TBLogGenerator _generator;
 		TBLogProject _project;
@@ -106,7 +106,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		#region IHasFullPath Members
 
 		string _fullPath;
-		string IHasFullPath.FullPath
+		internal string BasePath
 		{
 			get { return _fullPath; }
 		}
@@ -151,8 +151,8 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		protected virtual void OnEndInitialize(TokenizerEventArgs e)
 		{
 			_fullPath = Project.Path;
-			Configurations.Parent = this;
-			Scripts.Parent = this;
+			Configurations.LogFile = this;
+			Scripts.LogFile = this;
 		}
 
 		#endregion

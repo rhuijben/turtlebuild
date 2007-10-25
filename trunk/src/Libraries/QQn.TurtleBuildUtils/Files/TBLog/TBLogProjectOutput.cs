@@ -10,7 +10,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// <summary>
 	/// 
 	/// </summary>
-	public class TBLogProjectOutput : IHasFullPath
+	public class TBLogProjectOutput : TBLogContainer
 	{
 		readonly TBReferenceCollection<TBLogItem> _items;
 
@@ -34,31 +34,14 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 			[DebuggerStepThrough]
 			get { return _items; }
 		}
-
-		IHasFullPath _parent;
-		string IHasFullPath.FullPath
-		{
-			get { return (Parent != null) ? Parent.FullPath : null; }
-		}
-
-		internal IHasFullPath Parent
-		{
-			get { return _parent; }
-			set { _parent = value; }
-		}
-	}
-
-	interface IHasFullPath
-	{
-		string FullPath { get; }
 	}
 
 	class TBReferenceCollection<T> : TBLogItemCollection<T>
 		where T : TBLogItem
 	{
-		readonly IHasFullPath _parent;
+		readonly TBLogContainer _parent;
 
-		public TBReferenceCollection(IHasFullPath parent)
+		public TBReferenceCollection(TBLogContainer parent)
 		{
 			_parent = parent;
 		}
@@ -66,19 +49,19 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		protected override void InsertItem(int index, T item)
 		{
 			base.InsertItem(index, item);
-			item.Parent = _parent;
+			item.Container = _parent;
 		}
 
 		protected override void SetItem(int index, T item)
 		{
-			this[index].Parent = null;
+			this[index].Container = null;
 			base.SetItem(index, item);
-			item.Parent = _parent;
+			item.Container = _parent;
 		}
 
 		protected override void RemoveItem(int index)
 		{
-			this[index].Parent = null;
+			this[index].Container = null;
 			base.RemoveItem(index);
 		}
 	}

@@ -49,7 +49,9 @@
     <Compile Include="AttributeParsers\VBAttributeParser.cs" />
     <Compile Include="BuildTools.cs" />
     <Compile Include="DebugReference.cs" />
+    <Compile Include="Files\TBLog\TBLogCache.cs" />
     <Compile Include="Files\TBLog\TBLogConfiguration.cs" />
+    <Compile Include="Files\TBLog\TBLogContainer.cs" />
     <Compile Include="Files\TBLog\TBLogTarget.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="SortedFileList.cs" />
