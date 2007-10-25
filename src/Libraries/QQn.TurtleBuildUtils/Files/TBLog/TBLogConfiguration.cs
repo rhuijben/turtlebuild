@@ -32,9 +32,9 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		internal IHasFullPath Parent
 		{
 			get { return _parent; }
-			set 
-			{ 
-				_parent = value; 
+			set
+			{
+				_parent = value;
 			}
 		}
 
@@ -160,11 +160,94 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		internal IHasFullPath Parent
 		{
 			get { return _parent; }
-			set 
-			{ 
+			set
+			{
 				_parent = value;
 				foreach (TBLogConfiguration c in this)
 					c.Parent = value;
+			}
+		}
+
+		/// <summary>
+		/// Determines whether the list contains the specified configuration
+		/// </summary>
+		/// <param name="configuration">The configuration.</param>
+		/// <param name="platform">The platform.</param>
+		/// <returns>
+		/// 	<c>true</c> if the list contains the specified configuration; otherwise, <c>false</c>.
+		/// </returns>
+		public bool Contains(string configuration, string platform)
+		{
+			foreach (TBLogConfiguration config in this)
+			{
+				if (string.Equals(configuration, config.Name, StringComparison.OrdinalIgnoreCase) &&
+					string.Equals(platform, config.Platform, StringComparison.OrdinalIgnoreCase))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Determines whether the list contains the specified configuration
+		/// </summary>
+		/// <param name="configuration">The configuration.</param>
+		/// <returns>
+		/// 	<c>true</c> if the list contains the specified configuration; otherwise, <c>false</c>.
+		/// </returns>
+		public bool Contains(string configuration)
+		{
+			foreach (TBLogConfiguration config in this)
+			{
+				if (string.Equals(configuration, config.Name, StringComparison.OrdinalIgnoreCase))
+				{
+					return true;
+				}
+			}
+
+			return false;
+		}
+
+		/// <summary>
+		/// Gets the <see cref="QQn.TurtleBuildUtils.Files.TBLog.TBLogConfiguration"/> with the specified configuration and platform.
+		/// </summary>
+		/// <value></value>
+		public TBLogConfiguration this[string configuration, string platform]
+		{
+			get
+			{
+				foreach (TBLogConfiguration config in this)
+				{
+					if (string.Equals(configuration, config.Name, StringComparison.OrdinalIgnoreCase) &&
+						string.Equals(platform, config.Platform, StringComparison.OrdinalIgnoreCase))
+					{
+						return config;
+					}
+				}
+
+				throw new ArgumentException("Configuration not found", "configuration");
+			}
+		}
+
+		/// <summary>
+		/// Gets the <see cref="QQn.TurtleBuildUtils.Files.TBLog.TBLogConfiguration"/> with the specified configuration.
+		/// </summary>
+		/// <value></value>
+		public TBLogConfiguration this[string configuration]
+		{
+			get
+			{
+				foreach (TBLogConfiguration config in this)
+				{
+					if (string.Equals(configuration, config.Name, StringComparison.OrdinalIgnoreCase))
+					{
+						return config;
+					}
+				}
+
+				throw new ArgumentException("Configuration not found", "configuration");
 			}
 		}
 	}

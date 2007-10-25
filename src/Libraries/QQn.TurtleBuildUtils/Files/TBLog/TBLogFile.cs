@@ -15,11 +15,11 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	public class TBLogFile : IHasFullPath, ITokenizerInitialize
 	{
 		TBLogGenerator _generator;
-		TBLogProject _project;		
+		TBLogProject _project;
 		bool _completed;
 		TBLogScripts _scripts;
 		TBLogConfigurationCollection _configurations;
-		
+
 		/// <summary>
 		/// Gets "http://schemas.qqn.nl/2007/TurtleBuild/BuildResult"
 		/// </summary>
@@ -27,7 +27,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 
 		void EnsureWritable()
 		{
-			if(_completed)
+			if (_completed)
 				throw new InvalidOperationException();
 		}
 
@@ -50,7 +50,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 			get { return _project ?? (_project = new TBLogProject()); }
 			set { EnsureWritable(); _project = value; }
 		}
-		
+
 		/// <summary>
 		/// Gets the configurations.
 		/// </summary>
@@ -59,7 +59,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		public TBLogConfigurationCollection Configurations
 		{
 			get { return _configurations ?? (_configurations = new TBLogConfigurationCollection()); }
-		}		
+		}
 
 		/// <summary>
 		/// Gets scripts
@@ -127,7 +127,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		void ITokenizerInitialize.OnBeginInitialize(TokenizerEventArgs e)
 		{
 			OnBeginInitialize(e);
-			
+
 		}
 
 		/// <summary>
@@ -150,7 +150,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// <param name="e">The <see cref="QQn.TurtleUtils.Tokens.TokenizerEventArgs"/> instance containing the event data.</param>
 		protected virtual void OnEndInitialize(TokenizerEventArgs e)
 		{
- 			_fullPath = Project.Path;
+			_fullPath = Project.Path;
 			Configurations.Parent = this;
 			Scripts.Parent = this;
 		}
