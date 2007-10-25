@@ -7,6 +7,8 @@ using System.Xml;
 using QQn.TurtleBuildUtils;
 using QQn.TurtleUtils.IO;
 using QQn.TurtleUtils.Tokens.Converters;
+using System.Xml.XPath;
+using QQn.TurtleUtils.Tokens;
 
 namespace QQn.TurtleMSBuild
 {
@@ -16,7 +18,9 @@ namespace QQn.TurtleMSBuild
 		readonly string _projectFile;
 		string _projectName;
 		readonly ProjectOutputList _projectOutput = new ProjectOutputList();
-		string _configuration;
+		string _projectConfiguration;
+		string _projectType;
+		string _projectPlatform;
 		string _buildEngineTargets;
 		ReferenceList _references = new ReferenceList();
 
@@ -100,8 +104,7 @@ namespace QQn.TurtleMSBuild
 			}
 		}
 
-		string _outputPath;
-		string _projectPlatform;
+		string _outputPath;		
 		string _targetPlatform;
 		string _processorArchitecture;
 
@@ -127,8 +130,18 @@ namespace QQn.TurtleMSBuild
 		/// <value>The configuration.</value>
 		public string ProjectConfiguration
 		{
-			get { return _configuration; }
-			set { _configuration = value; }
+			get { return _projectConfiguration; }
+			set { _projectConfiguration = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the type of the project.
+		/// </summary>
+		/// <value>The type of the project.</value>
+		public string ProjectType
+		{
+			get { return _projectType; }
+			protected set { _projectType = value; }
 		}
 
 		/// <summary>
@@ -267,6 +280,7 @@ namespace QQn.TurtleMSBuild
 			get { return false; }
 		}
 
+		XPathDocument _previousLog;
 		public void WriteTBLog()
 		{
 			if (TargetName == null)
@@ -280,6 +294,14 @@ namespace QQn.TurtleMSBuild
 				Directory.CreateDirectory(outDir);
 
 			string atPath = Path.Combine(outDir, ProjectName + ".tbLog");
+
+			if (File.Exists(atPath))
+			{
+				using (FileStream fs = File.OpenRead(atPath))
+				{
+					_previousLog = new XPathDocument(fs);
+				}
+			}
 
 			using (StreamWriter sw = new StreamWriter(atPath, false, Encoding.UTF8))
 			{
@@ -305,6 +327,12 @@ namespace QQn.TurtleMSBuild
 			WriteProjectInfo(xw, forReadability);
 			xw.WriteEndElement();
 
+			WriteOldConfigurations(xw);
+
+			xw.WriteStartElement("Configuration");
+			WriteConfigurationInfo(xw, forReadability);
+
+
 			xw.WriteStartElement("Target");
 			WriteTargetInfo(xw, forReadability);
 			xw.WriteEndElement();
@@ -318,11 +346,32 @@ namespace QQn.TurtleMSBuild
 
 			WriteProjectOutput(xw, forReadability);
 			WriteContent(xw, forReadability);
-			WriteScripts(xw, forReadability);
 
+			xw.WriteEndElement();
+
+			WriteScripts(xw, forReadability);
 
 			xw.WriteEndElement();
 			xw.WriteEndDocument();
+		}
+
+		private void WriteOldConfigurations(XmlWriter xw)
+		{
+			if(_previousLog != null)
+			{
+				TokenNamespaceResolver resolver = new TokenNamespaceResolver();
+				resolver.AddNamespace("tb", Ns);
+				foreach (XPathNavigator n in _previousLog.CreateNavigator().Select("/tb:TurtleBuildData/tb:Configuration", resolver))
+				{
+					if (n.GetAttribute("name", "") == ProjectConfiguration)
+					{
+						if ((n.GetAttribute("platform", "") == ProjectPlatform) && (n.GetAttribute("type", "") == ProjectType))
+							continue; // Remove duplicate outputs
+					}
+
+					n.WriteSubtree(xw);
+				}
+			}
 		}
 
 		static T GetAttribute<T>(ICustomAttributeProvider provider)
@@ -356,11 +405,19 @@ namespace QQn.TurtleMSBuild
 		{
 			xw.WriteAttributeString("name", ProjectName);
 			xw.WriteAttributeString("path", ProjectPath);
-			xw.WriteAttributeString("configuration", ProjectConfiguration);
-			xw.WriteAttributeString("platform", ProjectPlatform);
-			xw.WriteAttributeString("outputDir", OutputPath);
+			xw.WriteAttributeString("configuration", ProjectConfiguration);			
 
 			xw.WriteAttributeString("file", Path.GetFileName(ProjectFile));
+		}
+
+		private void WriteConfigurationInfo(XmlWriter xw, bool forReadability)
+		{
+			xw.WriteAttributeString("name", ProjectConfiguration);
+			xw.WriteAttributeString("platform", ProjectPlatform);
+			xw.WriteAttributeString("basePath", ProjectPath);
+			xw.WriteAttributeString("outputPath", OutputPath);
+
+			xw.WriteAttributeString("type", ProjectType); // Add an extra type field to allow solutions with the name of a project
 		}
 
 		protected virtual void WriteTargetInfo(XmlWriter xw, bool forReadability)

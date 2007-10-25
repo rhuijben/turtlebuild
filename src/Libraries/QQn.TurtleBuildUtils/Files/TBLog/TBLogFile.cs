@@ -15,15 +15,11 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	public class TBLogFile : IHasFullPath, ITokenizerInitialize
 	{
 		TBLogGenerator _generator;
-		TBLogProject _project;
-		TBLogTarget _target;
-		TBLogReferences _references;
-		TBLogProjectOutput _projectOutput;
-		TBLogContent _content;
-		TBLogScripts _scripts;
+		TBLogProject _project;		
 		bool _completed;
-
-
+		TBLogScripts _scripts;
+		TBLogConfigurationCollection _configurations;
+		
 		/// <summary>
 		/// Gets "http://schemas.qqn.nl/2007/TurtleBuild/BuildResult"
 		/// </summary>
@@ -54,46 +50,16 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 			get { return _project ?? (_project = new TBLogProject()); }
 			set { EnsureWritable(); _project = value; }
 		}
-
+		
 		/// <summary>
-		/// Gets target information
+		/// Gets the configurations.
 		/// </summary>
-		[TokenGroup("Target")]
-		public TBLogTarget Target
+		/// <value>The configurations.</value>
+		[TokenGroup("Configuration", typeof(TBLogConfiguration))]
+		public TBLogConfigurationCollection Configurations
 		{
-			get { return _target ?? (_target = new TBLogTarget()); }
-			set { EnsureWritable(); _target = value; }
-		}
-
-		/// <summary>
-		/// gets reference information
-		/// </summary>
-		[TokenGroup("References")]
-		public TBLogReferences References
-		{
-			get { return _references ?? (_references = new TBLogReferences()); }
-			set { EnsureWritable(); _references = value; }
-		}
-
-		/// <summary>
-		/// Get project output
-		/// </summary>
-		[TokenGroup("ProjectOutput")]
-		public TBLogProjectOutput ProjectOutput
-		{
-			get { return _projectOutput ?? (_projectOutput = new TBLogProjectOutput()); }
-			set { EnsureWritable(); _projectOutput = value; }
-		}
-
-		/// <summary>
-		/// Gets project content
-		/// </summary>
-		[TokenGroup("Content")]
-		public TBLogContent Content
-		{
-			get { return _content ?? (_content = new TBLogContent()); }
-			set { EnsureWritable(); _content = value; }
-		}
+			get { return _configurations ?? (_configurations = new TBLogConfigurationCollection()); }
+		}		
 
 		/// <summary>
 		/// Gets scripts
@@ -185,20 +151,10 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		protected virtual void OnEndInitialize(TokenizerEventArgs e)
 		{
  			_fullPath = Project.Path;
-			ProjectOutput.Parent = this;
-			Content.Parent = this;
+			Configurations.Parent = this;
 			Scripts.Parent = this;
 		}
 
 		#endregion
-
-		/// <summary>
-		/// Gets the full name of the target output
-		/// </summary>
-		/// <value>The full name of the target.</value>
-		public string TargetFullName
-		{
-			get { return QQnPath.Combine(ProjectPath, Target.Src); }
-		}
 	}
 }

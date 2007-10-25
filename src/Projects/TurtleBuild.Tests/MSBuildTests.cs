@@ -182,14 +182,15 @@ namespace TurtleTests
 			XPathNavigator nav = doc.CreateNavigator();
 			XmlNamespaceManager nsMgr = new XmlNamespaceManager(nav.NameTable);
 			nsMgr.AddNamespace("tb", "http://schemas.qqn.nl/2007/TurtleBuild/BuildResult");
-			Assert.That(nav.SelectSingleNode("//tb:Project", nsMgr).GetAttribute("outputDir", ""), Is.Not.EqualTo(""), "Outputdir is set");
+			Assert.That(nav.SelectSingleNode("/tb:TurtleBuildData/tb:Configuration", nsMgr).GetAttribute("outputPath", ""), Is.Not.EqualTo(""), "outputPath is set");
 			//doc.CreateNavigator().SelectSingleNode("
 
 			TBLogFile file = TBLogFile.Load(Path.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog"));
 
 			Assert.That(file, Is.Not.Null);
+			Assert.That(file.Configurations.Count, Is.GreaterThanOrEqualTo(1), "Configurations available");
 
-			Assert.That(file.ProjectOutput.Items.Count, Is.GreaterThan(1));
+			Assert.That(file.Configurations[0].ProjectOutput.Items.Count, Is.GreaterThan(1));
 
 			using (StringWriter sw = new StringWriter())
 			{
@@ -236,7 +237,7 @@ namespace TurtleTests
 			TBLogFile log = TBLogFile.Load(logFile);
 
 			DebugReference reference = null;
-			foreach (TBLogItem item in log.ProjectOutput.Items)
+			foreach (TBLogItem item in log.Configurations[0].ProjectOutput.Items)
 			{
 				if (!item.IsShared && !item.IsCopy)
 				{

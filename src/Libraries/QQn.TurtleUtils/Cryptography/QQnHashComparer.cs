@@ -64,7 +64,7 @@ namespace QQn.TurtleUtils.Cryptography
 			string xHash = QQnCryptoHelpers.NormalizeHashValue(x, false, false);
 			string yHash = QQnCryptoHelpers.NormalizeHashValue(y, false, false);
 
-			return StringComparer.InvariantCultureIgnoreCase.Compare(xHash, yHash);
+			return StringComparer.OrdinalIgnoreCase.Compare(xHash, yHash);
 		}
 
 		#endregion
@@ -84,7 +84,7 @@ namespace QQn.TurtleUtils.Cryptography
 			string xHash = QQnCryptoHelpers.NormalizeHashValue(x, false, false);
 			string yHash = QQnCryptoHelpers.NormalizeHashValue(y, false, false);
 
-			return StringComparer.InvariantCultureIgnoreCase.Equals(xHash, yHash);
+			return StringComparer.OrdinalIgnoreCase.Equals(xHash, yHash);
 		}
 
 		/// <summary>
@@ -97,7 +97,7 @@ namespace QQn.TurtleUtils.Cryptography
 		{
 			string xHash = QQnCryptoHelpers.NormalizeHashValue(obj, false, false);
 
-			return StringComparer.InvariantCultureIgnoreCase.GetHashCode(xHash);
+			return StringComparer.OrdinalIgnoreCase.GetHashCode(xHash);
 		}
 
 		#endregion

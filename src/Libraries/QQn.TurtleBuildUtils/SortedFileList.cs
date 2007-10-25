@@ -23,7 +23,7 @@ namespace QQn.TurtleBuildUtils
 		/// Initializes a new instance of the <see cref="SortedFileList&lt;T&gt;"/> class.
 		/// </summary>
 		public SortedFileList()
-			: base(StringComparer.InvariantCultureIgnoreCase)
+			: base(StringComparer.OrdinalIgnoreCase)
 		{
 		}
 

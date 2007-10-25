@@ -17,7 +17,7 @@ namespace QQn.TurtlePackage
 		/// Initializes a new instance of the <see cref="PackCollection&lt;T&gt;"/> class.
 		/// </summary>
 		protected PackCollection()
-			: base(StringComparer.InvariantCultureIgnoreCase, 16)
+			: base(StringComparer.OrdinalIgnoreCase, 16)
 		{
 		}
 

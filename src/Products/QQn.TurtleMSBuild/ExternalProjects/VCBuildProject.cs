@@ -13,6 +13,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 		public VCBuildProject(Guid projectGuid, string projectFile, string projectName, TurtleParameters parameters)
 			: base(projectGuid, projectFile, projectName, parameters)
 		{
+			ProjectType = "VCProj";
 		}
 
 		Type _resolverType;
@@ -85,7 +86,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			{
 				XPathDocument doc = new XPathDocument(sr);
 
-				SortedList<string, string> extensions = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
+				SortedList<string, string> extensions = new SortedList<string, string>(StringComparer.OrdinalIgnoreCase);
 
 				if(Parameters.ScriptExtensions != null)
 				foreach (string extension in Parameters.ScriptExtensions)

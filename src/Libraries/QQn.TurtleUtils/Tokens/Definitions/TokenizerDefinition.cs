@@ -9,10 +9,10 @@ namespace QQn.TurtleUtils.Tokens.Definitions
 	public abstract class TokenizerDefinition : TokenItemBase
 	{
 		internal readonly Dictionary<string, TokenMember> _tokens = new Dictionary<string, TokenMember>();
-		readonly Dictionary<string, TokenItem> _csNames = new Dictionary<string, TokenItem>(StringComparer.InvariantCultureIgnoreCase);
-		readonly Dictionary<string, TokenItem> _ciNames = new Dictionary<string, TokenItem>(StringComparer.InvariantCultureIgnoreCase);
-		readonly Dictionary<string, TokenGroupItem> _csGroups = new Dictionary<string, TokenGroupItem>(StringComparer.InvariantCultureIgnoreCase);
-		readonly Dictionary<string, TokenGroupItem> _ciGroups = new Dictionary<string, TokenGroupItem>(StringComparer.InvariantCultureIgnoreCase);
+		readonly Dictionary<string, TokenItem> _csNames = new Dictionary<string, TokenItem>(StringComparer.OrdinalIgnoreCase);
+		readonly Dictionary<string, TokenItem> _ciNames = new Dictionary<string, TokenItem>(StringComparer.OrdinalIgnoreCase);
+		readonly Dictionary<string, TokenGroupItem> _csGroups = new Dictionary<string, TokenGroupItem>(StringComparer.OrdinalIgnoreCase);
+		readonly Dictionary<string, TokenGroupItem> _ciGroups = new Dictionary<string, TokenGroupItem>(StringComparer.OrdinalIgnoreCase);
 
 		private readonly List<TokenItem> _placedItems = new List<TokenItem>();
 

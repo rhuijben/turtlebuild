@@ -12,6 +12,7 @@ namespace QQn.TurtleMSBuild
 		public Solution(string projectFile, string targetNames, IEnumerable properties, IEnumerable items, TurtleParameters parameters)
 			: base(projectFile, targetNames, properties, items, parameters)
 		{
+			ProjectType = "Solution";
 		}
 
 		internal bool UsedVCBuild

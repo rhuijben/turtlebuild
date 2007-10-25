@@ -45,7 +45,7 @@ namespace QQn.TurtleUtils.Tokens
 						aliasList.Add(alias);
 				}
 
-				aliasList.Sort(StringComparer.InvariantCultureIgnoreCase);
+				aliasList.Sort(StringComparer.OrdinalIgnoreCase);
 			}
 
 			_aliases = aliasList.AsReadOnly();

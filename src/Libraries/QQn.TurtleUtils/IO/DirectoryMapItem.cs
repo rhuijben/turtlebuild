@@ -11,7 +11,7 @@ namespace QQn.TurtleUtils.IO
 	/// <summary>
 	/// 
 	/// </summary>
-	public class DirectoryMapItem : IVerifiableFile, ITokenizerInitialize
+	public abstract class DirectoryMapItem : IVerifiableFile, ITokenizerInitialize
 	{
 		bool _initCompleted;
 		string _fileName;
@@ -31,6 +31,14 @@ namespace QQn.TurtleUtils.IO
 		{
 			//_initCompleted = false;
 			_size = -1;
+		}
+
+		bool _toBeDeleted;
+
+		internal bool ToBeDeleted
+		{
+			get { return _toBeDeleted; }
+			set { _toBeDeleted = value; }
 		}
 
 		string _hash;

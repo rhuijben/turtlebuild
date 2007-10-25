@@ -331,7 +331,7 @@ namespace QQn.TurtleUtils.IO
 		/// </summary>
 		/// <param name="origin">The origin.</param>
 		/// <param name="path">The path.</param>
-		/// <returns></returns>
+		/// <returns>The unmodified path, or the path as relative from the specified origin</returns>
 		public static string EnsureRelativePath(string origin, string path)
 		{
 			if (string.IsNullOrEmpty(origin))
