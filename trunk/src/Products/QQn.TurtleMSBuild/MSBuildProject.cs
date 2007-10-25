@@ -32,6 +32,7 @@ namespace QQn.TurtleMSBuild
 			_properties = properties;
 			_items = items;
 			_parameters = parameters;
+			ProjectType = "MSBuild";
 		}
 
 		public string BuildTargetName
@@ -381,7 +382,7 @@ namespace QQn.TurtleMSBuild
 		void UpdateScripts()
 		{
 			SortedList<string, string> items = new SortedList<string, string>();
-			SortedList<string, string> extensions = new SortedList<string, string>(StringComparer.InvariantCultureIgnoreCase);
+			SortedList<string, string> extensions = new SortedList<string, string>(StringComparer.OrdinalIgnoreCase);
 
 			foreach (string v in GetParameters("ScriptItems", Parameters.ScriptItems, "Content;Compile;EmbeddedResource;None"))
 			{

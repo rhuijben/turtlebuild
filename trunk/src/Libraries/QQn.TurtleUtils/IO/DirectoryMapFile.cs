@@ -86,5 +86,14 @@ namespace QQn.TurtleUtils.IO
 		{
 			return VerifyUtils.VerifyFile(Map.FullPath, this, VerifyMode.TimeSize);
 		}
+
+		/// <summary>
+		/// Gets a value indicating whether this file exists.
+		/// </summary>
+		/// <value><c>true</c> if it exists; otherwise, <c>false</c>.</value>
+		public bool Exists
+		{
+			get { return VerifyUtils.VerifyFile(Map.FullPath, this, VerifyMode.TimeSize); }
+		}
 	}	
 }

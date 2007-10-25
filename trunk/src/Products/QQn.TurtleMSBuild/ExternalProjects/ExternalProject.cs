@@ -16,6 +16,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 		{
 			_projectGuid = projectGuid;
 			_buildItems = new List<ProjectItem>();
+			ProjectType = "External";
 		}
 
 		public Guid ProjectGuid

@@ -141,6 +141,9 @@ namespace QQn.TurtleUtils.IO
 
 			DirectoryMapFile file = DoGetFile(path);
 
+			if (file.ToBeDeleted && (fileMode == FileMode.Create || fileMode == FileMode.CreateNew))
+				file.ToBeDeleted = false;
+
 			return new DirectoryMapStream(File.Open(fullPath, fileMode), file, fileMode, hash, string.IsNullOrEmpty(hash) ? -1 : size, _data.HashType);
 		}
 
@@ -225,6 +228,76 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		/// <summary>
+		/// Deletes the specified file if it is within the DirectoryMap
+		/// </summary>
+		/// <param name="path"></param>
+		public void DeleteFile(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			path = QQnPath.EnsureRelativePath(_directory, path);
+
+			if(!_data.Files.Contains(path))
+				return; // Not in DirectoryMap
+			
+			DirectoryMapFile file = DoGetFile(path);
+
+			if (file.Exists)
+				File.Delete(file.FullName);
+
+			_data.Files.Remove(path);
+		}
+
+		/// <summary>
+		/// Schedules the delete.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		public void ScheduleDelete(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			path = QQnPath.EnsureRelativePath(_directory, path);
+
+			if (!_data.Files.Contains(path))
+				return; // Not in DirectoryMap
+
+			DirectoryMapFile file = DoGetFile(path);
+
+			file.ToBeDeleted = true;
+		}
+
+		/// <summary>
+		/// Unschedules the delete.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		public void UnscheduleDelete(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			path = QQnPath.EnsureRelativePath(_directory, path);
+
+			if (!_data.Files.Contains(path))
+				return; // Not in DirectoryMap
+
+			DirectoryMapFile file = DoGetFile(path);
+
+			file.ToBeDeleted = false;
+		}
+
+		/// <summary>
+		/// Schedules a clear action after the <see cref="DirectoryMap"/> is closed
+		/// </summary>
+		/// <remarks>Marks all files to be deleted on dispose</remarks>
+		public void ScheduleClear()
+		{
+			foreach (DirectoryMapFile file in _data.Files)
+				file.ToBeDeleted = true;
+		}
+
+		/// <summary>
 		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
 		/// </summary>
 		public void Dispose()
@@ -239,7 +312,26 @@ namespace QQn.TurtleUtils.IO
 		protected virtual void Dispose(bool disposing)
 		{
 			if (disposing)
+			{
+				List<DirectoryMapFile> toDelete = null;
+
+				foreach(DirectoryMapFile file in _data.Files)
+				{
+					if(file.ToBeDeleted)
+					{
+						if(toDelete == null)
+							toDelete = new List<DirectoryMapFile>();
+
+						toDelete.Add(file);
+					}
+				}
+
+				if (toDelete != null)
+					foreach (DirectoryMapFile file in toDelete)
+						DeleteFile(file.Filename);
+					
 				Flush();
+			}
 		}
 
 		/// <summary>
@@ -300,7 +392,12 @@ namespace QQn.TurtleUtils.IO
 			path = QQnPath.MakeRelativePath(_directory, fullPath);
 
 			if (_data.Files.Contains(path) || File.Exists(fullPath))
-				return DoGetFile(path);
+			{
+				DirectoryMapFile dmf = DoGetFile(path);
+				dmf.ToBeDeleted = false;
+
+				return dmf;
+			}
 			else
 				throw new FileNotFoundException("File not found", fullPath);
 		}

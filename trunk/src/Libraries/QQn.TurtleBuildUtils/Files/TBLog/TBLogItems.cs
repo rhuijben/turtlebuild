@@ -96,7 +96,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// Initializes a new instance of the <see cref="TBLogItemCollection&lt;T&gt;"/> class.
 		/// </summary>
 		public TBLogItemCollection()
-			: base(StringComparer.InvariantCultureIgnoreCase, 16)
+			: base(StringComparer.OrdinalIgnoreCase, 16)
 		{
 		}
 

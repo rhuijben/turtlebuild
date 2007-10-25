@@ -59,7 +59,7 @@ namespace QQn.TurtleBuildUtils.AttributeParsers
 		sealed class ArgCollection : KeyedCollection<string, NamedAttributeArgument>
 		{
 			public ArgCollection()
-				: base(StringComparer.InvariantCultureIgnoreCase)
+				: base(StringComparer.OrdinalIgnoreCase)
 			{
 			}
 

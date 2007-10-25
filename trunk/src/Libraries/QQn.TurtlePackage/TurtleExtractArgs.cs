@@ -7,7 +7,7 @@ namespace QQn.TurtlePackage
 	class KeyedStringCollection : KeyedCollection<string, string>
 	{
 		public KeyedStringCollection()
-			: base(StringComparer.InvariantCultureIgnoreCase)
+			: base(StringComparer.OrdinalIgnoreCase)
 		{
 		}
 		

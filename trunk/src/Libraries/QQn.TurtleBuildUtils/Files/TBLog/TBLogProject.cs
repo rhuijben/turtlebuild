@@ -39,36 +39,6 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		}
 
 		/// <summary>
-		/// The configuration used to build the project
-		/// </summary>
-		[Token("configuration")]
-		public string Configuration
-		{
-			get { return _configuration; }
-			set { EnsureWritable(); _configuration = value; }
-		}
-
-		/// <summary>
-		/// The configuration used to build the project
-		/// </summary>
-		[Token("platform")]
-		public string Platform
-		{
-			get { return _platform; }
-			set { EnsureWritable(); _platform = value; }
-		}
-		
-		/// <summary>
-		/// The project relative output directory used when building the project
-		/// </summary>
-		[Token("outputDir")]
-		public string OutputDir
-		{
-			get { return _outputDir; }
-			set { EnsureWritable(); _outputDir = value; }
-		}
-
-		/// <summary>
 		/// The full name of the project file (relative from the project path)
 		/// </summary>
 		[Token("file")]

@@ -33,15 +33,16 @@ namespace QQn.TurtlePackage
 
 			PackContainer projectOutput = p.Containers.AddItem("#ProjectOutput");
 
+			TBLogConfiguration config = log.Configurations[0];
 			
 
-			if(!string.IsNullOrEmpty(log.Project.OutputDir))
+			if(!string.IsNullOrEmpty(config.OutputPath))
 			{
-				projectOutput.ContainerDir = log.Project.OutputDir;
-				projectOutput.BaseDir = log.Project.OutputDir;
+				projectOutput.ContainerDir = config.OutputPath;
+				projectOutput.BaseDir = config.OutputPath;
 			}
 
-			foreach (TBLogItem item in log.ProjectOutput.Items)
+			foreach (TBLogItem item in config.ProjectOutput.Items)
 			{
 				if (item.IsShared)
 					continue;
@@ -51,34 +52,34 @@ namespace QQn.TurtlePackage
 
 			PackContainer projectContent = p.Containers.AddItem("#ProjectContent");
 
-			if (!string.IsNullOrEmpty(log.Project.OutputDir))
+			if (!string.IsNullOrEmpty(config.OutputPath))
 			{
 				projectContent.ContainerDir = "content/" + log.Project.Name;
 				projectContent.BaseDir = log.ProjectPath;
 			}
 
-			foreach (TBLogItem item in log.Content.Items)
+			foreach (TBLogItem item in config.Content.Items)
 			{
 				PackFile pf = projectContent.Files.AddItem(QQnPath.MakeRelativePath(projectContent.BaseDir, Path.Combine(projectDir,item.Src)));
 			}
 
 			PackContainer projectScripts = p.Containers.AddItem("#ProjectScripts");
 
-			if (!string.IsNullOrEmpty(log.Project.OutputDir))
+			if (!string.IsNullOrEmpty(config.OutputPath))
 			{
 				projectScripts.ContainerDir = "scripts/" + log.Project.Name;
 				projectScripts.BaseDir = log.Project.Path;
 			}
 
-			foreach (TBLogItem item in log.Content.Items)
+			foreach (TBLogItem item in config.Content.Items)
 			{
 				PackFile pf = projectContent.Files.AddItem(QQnPath.MakeRelativePath(projectContent.BaseDir, Path.Combine(projectDir, item.Src)));
 			}
 
-			if (log.Target.KeySrc != null)
-				p.StrongNameKey = StrongNameKey.LoadFrom(Path.Combine(log.Project.Path, log.Target.KeySrc));
-			else if (log.Target.KeyContainer != null)
-				p.StrongNameKey = StrongNameKey.LoadFromContainer(log.Target.KeyContainer, false);
+			if (config.Target.KeySrc != null)
+				p.StrongNameKey = StrongNameKey.LoadFrom(Path.Combine(log.Project.Path, config.Target.KeySrc));
+			else if (config.Target.KeyContainer != null)
+				p.StrongNameKey = StrongNameKey.LoadFromContainer(config.Target.KeyContainer, false);
 
 
 			foreach (PackContainer pc in p.Containers)

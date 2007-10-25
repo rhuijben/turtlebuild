@@ -390,11 +390,13 @@ namespace QQn.TurtlePackage
 			{
 				DirectoryMapFile dmf = directory.GetFile(file.RelativePath);
 
-				if (dmf == null || !dmf.Unmodified() || !QQnCryptoHelpers.HashComparer.Equals(dmf.FileHash, file.FileHash))
+				if ((dmf == null) || !dmf.Unmodified() || !QQnCryptoHelpers.HashComparer.Equals(dmf.FileHash, file.FileHash))
 					using (Stream s = directory.CreateFile(file.RelativePath, file.FileHash, file.FileSize))
 					{
 						QQnPath.CopyStream(fileStream, s);
 					}
+				else
+					directory.UnscheduleDelete(file.RelativePath); // Make sure it stays
 			});
 		}
 
