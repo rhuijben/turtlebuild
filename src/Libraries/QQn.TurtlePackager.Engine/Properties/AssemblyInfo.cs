@@ -1,26 +1,19 @@
 ﻿using System;
 using System.Reflection;
 using System.Resources;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
-
-[module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "QQn.TurtleUtils")]
-[module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "QQn.TurtleUtils.Cryptography")]
-[module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "QQn.TurtleUtils.Tokens.Converters")]
-[module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "QQn.TurtleUtils.Globalization")]
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: CLSCompliant(true)]
-[assembly: AssemblyTitle("QQn.TurtleUtils")]
-[assembly: AssemblyDescription("Utility Library for The Turtle projects; Visit http://code.google.com/p/turtlebuild/ for more info")]
+[assembly: AssemblyTitle("QQn.TurtlePackager.Engine")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("QQn.TurtleUtils")]
-[assembly: AssemblyCopyright("Copyright © QQn Project 2007")]
+[assembly: AssemblyProduct("QQn.TurtlePackager.Engine")]
+[assembly: AssemblyCopyright("Copyright © QQn TurtleBuild project 2007")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -30,7 +23,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("a67d19e3-1776-4308-b3ef-8397315faed3")]
+[assembly: Guid("bb22fd43-0056-4c01-a279-cb9d7da3b28b")]
 
 // Version information for an assembly consists of the following four values:
 //

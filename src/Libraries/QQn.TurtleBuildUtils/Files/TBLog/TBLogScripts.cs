@@ -10,7 +10,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// <summary>
 	/// 
 	/// </summary>
-	public class TBLogScripts : IHasFullPath
+	public class TBLogScripts : TBLogContainer
 	{
 		readonly TBReferenceCollection<TBLogItem> _items;
 		/// <summary>
@@ -29,18 +29,6 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		{
 			[DebuggerStepThrough]
 			get { return _items; }
-		}
-
-		IHasFullPath _parent;
-		string IHasFullPath.FullPath
-		{
-			get { return (Parent != null) ? Parent.FullPath : null; }
-		}
-
-		internal IHasFullPath Parent
-		{
-			get { return _parent; }
-			set { _parent = value; }
 		}
 	}
 }

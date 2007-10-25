@@ -9,7 +9,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// <summary>
 	/// 
 	/// </summary>
-	public class TBLogConfiguration : IHasFullPath, ITokenizerInitialize
+	public class TBLogConfiguration : ITokenizerInitialize
 	{
 		TBLogReferences _references;
 		TBLogTarget _target;
@@ -20,22 +20,17 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		string _platform;
 		string _outputPath;
 		string _basePath;
-
+		TBLogFile _logFile;
 		#region IHasFullPath Members
 
-		IHasFullPath _parent;
-		string IHasFullPath.FullPath
+		/// <summary>
+		/// Gets or sets the log file containing this configurations
+		/// </summary>
+		/// <value>The log file.</value>
+		public TBLogFile LogFile
 		{
-			get { return _basePath; }
-		}
-
-		internal IHasFullPath Parent
-		{
-			get { return _parent; }
-			set
-			{
-				_parent = value;
-			}
+			get { return _logFile; }
+			internal set { _logFile = value; }
 		}
 
 		#endregion
@@ -146,25 +141,28 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		{
 			_completed = true;
 
-			ProjectOutput.Parent = this;
-			Content.Parent = this;
+			ProjectOutput.Configuration = this;
+			Content.Configuration = this;
 		}
 
 		#endregion
 	}
 
+	/// <summary>
+	/// Keyed collection of <see cref="TBLogConfiguration"/> items
+	/// </summary>
 	public class TBLogConfigurationCollection : Collection<TBLogConfiguration>
 	{
-		IHasFullPath _parent;
+		TBLogFile _logFile;
 
-		internal IHasFullPath Parent
+		internal TBLogFile LogFile
 		{
-			get { return _parent; }
+			get { return _logFile; }
 			set
 			{
-				_parent = value;
+				_logFile = value;
 				foreach (TBLogConfiguration c in this)
-					c.Parent = value;
+					c.LogFile = value;
 			}
 		}
 

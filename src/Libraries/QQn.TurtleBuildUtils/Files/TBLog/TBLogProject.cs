@@ -12,9 +12,6 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	{
 		string _name;
 		string _path;
-		string _configuration;
-		string _outputDir;
-		string _platform;
 		string _file;
 		bool _completed;
 

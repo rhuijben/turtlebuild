@@ -14,7 +14,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	[DebuggerDisplay("src={Src}, fromSrc={FromSrc}")]
 	public class TBLogItem
 	{
-		IHasFullPath _parent;
+		TBLogContainer _container;
 		string _src;
 		string _fromSrc;
 
@@ -62,7 +62,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// <value>The full SRC.</value>
 		public string FullSrc
 		{
-			get { return _parent != null ? Path.Combine(_parent.FullPath, Src) : null; }
+			get { return _container != null ? Path.Combine(_container.BasePath, Src) : null; }
 		}
 
 		/// <summary>
@@ -71,17 +71,17 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// <value>The full from SRC.</value>
 		public string FullFromSrc
 		{
-			get { return _parent != null ? Path.Combine(_parent.FullPath, Src) : null; }
+			get { return _container != null ? Path.Combine(_container.BasePath, Src) : null; }
 		}
 
 		/// <summary>
-		/// Gets or sets the parent.
+		/// Gets or sets the container.
 		/// </summary>
-		/// <value>The parent.</value>
-		internal IHasFullPath Parent
+		/// <value>The container.</value>
+		public TBLogContainer Container
 		{
-			get { return _parent; }
-			set { _parent = value; }
+			get { return _container; }
+			internal set { _container = value; }
 		}
 	}
 

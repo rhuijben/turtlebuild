@@ -5,15 +5,21 @@ using System.Xml;
 
 namespace QQn.TurtleUtils.Tokens
 {
+	/// <summary>
+	/// Minimalistic IXmlNamespaceResolver implementation
+	/// </summary>
 	public sealed class TokenNamespaceResolver : IXmlNamespaceResolver
 	{
 		Dictionary<string, string> _prefixToNs = new Dictionary<string, string>();
 		Dictionary<string, string> _nsToPrefix = new Dictionary<string, string>();
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TokenNamespaceResolver"/> class.
+		/// </summary>
 		public TokenNamespaceResolver()
 		{
 		}
-		
+
 		/// <summary>
 		/// Adds the namespace.
 		/// </summary>

@@ -58,6 +58,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QQn.ReportViewer.Tasks", "P
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QQn.TurtlePackager.Engine", "Libraries\QQn.TurtlePackager.Engine\QQn.TurtlePackager.Engine.csproj", "{7FC8BBB3-A09B-4192-B8E4-4ACD61F42F6E}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(TextTemplating) = postSolution
 		TextTemplating = 1
@@ -93,6 +99,10 @@ Global
 		{CA98E5E6-285E-48D2-BB1D-1FC1A5547122}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CA98E5E6-285E-48D2-BB1D-1FC1A5547122}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CA98E5E6-285E-48D2-BB1D-1FC1A5547122}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FC8BBB3-A09B-4192-B8E4-4ACD61F42F6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FC8BBB3-A09B-4192-B8E4-4ACD61F42F6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FC8BBB3-A09B-4192-B8E4-4ACD61F42F6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FC8BBB3-A09B-4192-B8E4-4ACD61F42F6E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

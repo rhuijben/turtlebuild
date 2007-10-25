@@ -192,6 +192,9 @@ namespace TurtleTests
 
 			Assert.That(file.Configurations[0].ProjectOutput.Items.Count, Is.GreaterThan(1));
 
+			Assert.That(file.Configurations[0].ProjectOutput.Items[0].Container, Is.SameAs(file.Configurations[0].ProjectOutput), "Container is set");
+
+
 			using (StringWriter sw = new StringWriter())
 			{
 				using (XmlWriter xw = new XmlTextWriter(sw))
