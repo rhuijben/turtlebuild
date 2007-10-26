@@ -173,7 +173,7 @@ namespace QQn.TurtleBuildUtils
 			string relative = EnsureRelative(filename);
 
 			if (!ContainsKey(relative))
-				Add(filename, filename);
+				Add(relative, relative);
 		}
 
 		/// <summary>
