@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Build.Framework;
+using QQn.TurtleUtils.IO;
+using System.Reflection;
+using QQn.TurtleBuildUtils;
 
 namespace QQn.TurtleMSBuild.ExternalProjects
 {
@@ -19,14 +22,32 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			ProjectType = "External";
 		}
 
+		/// <summary>
+		/// Gets the project GUID.
+		/// </summary>
+		/// <value>The project GUID.</value>
 		public Guid ProjectGuid
 		{
 			get { return _projectGuid; }
 		}
 
+		/// <summary>
+		/// Gets the build items.
+		/// </summary>
+		/// <value>The build items.</value>
 		public List<ProjectItem> BuildItems
 		{
 			get { return _buildItems; }
+		}
+
+		/// <summary>
+		/// Gets or sets the full project configuration.
+		/// </summary>
+		/// <value>The full project configuration.</value>
+		public virtual string FullProjectConfiguration
+		{
+			get { return ProjectConfiguration; }
+			set { ProjectConfiguration = value; }
 		}
 
 
@@ -172,6 +193,57 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 				foreach (ITaskItem item in GetTaskParameter<ITaskItem[]>(ResolveReferencesTask, "FilesWritten"))
 				{
 					AddItem(local, TargetType.Copy, item);
+				}
+
+				if (local)
+				{
+					// Resources assemblies are not found by the resolver code if FindDependencies is false
+					// So look through them 
+
+					SortedFileList extraCopyItems = null;
+					foreach (TargetItem target in ProjectOutput.Values)
+					{
+						if (target.Type == TargetType.Item && QQnPath.IsAssemblyFile(target.Target))
+						{
+							Assembly asm = null;
+							try
+							{
+								asm = Assembly.ReflectionOnlyLoadFrom(Path.Combine(ProjectPath, target.Target));
+
+								if (asm == null)
+									continue;
+							}
+							catch (IOException)
+							{ } // Can't load file
+							catch(SystemException)
+							{ } // Not an assembly
+
+							if(asm != null)
+								foreach (Module module in asm.GetModules(true))
+								{
+									string file = module.FullyQualifiedName;
+
+									if (!ProjectOutput.ContainsKey(file))
+									{
+										if (extraCopyItems == null)
+										{
+											extraCopyItems = new SortedFileList();
+											extraCopyItems.BaseDirectory = ProjectOutput.BaseDirectory;
+										}
+
+										extraCopyItems.AddUnique(file); // Don't edit projectoutput while walking through it
+									}
+								}
+						}						
+					}
+					if(extraCopyItems != null)
+					{
+						foreach (string file in extraCopyItems)
+						{
+							// Add resources as Item instead of Copy: Dependencies will see it as SharedItems
+							ProjectOutput.Add(new TargetItem(file, file, TargetType.Item));
+						}
+					}
 				}
 			}
 		}

@@ -116,6 +116,7 @@ namespace QQn.TurtleMSBuild
 			SortedFileList<bool> localCopyItems = new SortedFileList<bool>();
 			SortedFileList<TargetType> keys = new SortedFileList<TargetType>();
 
+			ProjectOutput.BaseDirectory = ProjectPath;
 			localCopyItems.BaseDirectory = ProjectPath;
 			keys.BaseDirectory = ProjectPath;
 

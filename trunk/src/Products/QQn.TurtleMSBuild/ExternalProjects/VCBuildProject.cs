@@ -34,6 +34,19 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			}
 		}
 
+		public override string FullProjectConfiguration
+		{
+			get { return ProjectConfiguration + '|' + ProjectPlatform; }
+			set
+			{
+				string[] parts = value.Split('|');
+
+				ProjectConfiguration = parts[0];
+				if (parts.Length > 1)
+					ProjectPlatform = parts[1];
+			}
+		}
+
 		ITask _resolverTask;
 		ITask ResolverTask
 		{
@@ -64,6 +77,8 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			OutputPath = Path.GetDirectoryName(targetFile);
 			TargetName = Path.GetFileNameWithoutExtension(targetFile);
 			TargetExt = Path.GetExtension(targetFile);
+
+			ProjectOutput.BaseDirectory = ProjectPath;
 
 			ResolveToOutput(output);
 
@@ -112,14 +127,14 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 						ScriptFiles.AddUnique(file);
 				}
 
-				XPathNavigator n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + ProjectConfiguration + "'] and @Name='VCLinkerTool' and @KeyFile!='']");
+				XPathNavigator n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + FullProjectConfiguration + "'] and @Name='VCLinkerTool' and @KeyFile!='']");
 
 				if(n != null)
 				{
 					KeyFile = EnsureRelativePath(n.GetAttribute("KeyFile", ""));
 				}
 
-				n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + ProjectConfiguration + "'] and @Name='VCLinkerTool' and @KeyContainer!='']");
+				n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + FullProjectConfiguration + "'] and @Name='VCLinkerTool' and @KeyContainer!='']");
 
 				if (n != null)
 				{
