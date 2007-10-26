@@ -27,8 +27,6 @@ namespace QQn.TurtleBuildUtils
 		{
 		}
 
-		#region IEnumerable<T> Members
-
 		/// <summary>
 		/// Returns an enumerator that iterates through values inthe collection.
 		/// </summary>
@@ -137,10 +135,6 @@ namespace QQn.TurtleBuildUtils
 		{
 			return base.ContainsKey(EnsureRelative(key));
 		}
-
-
-
-		#endregion
 	}
 	/// <summary>
 	/// 
