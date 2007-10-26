@@ -428,5 +428,26 @@ namespace QQn.TurtleUtils.IO
 
 			return null;
 		}
+
+		/// <summary>
+		/// Gets a boolean indicating whether a filename might be of an assembly
+		/// </summary>
+		/// <param name="filename">The filename.</param>
+		/// <returns>true for .exe and .dll files</returns>
+		public static bool IsAssemblyFile(string filename)
+		{
+			if (string.IsNullOrEmpty(filename))
+				throw new ArgumentNullException("filename");
+
+			string extension = Path.GetExtension(filename);
+
+			if (string.Equals(extension, ".dll", StringComparison.OrdinalIgnoreCase) ||
+				string.Equals(extension, ".exe", StringComparison.OrdinalIgnoreCase))
+			{
+				return true;
+			}
+
+			return false;
+		}
 	}
 }
