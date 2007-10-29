@@ -449,5 +449,26 @@ namespace QQn.TurtleUtils.IO
 
 			return false;
 		}
+
+		/// <summary>
+		/// Replaces the extension.
+		/// </summary>
+		/// <param name="targetFile">The target file.</param>
+		/// <param name="newExtension">The new extension.</param>
+		/// <returns></returns>
+		public static string ReplaceExtension(string targetFile, string newExtension)
+		{
+			if (string.IsNullOrEmpty(targetFile))
+				throw new ArgumentNullException("targetFile");
+			else if (string.IsNullOrEmpty("newExtension"))
+				throw new ArgumentNullException("newExtension");
+
+			targetFile = NormalizePath(targetFile);
+
+			if (newExtension[0] != '.')
+				newExtension = '.' + newExtension;
+
+			return Path.Combine(Path.GetDirectoryName(targetFile), Path.GetFileNameWithoutExtension(targetFile) + newExtension);
+		}
 	}
 }

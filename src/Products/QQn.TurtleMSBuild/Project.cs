@@ -436,7 +436,7 @@ namespace QQn.TurtleMSBuild
 
 			string targetFile = Path.Combine(ProjectPath, TargetPath);
 
-			if(File.Exists(targetFile))
+			if(File.Exists(targetFile) && QQnPath.IsAssemblyFile(targetFile))
 			{				
 				DebugReference reference = AssemblyUtils.GetDebugReference(targetFile);
 
@@ -456,7 +456,19 @@ namespace QQn.TurtleMSBuild
 					xw.WriteAttributeString("debugSrc", pdbSrc);
 					xw.WriteAttributeString("debugId", reference.DebugId);
 				}
-			}
+				else
+				{
+					string pdbFile = QQnPath.ReplaceExtension(targetFile, ".pdb");
+
+					if(ProjectOutput.ContainsKey(pdbFile) && File.Exists(pdbFile))
+					{
+						pdbFile = EnsureRelativePath(pdbFile);
+						
+						xw.WriteAttributeString("debugSrc", pdbFile);
+						xw.WriteAttributeString("debugId", "** Unavailable - Please install dbghelp 6.6 or higher **");
+					}
+				}
+			}					
 		}
 
 		protected virtual void WriteManifest(XmlWriter xw, bool forReadability)
