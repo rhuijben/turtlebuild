@@ -55,7 +55,7 @@ namespace QQn.TurtleBuildUtils
 		}
 
 		/// <summary>
-		/// Adds an element with the specified key and value into the <see cref="T:System.Collections.Generic.SortedList`2"/>.
+		/// Adds an element with the specified key and value into the <see cref="SortedFileList{T}"/>.
 		/// </summary>
 		/// <param name="key">The key of the element to add.</param>
 		/// <param name="value">The value of the element to add. The value can be null for reference types.</param>
@@ -108,7 +108,7 @@ namespace QQn.TurtleBuildUtils
 		/// <param name="key">The key whose value to get.</param>
 		/// <param name="value">When this method returns, the value associated with the specified key, if the key is found; otherwise, the default value for the type of the <paramref name="value"/> parameter. This parameter is passed uninitialized.</param>
 		/// <returns>
-		/// true if the <see cref="T:System.Collections.Generic.SortedList`2"/> contains an element with the specified key; otherwise, false.
+		/// true if the <see cref="SortedFileList{T}"/> contains an element with the specified key; otherwise, false.
 		/// </returns>
 		/// <exception cref="T:System.ArgumentNullException">
 		/// 	<paramref name="key"/> is null.</exception>
@@ -118,7 +118,7 @@ namespace QQn.TurtleBuildUtils
 		}
 
 		/// <summary>
-		/// Removes the element with the specified key from the <see cref="T:System.Collections.Generic.SortedList`2"/>.
+		/// Removes the element with the specified key from the <see cref="SortedFileList{T}"/>.
 		/// </summary>
 		/// <param name="key">The key of the element to remove.</param>
 		/// <returns>
@@ -132,11 +132,11 @@ namespace QQn.TurtleBuildUtils
 		}
 
 		/// <summary>
-		/// Determines whether the <see cref="T:System.Collections.Generic.SortedList`2"/> contains a specific key.
+		/// Determines whether the <see cref="SortedFileList{T}"/> contains a specific file
 		/// </summary>
-		/// <param name="key">The key to locate in the <see cref="T:System.Collections.Generic.SortedList`2"/>.</param>
+		/// <param name="key">The file to locate in the <see cref="SortedFileList{T}"/>.</param>
 		/// <returns>
-		/// true if the <see cref="T:System.Collections.Generic.SortedList`2"/> contains an element with the specified key; otherwise, false.
+		/// true if the <see cref="SortedFileList{T}"/> contains an element with the specified key; otherwise, false.
 		/// </returns>
 		/// <exception cref="T:System.ArgumentNullException">
 		/// 	<paramref name="key"/> is null.</exception>
@@ -170,7 +170,7 @@ namespace QQn.TurtleBuildUtils
 		/// <summary>
 		/// Adds the specified file if it was not already added
 		/// </summary>
-		/// <param name="filename"></param>
+		/// <param name="filename">The filename.</param>
 		public virtual void AddUnique(string filename)
 		{
 			string relative = EnsureRelative(filename);
@@ -180,7 +180,7 @@ namespace QQn.TurtleBuildUtils
 		}
 
 		/// <summary>
-		/// Determines whether [contains] [the specified filename].
+		/// Determines whether the <see cref="SortedFileList"/> contains the specified file
 		/// </summary>
 		/// <param name="filename">The filename.</param>
 		/// <returns>
