@@ -242,6 +242,8 @@ namespace QQn.TurtleMSBuild
 
 		string _keyFile;
 		string _keyContainer;
+		string _dbgSrc;
+		string _dbgId;
 
 		public string KeyFile
 		{
@@ -255,6 +257,17 @@ namespace QQn.TurtleMSBuild
 			set { _keyContainer = value; }
 		}
 
+		public string DebugSrc
+		{
+			get { return _dbgSrc; }
+			set { _dbgSrc = value; }
+		}
+
+		public string DebugId
+		{
+			get { return _dbgId; }
+			set { _dbgId = value; }
+		}
 
 		/// <summary>
 		/// Parses the result.
@@ -263,6 +276,50 @@ namespace QQn.TurtleMSBuild
 		public virtual void ParseBuildResult(Project parentProject)
 		{
 			
+		}
+
+		public virtual void PostParseBuildResult()
+		{
+			if (string.IsNullOrEmpty(TargetPath) || string.IsNullOrEmpty(ProjectPath))
+				return;
+
+			if ((DebugSrc == null) || (DebugId == null))
+			{
+				string targetFile = Path.Combine(ProjectPath, TargetPath);
+
+				if (QQnPath.IsAssemblyFile(targetFile) && File.Exists(targetFile))
+				{
+					DebugReference reference = AssemblyUtils.GetDebugReference(targetFile);
+
+					if (reference != null)
+					{
+						string pdbSrc = EnsureRelativePath(QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), reference.PdbFile));
+						FileInfo pdbTarget = new FileInfo(Path.GetFullPath(QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), Path.GetFileName(pdbSrc))));
+
+						if (pdbTarget.Exists)
+						{
+							FileInfo pdbFrom = new FileInfo(Path.Combine(ProjectPath, pdbSrc));
+
+							if (!pdbFrom.Exists || ((pdbFrom.Length == pdbTarget.Length) && (pdbFrom.LastWriteTime == pdbTarget.LastWriteTime)))
+								pdbSrc = EnsureRelativePath(pdbTarget.FullName);
+						}
+
+						DebugSrc = pdbSrc;
+						DebugId = reference.DebugId;
+					}
+					else
+					{
+						string pdbFile = QQnPath.ReplaceExtension(targetFile, ".pdb");
+
+						if (ProjectOutput.ContainsKey(pdbFile) && File.Exists(pdbFile))
+						{
+							pdbFile = EnsureRelativePath(pdbFile);
+
+							DebugSrc = pdbFile;
+						}
+					}
+				}
+			}	
 		}
 
 		/// <summary>
@@ -434,41 +491,13 @@ namespace QQn.TurtleMSBuild
 			xw.WriteAttributeString("processorArchitecture", ProcessorArchitecture);
 			xw.WriteAttributeString("platform", TargetPlatform);
 
-			string targetFile = Path.Combine(ProjectPath, TargetPath);
+			if (DebugSrc != null)
+			{
+				xw.WriteAttributeString("debugSrc", DebugSrc);
 
-			if(File.Exists(targetFile) && QQnPath.IsAssemblyFile(targetFile))
-			{				
-				DebugReference reference = AssemblyUtils.GetDebugReference(targetFile);
-
-				if (reference != null)
-				{
-					string pdbSrc = EnsureRelativePath(QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), reference.PdbFile));
-					FileInfo pdbTarget = new FileInfo(Path.GetFullPath(QQnPath.Combine(ProjectPath, Path.GetDirectoryName(TargetPath), Path.GetFileName(pdbSrc))));
-
-					if (pdbTarget.Exists)
-					{
-						FileInfo pdbFrom = new FileInfo(Path.Combine(ProjectPath, pdbSrc));
-
-						if (!pdbFrom.Exists || ((pdbFrom.Length == pdbTarget.Length) && (pdbFrom.LastWriteTime == pdbTarget.LastWriteTime)))
-							pdbSrc = EnsureRelativePath(pdbTarget.FullName);
-					}
-
-					xw.WriteAttributeString("debugSrc", pdbSrc);
-					xw.WriteAttributeString("debugId", reference.DebugId);
-				}
-				else
-				{
-					string pdbFile = QQnPath.ReplaceExtension(targetFile, ".pdb");
-
-					if(ProjectOutput.ContainsKey(pdbFile) && File.Exists(pdbFile))
-					{
-						pdbFile = EnsureRelativePath(pdbFile);
-						
-						xw.WriteAttributeString("debugSrc", pdbFile);
-						xw.WriteAttributeString("debugId", "** Unavailable - Please install dbghelp 6.6 or higher **");
-					}
-				}
-			}					
+				if (DebugId != null)
+					xw.WriteAttributeString("debugId", DebugId);
+			}						
 		}
 
 		protected virtual void WriteManifest(XmlWriter xw, bool forReadability)
@@ -585,5 +614,7 @@ namespace QQn.TurtleMSBuild
 			get { return _buildEngineTargets; }
 			set { _buildEngineTargets = value; }
 		}
+
+		
 	}
 }

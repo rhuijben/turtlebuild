@@ -55,6 +55,7 @@ namespace QQn.TurtleMSBuild
 			foreach (ExternalProject ep in externalProjects)
 			{
 				ep.ParseBuildResult(solution);
+				ep.PostParseBuildResult();
 				ep.WriteTBLog();
 			}
 		}

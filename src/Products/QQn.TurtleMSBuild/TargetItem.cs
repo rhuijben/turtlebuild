@@ -7,11 +7,11 @@ namespace QQn.TurtleMSBuild
 {
 	enum TargetType
 	{
-		None=0,
-		Item=0x01,
-		Copy=0x02,
-		SharedItem=0x11,
-		SharedCopy=0x12,
+		None = 0,
+		Item = 0x01,
+		Copy = 0x02,
+		SharedItem = 0x11,
+		SharedCopy = 0x12,
 	}
 
 	sealed class TargetItem
@@ -68,7 +68,7 @@ namespace QQn.TurtleMSBuild
 		public void WriteProjectOutput(XmlWriter xw, bool forReadability)
 		{
 			xw.WriteStartElement("ProjectOutput");
-			
+
 			if (forReadability)
 				xw.WriteComment("Project Items");
 
@@ -114,7 +114,7 @@ namespace QQn.TurtleMSBuild
 		{
 			xw.WriteStartElement(ti.Type.ToString());
 			xw.WriteAttributeString("src", ti.Target);
-			if(ti.Include != ti.Target)
+			if (ti.Include != ti.Target)
 				xw.WriteAttributeString("fromSrc", ti.Include);
 
 			xw.WriteEndElement();

@@ -86,7 +86,7 @@ namespace QQn.TurtleMSBuild
 		public void RemoveMetadata(string metadataName)
 		{
 			_metaData.Remove(metadataName);
-			
+
 		}
 
 		public void SetMetadata(string metadataName, string metadataValue)
