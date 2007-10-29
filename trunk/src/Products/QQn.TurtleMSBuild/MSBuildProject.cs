@@ -154,6 +154,7 @@ namespace QQn.TurtleMSBuild
 			if (BuildProperties.ContainsKey("_DebugSymbolsProduced") && GetProperty("_DebugSymbolsProduced") == "true")
 			{
 				string pdbName = GetProperty("TargetName") + ".pdb";
+				DebugSrc = pdbName;
 				itemTarget = Path.Combine(OutputPath, pdbName);
 				items.Add(new TargetItem(itemTarget, Path.Combine(IntermediateOutputPath, pdbName), TargetType.Item));
 			}

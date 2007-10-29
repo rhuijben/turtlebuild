@@ -30,7 +30,7 @@ namespace QQn.TurtleMSBuild
 		{
 			Refresh();
 
-			if(UsedVCBuild)
+			if (UsedVCBuild)
 				VCBuildHandler.HandleProject(this);
 		}
 	}

@@ -27,25 +27,25 @@ namespace QQn.TurtleMSBuild
 					skipLast = name.StartsWith(lastName) && (name.Length == lastName.Length || name[lastName.Length] == ',');
 				else
 					skipLast = true;
-				
-				if(!skipLast)
+
+				if (!skipLast)
 					last.WriteReference(xw, forReadability);
 
 				last = reference;
 				lastName = name;
 			}
-			if(last != null)
+			if (last != null)
 				last.WriteReference(xw, forReadability);
-			
+
 		}
 
 		#region IComparer<AssemblyReference> Members
 
 		public int Compare(AssemblyReference x, AssemblyReference y)
 		{
-			if(x == null)
+			if (x == null)
 				return -1;
-			else if(y == null)
+			else if (y == null)
 				return 1;
 
 			return string.Compare(x.AssemblyName, y.AssemblyName);
@@ -72,7 +72,7 @@ namespace QQn.TurtleMSBuild
 		public void WriteAttributes(XmlWriter xw)
 		{
 			xw.WriteAttributeString("assemblyName", _assemblyName);
-			if(_src != null)
+			if (_src != null)
 				xw.WriteAttributeString("src", _src);
 		}
 

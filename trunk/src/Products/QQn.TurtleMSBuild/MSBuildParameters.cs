@@ -67,7 +67,7 @@ namespace QQn.TurtleMSBuild
 		/// <summary>
 		/// If set to true the unmanaged version resource is replaced with the managed information in the assembly attributes
 		/// </summary>
-        [Token("VC-UpdateVersionInformation")]
+		[Token("VC-UpdateVersionInformation")]
 		public bool UpdateVCVersionInfo;
 	}
 }

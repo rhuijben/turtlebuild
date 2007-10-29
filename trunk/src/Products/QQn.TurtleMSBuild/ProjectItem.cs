@@ -15,7 +15,7 @@ namespace QQn.TurtleMSBuild
 		internal MSBuildProject Project
 		{
 			get { return _project; }
-		} 
+		}
 
 		readonly string _name;
 		readonly string _include;
@@ -95,7 +95,7 @@ namespace QQn.TurtleMSBuild
 		{
 			if (TryTransformMetaData(metaDataName, out value))
 				return true;
-			else if(_metaData.TryGetValue(metaDataName, out value))
+			else if (_metaData.TryGetValue(metaDataName, out value))
 				return true;
 
 			return false;
@@ -126,7 +126,7 @@ namespace QQn.TurtleMSBuild
 					return true;
 				case "RelativeDir":
 					n = Include.LastIndexOfAny(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
-					value = (n >= 0) ? Include.Substring(0, n+1) : "";
+					value = (n >= 0) ? Include.Substring(0, n + 1) : "";
 					return true;
 				case "Directory":
 					value = Path.Combine(_project.ProjectPath, Include);
@@ -192,10 +192,10 @@ namespace QQn.TurtleMSBuild
 		string ITaskItem.GetMetadata(string metadataName)
 		{
 			string result;
-			if(TryTransformMetaData(metadataName, out result))
+			if (TryTransformMetaData(metadataName, out result))
 				return result;
 
-			if(_metaData.TryGetValue(metadataName, out result))
+			if (_metaData.TryGetValue(metadataName, out result))
 				return result;
 
 			return null;
