@@ -194,6 +194,8 @@ namespace TurtleTests
 
 			Assert.That(file.Configurations[0].ProjectOutput.Items[0].Container, Is.SameAs(file.Configurations[0].ProjectOutput), "Container is set");
 
+			Assert.That(file.Configurations[0].Target.DebugSrc, Is.Not.Null);
+
 
 			using (StringWriter sw = new StringWriter())
 			{

@@ -94,6 +94,15 @@ namespace QQn.TurtleBuildUtils
 		}
 
 		/// <summary>
+		/// Gets the T at the specified index.
+		/// </summary>
+		/// <value></value>
+		public T this[int index]
+		{
+			get { return base[Keys[index]]; }
+		}
+
+		/// <summary>
 		/// Gets the value associated with the specified key.
 		/// </summary>
 		/// <param name="key">The key whose value to get.</param>
