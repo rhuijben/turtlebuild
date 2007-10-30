@@ -20,14 +20,17 @@ namespace QQn.TurtleUtils.IO
 		/// Initializes a new instance of the <see cref="DirectoryMapFile"/> class.
 		/// </summary>
 		/// <param name="name">The name.</param>
-		public DirectoryMapItem(string name)
+		protected DirectoryMapItem(string name)
 			: this()
 		{
 			_fileName = name;
 			_initCompleted = true;
 		}
 
-		internal DirectoryMapItem()
+		/// <summary>
+		/// Initializes a new instance of the <see cref="DirectoryMapItem"/> class.
+		/// </summary>
+		protected DirectoryMapItem()
 		{
 			//_initCompleted = false;
 			_size = -1;

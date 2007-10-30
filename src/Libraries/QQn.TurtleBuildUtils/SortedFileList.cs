@@ -48,7 +48,18 @@ namespace QQn.TurtleBuildUtils
 			set
 			{
 				if (Count > 0)
-					throw new InvalidOperationException();
+				{
+					List<KeyValuePair<string, T>> values = new List<KeyValuePair<string, T>>(this);
+					bool hadBase = !string.IsNullOrEmpty(_baseDirectory);
+					string oldBase = _baseDirectory;
+					_baseDirectory = value;
+					
+					Clear();
+					foreach (KeyValuePair<string, T> v in values)
+					{
+						Add(hadBase ? Path.Combine(oldBase, v.Key) : v.Key, v.Value);
+					}
+				}
 
 				_baseDirectory = value;
 			}
@@ -144,6 +155,40 @@ namespace QQn.TurtleBuildUtils
 		{
 			return base.ContainsKey(EnsureRelative(key));
 		}
+
+		/// <summary>
+		/// Determines whether the <see cref="SortedFileList{T}"/> contains the specified file
+		/// </summary>
+		/// <param name="filename">The filename.</param>
+		/// <returns>
+		/// 	<c>true</c> if the list contains the specified filename; otherwise, <c>false</c>.
+		/// </returns>
+		public bool Contains(string filename)
+		{
+			return ContainsKey(filename);
+		}
+
+		/// <summary>
+		/// Gets all the keys as full paths.
+		/// </summary>
+		/// <value>The keys as full paths.</value>
+		public IEnumerable<string> KeysAsFullPaths
+		{
+			get
+			{
+				bool hasBase = !string.IsNullOrEmpty(BaseDirectory);
+
+				foreach (string key in Keys)
+				{
+					if (hasBase)
+						yield return Path.Combine(BaseDirectory, key);
+					else
+						yield return key;
+				}
+			}
+		}
+
+		
 	}
 	/// <summary>
 	/// 
@@ -178,17 +223,82 @@ namespace QQn.TurtleBuildUtils
 			if (!ContainsKey(relative))
 				Add(relative, relative);
 		}
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	public abstract class KeyedFileCollection<T> : SortedFileList<T>
+	{
+		/// <summary>
+		/// Extracts the key from the specified element
+		/// </summary>
+		/// <param name="item">The item.</param>
+		/// <returns></returns>
+		protected abstract string GetKeyForItem(T item);
 
 		/// <summary>
-		/// Determines whether the <see cref="SortedFileList"/> contains the specified file
+		/// Adds the specified item.
 		/// </summary>
-		/// <param name="filename">The filename.</param>
-		/// <returns>
-		/// 	<c>true</c> if the list contains the specified filename; otherwise, <c>false</c>.
-		/// </returns>
-		public bool Contains(string filename)
+		/// <param name="item">The item.</param>
+		public virtual void Add(T item)
 		{
-			return ContainsKey(filename);
+			Add(GetKeyForItem(item), item);
+		}
+
+		/// <summary>
+		/// Adds the specified file if it was not already added
+		/// </summary>
+		/// <param name="item">The filename.</param>
+		public virtual void AddUnique(T item)
+		{
+			string key = GetKeyForItem(item);
+
+			if(!ContainsKey(key))
+				Add(key, item);
+		}
+
+		/// <summary>
+		/// Determines whether the list contains the specified item.
+		/// </summary>
+		/// <param name="item">The item.</param>
+		/// <returns>
+		/// 	<c>true</c> if the list contains the specified item; otherwise, <c>false</c>.
+		/// </returns>
+		public bool Contains(T item)
+		{
+			return Contains(GetKeyForItem(item));
+		}
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	public interface IHasFileName
+	{
+		/// <summary>
+		/// Gets the name of the file.
+		/// </summary>
+		/// <value>The name of the file.</value>
+		string FileName { get; }
+	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
+	public class FileCollection<T> : KeyedFileCollection<T>
+		where T : IHasFileName
+	{
+		/// <summary>
+		/// Extracts the key from the specified element
+		/// </summary>
+		/// <param name="item">The item.</param>
+		/// <returns></returns>
+		protected override string GetKeyForItem(T item)
+		{
+			return (item != null) ? item.FileName : null;
 		}
 	}
 }

@@ -10,31 +10,38 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// <summary>
 	/// A cache of <see cref="TBLogFile"/> instances within a directory
 	/// </summary>
-	public class TBLogCache : KeyedCollection<string, TBLogFile>
+	public class TBLogCollection : SortedFileList<TBLogFile>
 	{
 		string _logPath;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TBLogCache"/> class.
+		/// Initializes a new instance of the <see cref="TBLogCollection"/> class.
 		/// </summary>
 		/// <param name="logPath">The log path.</param>
-		public TBLogCache(string logPath)
-			: base(StringComparer.InvariantCultureIgnoreCase)
+		public TBLogCollection(string logPath)
 		{
 			if (string.IsNullOrEmpty("logPath"))
 				throw new ArgumentNullException("logPath");
 
+			BaseDirectory = logPath;
 			_logPath = logPath;
 		}
 
 		/// <summary>
-		/// Extracts the key from the specified element.
+		/// Initializes a new instance of the <see cref="TBLogCollection"/> class.
 		/// </summary>
-		/// <param name="item">The element from which to extract the key.</param>
-		/// <returns>The key for the specified element.</returns>
-		protected override string GetKeyForItem(TBLogFile item)
+		public TBLogCollection()
 		{
-			return item.Project.Name;
+		}
+
+		/// <summary>
+		/// Ensures the specified key is relative
+		/// </summary>
+		/// <param name="key">The key.</param>
+		/// <returns></returns>
+		protected override string EnsureRelative(string key)
+		{
+			return QQnPath.EnsureExtension(base.EnsureRelative(key), ".tbLog");
 		}
 
 		/// <summary>
@@ -42,9 +49,12 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// </summary>
 		public void LoadAll()
 		{
+			if (_logPath == null)
+				throw new InvalidOperationException("Logpath must be set to use loadalll");
+
 			foreach (FileInfo file in new DirectoryInfo(_logPath).GetFiles("*.tbLog", SearchOption.TopDirectoryOnly))
 			{
-				GC.KeepAlive(Get(Path.GetFileNameWithoutExtension(file.Name)));
+				GC.KeepAlive(Get(file.Name));
 			}
 		}
 
@@ -57,14 +67,17 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		{
 			if (string.IsNullOrEmpty(name))
 				throw new ArgumentNullException("name");
-			else if(!QQnPath.IsRelativeSubPath(name))
-				throw new ArgumentException("Not a valid project name", "name");
 
-			if (Contains(name))
+			name = QQnPath.EnsureExtension(name, ".tbLog");
+
+			if (ContainsKey(name))
 				return this[name];
 
-			TBLogFile logFile = TBLogFile.Load(Path.Combine(_logPath, name + ".tbLog"));
-			Add(logFile);
+			if (!string.IsNullOrEmpty(_logPath))
+				name = Path.Combine(_logPath, name);
+
+			TBLogFile logFile = TBLogFile.Load(name);
+			Add(name, logFile);
 
 			return logFile;
 		}

@@ -5,6 +5,7 @@ using QQn.TurtleUtils.Tokens;
 using System.Diagnostics;
 using System.IO;
 using System.Collections.ObjectModel;
+using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
@@ -62,7 +63,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// <value>The full SRC.</value>
 		public string FullSrc
 		{
-			get { return _container != null ? Path.Combine(_container.BasePath, Src) : null; }
+			get { return _container != null ? QQnPath.Combine(_container.BasePath, Src) : null; }
 		}
 
 		/// <summary>
