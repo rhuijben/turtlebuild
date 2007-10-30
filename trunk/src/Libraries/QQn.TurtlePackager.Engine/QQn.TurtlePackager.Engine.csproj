@@ -7,7 +7,7 @@
     <ProjectGuid>{7FC8BBB3-A09B-4192-B8E4-4ACD61F42F6E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>QQn.TurtlePackager.Engine</RootNamespace>
+    <RootNamespace>QQn.TurtlePackager</RootNamespace>
     <AssemblyName>QQn.TurtlePackager.Engine</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>QQn.TurtlePackager.Engine.snk</AssemblyOriginatorKeyFile>
@@ -35,6 +35,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Origins\BuildOrigin.cs" />
+    <Compile Include="Origins\ExternalFileOrigin.cs" />
+    <Compile Include="Origins\Origin.cs" />
+    <Compile Include="Origins\PackageOrigin.cs" />
+    <Compile Include="PackageArgs.cs" />
+    <Compile Include="Packager.cs" />
+    <Compile Include="PackageState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -42,6 +49,24 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="QQn.TurtlePackager.Engine.snk" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Products\QQn.TurtleMSBuild\QQn.TurtleMSBuild.csproj">
+      <Project>{15BEEA8C-9ADB-40C7-AF5A-C1A0AD0CDD5F}</Project>
+      <Name>QQn.TurtleMSBuild</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\QQn.TurtleBuildUtils\QQn.TurtleBuildUtils.csproj">
+      <Project>{4FB6CAEF-DEF4-46FA-A118-DB35B373C397}</Project>
+      <Name>QQn.TurtleBuildUtils</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\QQn.TurtlePackage\QQn.TurtlePackage.csproj">
+      <Project>{D5E2380F-F59B-4C52-83A3-4CF08FFCC111}</Project>
+      <Name>QQn.TurtlePackage</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\QQn.TurtleUtils\QQn.TurtleUtils.csproj">
+      <Project>{BB47C9BD-2E01-4EEC-9128-BDDCF80300B1}</Project>
+      <Name>QQn.TurtleUtils</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
