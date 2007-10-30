@@ -15,6 +15,7 @@ using QQn.TurtlePackage;
 using QQn.TurtleUtils.IO;
 using QQn.TurtleBuildUtils;
 using NUnit.Framework.SyntaxHelpers;
+using QQn.TurtlePackager;
 
 namespace TurtleTests
 {
@@ -218,7 +219,7 @@ namespace TurtleTests
 			Engine engine = new Engine(Path.GetDirectoryName(new Uri(typeof(int).Assembly.CodeBase).LocalPath));
 			MSBuildLogger logger = new MSBuildLogger();
 			engine.GlobalProperties.SetProperty("Configuration", OtherConfiguration);
-			logger.Parameters = string.Format("OutputDir={0};Indent=true", LoggerPath);
+			logger.Parameters = string.Format("OutputPath={0};Indent=true", LoggerPath);
 			engine.RegisterLogger(logger);
 
 			Project p = new Project(engine);
@@ -294,5 +295,42 @@ namespace TurtleTests
 				pkg.ExtractTo(dm);
 			}
 		}
+
+		[Test]
+		public void CalculatePackageWithProjects()
+		{
+			CalculatePackage(true);
+		}
+
+		[Test]
+		public void CalculatePackageWithoutProjects()
+		{
+			CalculatePackage(false);
+		}
+
+		public void CalculatePackage(bool useProjectReferences)
+		{
+			string logFile = Path.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog");
+			if (!File.Exists(logFile))
+				BuildInternal();
+
+			TBLogCollection logCollection = new TBLogCollection(LoggerPath);
+			logCollection.LoadAll();
+
+			PackageArgs args = new PackageArgs();
+			args.LogCache = logCollection;
+			args.BuildRoot = Path.GetDirectoryName(Solution);
+			args.UseProjectDependencies = useProjectReferences;
+
+			foreach (string file in logCollection.KeysAsFullPaths)
+			{
+				args.ProjectsToPackage.Add(file);
+			}
+
+			SortedFileList<Pack> newPackages;
+
+			Assert.That(Packager.TryCreatePackages(args, out newPackages), "Created packages");
+		}
+
 	}
 }

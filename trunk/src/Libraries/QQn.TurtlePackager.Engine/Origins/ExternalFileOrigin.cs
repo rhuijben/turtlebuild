@@ -4,7 +4,7 @@ using System.Text;
 
 namespace QQn.TurtlePackager.Origins
 {
-	public class ExternalFileOrigin : Origin
+	class ExternalFileOrigin : Origin
 	{
 	}
 }

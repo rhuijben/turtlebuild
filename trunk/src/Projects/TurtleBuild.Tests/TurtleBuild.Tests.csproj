@@ -56,6 +56,10 @@
       <Project>{4FB6CAEF-DEF4-46FA-A118-DB35B373C397}</Project>
       <Name>QQn.TurtleBuildUtils</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\Libraries\QQn.TurtlePackager.Engine\QQn.TurtlePackager.Engine.csproj">
+      <Project>{7FC8BBB3-A09B-4192-B8E4-4ACD61F42F6E}</Project>
+      <Name>QQn.TurtlePackager.Engine</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Libraries\QQn.TurtlePackage\QQn.TurtlePackage.csproj">
       <Project>{D5E2380F-F59B-4C52-83A3-4CF08FFCC111}</Project>
       <Name>QQn.TurtlePackage</Name>

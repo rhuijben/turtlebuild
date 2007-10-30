@@ -133,11 +133,28 @@ namespace QQn.TurtleUtils.IO
 
 			foreach (string part in items)
 			{
-				if (part == null)
+				if (string.IsNullOrEmpty(part))
 					continue;
 
 				path = Path.Combine(path, part);
 			}
+
+			return path;
+		}
+
+		/// <summary>
+		/// Combines the specified path parts to a complete directory
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <param name="item">The item.</param>
+		/// <returns></returns>
+		public static string Combine(string path, string item)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			if (!string.IsNullOrEmpty(item))
+				path = Path.Combine(path, item);
 
 			return path;
 		}
@@ -154,7 +171,6 @@ namespace QQn.TurtleUtils.IO
 				throw new ArgumentNullException("path");
 			else if(items == null)
 				throw new ArgumentNullException("items");
-
 
 			foreach (string part in items)
 			{
@@ -194,7 +210,7 @@ namespace QQn.TurtleUtils.IO
 
 			path = path.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 
-			if (Path.IsPathRooted(path))
+			if (Path.IsPathRooted(path) || path.Contains(_dotSlash))
 			{
 				path = Path.GetFullPath(path);
 				string root = Path.GetPathRoot(path);
@@ -303,8 +319,8 @@ namespace QQn.TurtleUtils.IO
 		}
 
 
-		static readonly string dotSlash = "." + Path.DirectorySeparatorChar;
-		static readonly string doubleSlash = String.Concat(Path.DirectorySeparatorChar, Path.DirectorySeparatorChar);
+		static readonly string _dotSlash = "." + Path.DirectorySeparatorChar;
+		static readonly string _doubleSlash = String.Concat(Path.DirectorySeparatorChar, Path.DirectorySeparatorChar);
 
 		/// <summary>
 		/// Determines whether the specified path is a subpath.
@@ -320,7 +336,7 @@ namespace QQn.TurtleUtils.IO
 
 			if (Path.IsPathRooted(path))
 				return false;
-			else if (path.IndexOf(Path.AltDirectorySeparatorChar) >= 0 || path.Contains(dotSlash) || path.Contains(doubleSlash))
+			else if (path.IndexOf(Path.AltDirectorySeparatorChar) >= 0 || path.Contains(_dotSlash) || path.Contains(_doubleSlash))
 				return false;
 
 			return true;
@@ -453,22 +469,80 @@ namespace QQn.TurtleUtils.IO
 		/// <summary>
 		/// Replaces the extension.
 		/// </summary>
-		/// <param name="targetFile">The target file.</param>
+		/// <param name="fileName">Name of the file.</param>
 		/// <param name="newExtension">The new extension.</param>
 		/// <returns></returns>
-		public static string ReplaceExtension(string targetFile, string newExtension)
+		public static string ReplaceExtension(string fileName, string newExtension)
 		{
-			if (string.IsNullOrEmpty(targetFile))
-				throw new ArgumentNullException("targetFile");
+			if (string.IsNullOrEmpty(fileName))
+				throw new ArgumentNullException("fileName");
 			else if (string.IsNullOrEmpty("newExtension"))
 				throw new ArgumentNullException("newExtension");
 
-			targetFile = NormalizePath(targetFile);
+			fileName = NormalizePath(fileName);
 
 			if (newExtension[0] != '.')
 				newExtension = '.' + newExtension;
 
-			return Path.Combine(Path.GetDirectoryName(targetFile), Path.GetFileNameWithoutExtension(targetFile) + newExtension);
+			return Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(fileName) + newExtension);
+		}
+
+		/// <summary>
+		/// Makes sure the file has the specified extension, appending it if needed
+		/// </summary>
+		/// <param name="fileName">Name of the file.</param>
+		/// <param name="extension">The extension.</param>
+		/// <returns></returns>
+		public static string EnsureExtension(string fileName, string extension)
+		{
+			if (string.IsNullOrEmpty(fileName))
+				throw new ArgumentNullException("fileName");
+			else if (string.IsNullOrEmpty(extension))
+				throw new ArgumentNullException("extension");
+
+			if (extension[0] != '.')
+				extension = '.' + extension;
+
+			string currentExtension = Path.GetExtension(fileName);
+
+			if (!string.Equals(extension, currentExtension, StringComparison.OrdinalIgnoreCase))
+				fileName = fileName + extension;
+
+			return fileName;
+		}
+
+		/// <summary>
+		/// Compares the specified paths
+		/// </summary>
+		/// <param name="path1">The path1.</param>
+		/// <param name="path2">The path2.</param>
+		/// <returns><c>true</c> if the paths specify the same file, otherwise <c>false</c></returns>
+		public static bool Equals(string path1, string path2)
+		{
+			if (string.IsNullOrEmpty(path1))
+				throw new ArgumentNullException("path1");
+			else if(string.IsNullOrEmpty(path2))
+				throw new ArgumentNullException("path2");
+
+			if (StringComparer.OrdinalIgnoreCase.Equals(path1, path2))
+				return true;
+			
+			path1 = NormalizePath(path1);
+			path2 = NormalizePath(path2);
+
+			if (StringComparer.OrdinalIgnoreCase.Equals(path1, path2))
+				return true;
+
+			if (Path.IsPathRooted(path1) != Path.IsPathRooted(path2))
+			{
+				path1 = Path.GetFullPath(path1);
+				path2 = Path.GetFullPath(path2);
+
+				if (StringComparer.OrdinalIgnoreCase.Equals(NormalizePath(path1), NormalizePath(path2)))
+					return true;
+			}
+
+			return false;
 		}
 	}
 }

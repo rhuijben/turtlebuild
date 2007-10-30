@@ -8,7 +8,7 @@ namespace QQn.TurtleBuildUtils
 	/// <summary>
 	/// Debug information container
 	/// </summary>
-	public class DebugReference
+	public sealed class DebugReference
 	{
 		readonly string _pdbFile;
 		readonly Guid _guid;

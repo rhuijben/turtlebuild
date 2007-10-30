@@ -141,6 +141,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		{
 			_completed = true;
 
+			References.Configuration = this;
 			ProjectOutput.Configuration = this;
 			Content.Configuration = this;
 		}
