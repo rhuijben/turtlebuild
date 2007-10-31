@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace QQn.TurtleUtils.Tokens
 {
@@ -28,6 +29,16 @@ namespace QQn.TurtleUtils.Tokens
 		bool _removeNonExistingFiles;
 		bool _matchDirectories;
 		bool _dontMatchFiles;
+		bool _matchHidden;
+		bool _matchSystem;
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="FileExpandArgs"/> class.
+		/// </summary>
+		public FileExpandArgs()
+		{
+			_baseDirectory = Environment.CurrentDirectory;
+		}
 
 		/// <summary>
 		/// Gets or sets a value indicating whether [remove non existing files].
@@ -35,6 +46,7 @@ namespace QQn.TurtleUtils.Tokens
 		/// <value>
 		/// 	<c>true</c> if [remove non existing files]; otherwise, <c>false</c>.
 		/// </value>
+		[DefaultValue(false)]
 		public bool RemoveNonExistingFiles
 		{
 			get { return _removeNonExistingFiles; }
@@ -45,6 +57,7 @@ namespace QQn.TurtleUtils.Tokens
 		/// Gets or sets a value indicating whether [match directories].
 		/// </summary>
 		/// <value><c>true</c> if [match directories]; otherwise, <c>false</c>.</value>
+		[DefaultValue(false)]
 		public bool MatchDirectories
 		{
 			get { return _matchDirectories; }
@@ -52,21 +65,36 @@ namespace QQn.TurtleUtils.Tokens
 		}
 
 		/// <summary>
+		/// Gets or sets a value indicating whether to match hidden files.
+		/// </summary>
+		/// <value><c>true</c> if [match hidden files]; otherwise, <c>false</c>.</value>
+		[DefaultValue(false)]
+		public bool MatchHiddenFiles
+		{
+			get { return _matchHidden; }
+			set { _matchHidden = true; }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether to match system files.
+		/// </summary>
+		/// <value><c>true</c> if [match system files]; otherwise, <c>false</c>.</value>
+		[DefaultValue(false)]
+		public bool MatchSystemFiles
+		{
+			get { return _matchSystem; }
+			set { _matchSystem = true; }
+		}
+
+		/// <summary>
 		/// Gets or sets a value indicating whether [match files].
 		/// </summary>
 		/// <value><c>true</c> if [match files]; otherwise, <c>false</c>.</value>
+		[DefaultValue(true)]
 		public bool MatchFiles
 		{
 			get { return !_dontMatchFiles; }
 			set { _dontMatchFiles = !value; }
-		}
-
-		/// <summary>
-		/// Initializes a new instance of the <see cref="FileExpandArgs"/> class.
-		/// </summary>
-		public FileExpandArgs()
-		{
-			_baseDirectory = Environment.CurrentDirectory;
 		}
 
 		/// <summary>

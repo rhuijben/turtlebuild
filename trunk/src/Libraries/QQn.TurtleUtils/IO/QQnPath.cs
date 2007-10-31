@@ -295,6 +295,16 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		/// <summary>
+		/// Gets the <see cref="StringComparer"/> to use for comparing paths
+		/// </summary>
+		/// <value>The path comparer.</value>
+		/// <remarks>Returns StringComparer.OrdinalIgnoreCase on Windows</remarks>
+		public static StringComparer PathStringComparer
+		{
+			get { return StringComparer.OrdinalIgnoreCase; }
+		}
+
+		/// <summary>
 		/// Removes all instances of the double slash sequence
 		/// </summary>
 		/// <param name="path">The path (with only primary directory separators)</param>
