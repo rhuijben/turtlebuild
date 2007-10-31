@@ -48,7 +48,7 @@ namespace QQn.TurtleUtils.IO
 			if (NativeMethods.PathRelativePathTo(result, relativeFrom, FILE_ATTRIBUTE_DIRECTORY, path, FILE_ATTRIBUTE_FILE))
 			{
 				string p = result.ToString();
-				if (p.Length > 2 && p[0] == '.' && (p[1] == Path.DirectorySeparatorChar))
+				if (p.Length > 2 && p[0] == '.' && IsDirectorySeparator(p[1]))
 					p = p.Substring(2);
 
 				return p;
@@ -72,10 +72,7 @@ namespace QQn.TurtleUtils.IO
 				throw new ArgumentNullException("itemPath");
 
 			itemPath = Path.GetFullPath(itemPath);
-			originDirectory = Path.GetFullPath(originDirectory);
-
-			if (originDirectory.Length > 3 && originDirectory[originDirectory.Length - 1] == Path.DirectorySeparatorChar)
-				originDirectory = originDirectory.Substring(0, originDirectory.Length - 1);
+			originDirectory = NormalizePath(Path.GetFullPath(originDirectory), false);
 
 			const int FILE_ATTRIBUTE_FILE = 0x00000000;
 			const int FILE_ATTRIBUTE_DIRECTORY = 0x00000010;
@@ -83,7 +80,7 @@ namespace QQn.TurtleUtils.IO
 			if (NativeMethods.PathRelativePathTo(result, originDirectory, FILE_ATTRIBUTE_DIRECTORY, itemPath, FILE_ATTRIBUTE_FILE))
 			{
 				string p = result.ToString();
-				if (p.Length > 2 && p[0] == '.' && (p[1] == Path.DirectorySeparatorChar || p[1] == Path.AltDirectorySeparatorChar))
+				if (p.Length > 2 && p[0] == '.' && IsDirectorySeparator(p[1]))
 					p = p.Substring(2);
 
 				return p;
@@ -104,9 +101,7 @@ namespace QQn.TurtleUtils.IO
 
 			if(path.Length > 0)
 			{
-				char c =path[path.Length - 1];
-				
-				if((c == Path.DirectorySeparatorChar) || (c == Path.AltDirectorySeparatorChar))
+				if(IsDirectorySeparator(path[path.Length-1]))
 				{
 					string root = Path.GetPathRoot(path);
 
@@ -136,10 +131,54 @@ namespace QQn.TurtleUtils.IO
 				if (string.IsNullOrEmpty(part))
 					continue;
 
-				path = Path.Combine(path, part);
+				path = Combine(path, part);
 			}
 
 			return path;
+		}
+
+		public static bool IsDirectorySeparator(char c)
+		{
+			return (c == Path.DirectorySeparatorChar) || (c == Path.AltDirectorySeparatorChar);
+		}
+
+		/// <summary>
+		/// Determines whether the specified path is rooted and absolute
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <returns>
+		/// 	<c>true</c> if [is absolute path] [the specified path]; otherwise, <c>false</c>.
+		/// </returns>
+		public static bool IsAbsolutePath(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			if (!Path.IsPathRooted(path))
+				return false;
+
+			if (IsRelativeViaRootPath(path))
+				return false;
+
+			return true;
+		}
+
+		/// <summary>
+		/// Determines whether tje path is relative via the root path
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <returns>
+		/// 	<c>true</c> if [is relative via root path] [the specified path]; otherwise, <c>false</c>.
+		/// </returns>
+		public static bool IsRelativeViaRootPath(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			if (IsDirectorySeparator(path[0]) && (path.Length == 1 || !IsDirectorySeparator(path[1])))
+				return true;
+
+			return false;
 		}
 
 		/// <summary>
@@ -152,11 +191,21 @@ namespace QQn.TurtleUtils.IO
 		{
 			if (string.IsNullOrEmpty(path))
 				throw new ArgumentNullException("path");
+			else if (string.IsNullOrEmpty(item))
+				throw new ArgumentNullException("item");
 
-			if (!string.IsNullOrEmpty(item))
-				path = Path.Combine(path, item);
+			string result = Path.Combine(path, item);
 
-			return path;
+			if (!string.IsNullOrEmpty(result) && IsRelativeViaRootPath(result) && Path.IsPathRooted(path))
+			{
+				// .Net combines @"f:\tools" and @"\test.txt" to @"\test.txt", removing the relative path origin of path
+				if (result.Length == 1 || !IsDirectorySeparator(result[1])) // No UNC path
+				{
+					return Path.GetPathRoot(path) + TrimStartSlashes(result);
+				}
+			}
+
+			return result;
 		}
 
 		/// <summary>
@@ -172,15 +221,7 @@ namespace QQn.TurtleUtils.IO
 			else if(items == null)
 				throw new ArgumentNullException("items");
 
-			foreach (string part in items)
-			{
-				if (part == null)
-					continue;
-
-				path = Path.Combine(path, part);
-			}
-
-			return Path.GetFullPath(path);
+			return Path.GetFullPath(Combine(path, items));
 		}
 
 		/// <summary>
@@ -194,7 +235,7 @@ namespace QQn.TurtleUtils.IO
 			if (string.IsNullOrEmpty(path))
 				throw new ArgumentNullException("path");
 
-			return Path.GetFullPath(Path.Combine(path, path2));
+			return Path.GetFullPath(Combine(path, path2));
 		}
 
 		/// <summary>
@@ -214,6 +255,8 @@ namespace QQn.TurtleUtils.IO
 			{
 				path = Path.GetFullPath(path);
 				string root = Path.GetPathRoot(path);
+
+
 
 				path = root + RemoveDoubleSlash(path.Substring(root.Length), addEndSlash);
 			}
@@ -236,28 +279,47 @@ namespace QQn.TurtleUtils.IO
 			return NormalizePath(path, false);
 		}
 
+		static string TrimStartSlashes(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			int i = 0;
+			while (i < path.Length && IsDirectorySeparator(path[i]))
+				i++;
+
+			if (i > 0)
+				path = path.Substring(i);
+
+			return path;
+		}
+
 		/// <summary>
-		/// Removes the double slash.
+		/// Removes all instances of the double slash sequence
 		/// </summary>
-		/// <param name="path">The path.</param>
-		/// <param name="addEndSlash">if set to <c>true</c> adds a path separator at the end.</param>
+		/// <param name="path">The path (with only primary directory separators)</param>
+		/// <param name="addEndSlash">if set to <c>true</c> [add end slash].</param>
 		/// <returns></returns>
 		static string RemoveDoubleSlash(string path, bool addEndSlash)
 		{
-			string doubleSlash = string.Concat(Path.DirectorySeparatorChar, Path.DirectorySeparatorChar);
-			int n;
-			while(0 <= (n = path.IndexOf(doubleSlash)))
-				path = path.Remove(n,1); // Remove the first slash
+			if (path == null)
+				throw new ArgumentNullException("path");
 
-			if (addEndSlash != (path[path.Length - 1] == Path.DirectorySeparatorChar))
+			int n;
+			while (0 <= (n = path.IndexOf(_doubleSlash)))
+				path = path.Remove(n, 1); // Remove the first slash
+
+			char lastChar = (path.Length > 0) ? path[path.Length - 1] : '\0';
+
+			if (addEndSlash != (lastChar == Path.DirectorySeparatorChar))
 			{
 				if (addEndSlash)
 					path += Path.DirectorySeparatorChar;
-				else
+				else if(path.Length > 0)
 					path = path.Substring(0, path.Length - 1);
 			}
 
-			return path;				
+			return path;
 		}
 
 		/// <summary>
@@ -334,7 +396,7 @@ namespace QQn.TurtleUtils.IO
 			if (string.IsNullOrEmpty(path))
 				throw new ArgumentNullException("path");
 
-			if (Path.IsPathRooted(path))
+			if (Path.IsPathRooted(path)) // Absolute or relative via root directory
 				return false;
 			else if (path.IndexOf(Path.AltDirectorySeparatorChar) >= 0 || path.Contains(_dotSlash) || path.Contains(_doubleSlash))
 				return false;
@@ -358,7 +420,7 @@ namespace QQn.TurtleUtils.IO
 			if (IsRelativeSubPath(path))
 				return path;
 			else
-				return MakeRelativePath(origin, Path.Combine(origin, path));
+				return MakeRelativePath(origin, Combine(origin, path));
 		}
 
 		/// <summary>
@@ -467,27 +529,6 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		/// <summary>
-		/// Replaces the extension.
-		/// </summary>
-		/// <param name="fileName">Name of the file.</param>
-		/// <param name="newExtension">The new extension.</param>
-		/// <returns></returns>
-		public static string ReplaceExtension(string fileName, string newExtension)
-		{
-			if (string.IsNullOrEmpty(fileName))
-				throw new ArgumentNullException("fileName");
-			else if (string.IsNullOrEmpty("newExtension"))
-				throw new ArgumentNullException("newExtension");
-
-			fileName = NormalizePath(fileName);
-
-			if (newExtension[0] != '.')
-				newExtension = '.' + newExtension;
-
-			return Path.Combine(Path.GetDirectoryName(fileName), Path.GetFileNameWithoutExtension(fileName) + newExtension);
-		}
-
-		/// <summary>
 		/// Makes sure the file has the specified extension, appending it if needed
 		/// </summary>
 		/// <param name="fileName">Name of the file.</param>
@@ -503,9 +544,7 @@ namespace QQn.TurtleUtils.IO
 			if (extension[0] != '.')
 				extension = '.' + extension;
 
-			string currentExtension = Path.GetExtension(fileName);
-
-			if (!string.Equals(extension, currentExtension, StringComparison.OrdinalIgnoreCase))
+			if (!ExtensionEquals(fileName, extension))
 				fileName = fileName + extension;
 
 			return fileName;
@@ -519,10 +558,10 @@ namespace QQn.TurtleUtils.IO
 		/// <returns>
 		/// 	<c>true</c> if the specified path has the extension; otherwise, <c>false</c>.
 		/// </returns>
-		public bool HasExtension(string path, string extension)
+		public static bool ExtensionEquals(string path, string extension)
 		{
-			if (string.IsNullOrEmpty(fileName))
-				throw new ArgumentNullException("fileName");
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
 			else if (string.IsNullOrEmpty(extension))
 				throw new ArgumentNullException("extension");
 

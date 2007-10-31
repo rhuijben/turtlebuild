@@ -309,7 +309,7 @@ namespace QQn.TurtleMSBuild
 					}
 					else
 					{
-						string pdbFile = QQnPath.ReplaceExtension(targetFile, ".pdb");
+						string pdbFile = Path.ChangeExtension(targetFile, ".pdb");
 
 						if (ProjectOutput.ContainsKey(pdbFile) && File.Exists(pdbFile))
 						{
