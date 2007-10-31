@@ -50,7 +50,7 @@
     <Compile Include="BuildTools.cs" />
     <Compile Include="DebugReference.cs" />
     <Compile Include="FileCollection.cs" />
-    <Compile Include="Files\TBLog\TBLogCollection.cs" />
+    <Compile Include="Files\TBLog\TBLogCache.cs" />
     <Compile Include="Files\TBLog\TBLogConfiguration.cs" />
     <Compile Include="Files\TBLog\TBLogContainer.cs" />
     <Compile Include="Files\TBLog\TBLogTarget.cs" />

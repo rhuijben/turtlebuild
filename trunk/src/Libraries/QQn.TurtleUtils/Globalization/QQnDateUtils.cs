@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace QQn.TurtleUtils.Globalization
 {
 	/// <summary>
-	/// 
+	/// Container of several date-time helpers
 	/// </summary>
 	public static class QQnDateUtils
 	{
