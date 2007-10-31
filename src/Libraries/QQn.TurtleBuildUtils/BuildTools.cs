@@ -86,7 +86,7 @@ namespace QQn.TurtleBuildUtils
 			{
 				if (_snExe == null)
 				{
-					string sn = Path.Combine(FrameworkSdkDir, "bin\\sn.exe");
+					string sn = QQnPath.Combine(FrameworkSdkDir, "bin\\sn.exe");
 
 					if (File.Exists(sn))
 						_snExe = sn;

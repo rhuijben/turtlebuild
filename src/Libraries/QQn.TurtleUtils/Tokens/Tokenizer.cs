@@ -331,7 +331,7 @@ namespace QQn.TurtleUtils.Tokens
 					else
 					{
 						string dir = word.Substring(0, lastSlash);
-						rootDir = new DirectoryInfo(Path.Combine(args.BaseDirectory, dir));
+						rootDir = new DirectoryInfo(QQnPath.Combine(args.BaseDirectory, dir));
 						rest = word.Substring(lastSlash + 1);
 					}
 

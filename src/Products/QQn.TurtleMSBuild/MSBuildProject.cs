@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Xml;
 using Microsoft.Build.Framework;
 using QQn.TurtleBuildUtils;
+using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleMSBuild
 {
@@ -140,23 +141,23 @@ namespace QQn.TurtleMSBuild
 					copyKeys.Add(v, true);
 			}
 
-			string primaryTarget = Path.Combine(OutputPath, TargetName + TargetExt);
+			string primaryTarget = QQnPath.Combine(OutputPath, TargetName + TargetExt);
 			string itemTarget = primaryTarget;
-			items.Add(new TargetItem(itemTarget, Path.Combine(IntermediateOutputPath, TargetName + TargetExt), TargetType.Item));
+			items.Add(new TargetItem(itemTarget, QQnPath.Combine(IntermediateOutputPath, TargetName + TargetExt), TargetType.Item));
 
 			if (BuildProperties.ContainsKey("_SGenDllCreated") && GetProperty("_SGenDllCreated") == "true" && BuildProperties.ContainsKey("_SGenDllName"))
 			{
 				string dllName = GetProperty("_SGenDllName");
-				itemTarget = Path.Combine(OutputPath, dllName);
-				items.Add(new TargetItem(itemTarget, Path.Combine(IntermediateOutputPath, dllName), TargetType.Item));
+				itemTarget = QQnPath.Combine(OutputPath, dllName);
+				items.Add(new TargetItem(itemTarget, QQnPath.Combine(IntermediateOutputPath, dllName), TargetType.Item));
 			}
 
 			if (BuildProperties.ContainsKey("_DebugSymbolsProduced") && GetProperty("_DebugSymbolsProduced") == "true")
 			{
 				string pdbName = GetProperty("TargetName") + ".pdb";
 				DebugSrc = pdbName;
-				itemTarget = Path.Combine(OutputPath, pdbName);
-				items.Add(new TargetItem(itemTarget, Path.Combine(IntermediateOutputPath, pdbName), TargetType.Item));
+				itemTarget = QQnPath.Combine(OutputPath, pdbName);
+				items.Add(new TargetItem(itemTarget, QQnPath.Combine(IntermediateOutputPath, pdbName), TargetType.Item));
 			}
 
 			foreach (ProjectItem pi in BuildItems)
@@ -252,11 +253,11 @@ namespace QQn.TurtleMSBuild
 			string destinationSubDirectory;
 
 			if (pi.TryGetMetaData("TargetPath", out target))
-				return Path.Combine(OutputPath, target);
+				return QQnPath.Combine(OutputPath, target);
 			else if (pi.TryGetMetaData("DestinationSubDirectory", out destinationSubDirectory))
-				return Path.Combine(Path.Combine(OutputPath, destinationSubDirectory), pi.Filename);
+				return QQnPath.Combine(OutputPath, destinationSubDirectory, pi.Filename);
 			else
-				return Path.Combine(OutputPath, pi.Filename);
+				return QQnPath.Combine(OutputPath, pi.Filename);
 		}
 
 		string _intermediateOutputPath;
@@ -287,7 +288,7 @@ namespace QQn.TurtleMSBuild
 			{
 				try
 				{
-					AssemblyName name = AssemblyName.GetAssemblyName(Path.Combine(ProjectPath, TargetPath));
+					AssemblyName name = AssemblyName.GetAssemblyName(QQnPath.Combine(ProjectPath, TargetPath));
 					if (name != null)
 						this.TargetAssembly = new AssemblyReference(name.FullName, null, this);
 				}

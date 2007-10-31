@@ -211,8 +211,8 @@ namespace QQn.TurtleMSBuild
 					return null;
 				else if (TargetExt == null)
 					return null;
- 
-				return Path.Combine(OutputPath, TargetName + TargetExt);
+
+				return QQnPath.Combine(OutputPath, TargetName + TargetExt);
 			}
 		}
 
@@ -285,7 +285,7 @@ namespace QQn.TurtleMSBuild
 
 			if ((DebugSrc == null) || (DebugId == null))
 			{
-				string targetFile = Path.Combine(ProjectPath, TargetPath);
+				string targetFile = QQnPath.Combine(ProjectPath, TargetPath);
 
 				if (QQnPath.IsAssemblyFile(targetFile) && File.Exists(targetFile))
 				{
@@ -298,7 +298,7 @@ namespace QQn.TurtleMSBuild
 
 						if (pdbTarget.Exists)
 						{
-							FileInfo pdbFrom = new FileInfo(Path.Combine(ProjectPath, pdbSrc));
+							FileInfo pdbFrom = new FileInfo(QQnPath.Combine(ProjectPath, pdbSrc));
 
 							if (!pdbFrom.Exists || ((pdbFrom.Length == pdbTarget.Length) && (pdbFrom.LastWriteTime == pdbTarget.LastWriteTime)))
 								pdbSrc = EnsureRelativePath(pdbTarget.FullName);
@@ -345,12 +345,12 @@ namespace QQn.TurtleMSBuild
 
 			string outDir = OutputPath;
 
-			outDir = Parameters.OutputPath ?? Path.Combine(ProjectPath, OutputPath);
+			outDir = Parameters.OutputPath ?? QQnPath.Combine(ProjectPath, OutputPath);
 
 			if (!Directory.Exists(outDir))
 				Directory.CreateDirectory(outDir);
 
-			string atPath = Path.Combine(outDir, ProjectName + ".tbLog");
+			string atPath = QQnPath.Combine(outDir, ProjectName + ".tbLog");
 
 			if (File.Exists(atPath))
 			{

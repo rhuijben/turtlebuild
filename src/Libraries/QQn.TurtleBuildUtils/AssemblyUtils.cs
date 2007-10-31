@@ -8,6 +8,7 @@ using System.Reflection.Emit;
 using Microsoft.Win32;
 using System.Globalization;
 using System.Diagnostics;
+using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleBuildUtils
 {
@@ -28,7 +29,7 @@ namespace QQn.TurtleBuildUtils
 			if (!File.Exists(file))
 				throw new FileNotFoundException("File to update not found", file);
 
-			string tmpDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+			string tmpDir = QQnPath.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 			Directory.CreateDirectory(tmpDir);
 			try
 			{
@@ -164,7 +165,7 @@ namespace QQn.TurtleBuildUtils
 
 						Type type = attr.Constructor.ReflectedType;
 
-						if (type.Assembly != typeof(AssemblyVersionAttribute).Assembly)
+						if (type.Assembly != typeof(AssemblyVersionAttribute).Assembly && type.Assembly != mscorlib && type.Assembly != system)
 						{
 							continue;
 						}
@@ -188,13 +189,10 @@ namespace QQn.TurtleBuildUtils
 					AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve -= new ResolveEventHandler(OnReflectionOnlyAssemblyResolve);
 				}
 
-				GC.KeepAlive(system);
-				GC.KeepAlive(mscorlib);
-
 				newAssembly.DefineVersionInfoResource();
 				newAssembly.Save(tmpFile);
 
-				return Path.Combine(outputDirectory, tmpFile);
+				return QQnPath.Combine(outputDirectory, tmpFile);
 			}
 			catch (FileLoadException)
 			{

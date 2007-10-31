@@ -131,8 +131,8 @@ namespace QQn.TurtlePackage
 					return baseDir;
 				else if (baseDir == null)
 					return _baseDir;
-				
-				return Path.Combine(baseDir, _baseDir);
+
+				return QQnPath.Combine(baseDir, _baseDir);
 			}
 			set
 			{

@@ -176,7 +176,7 @@ namespace QQn.TurtlePackage
 						{
 							foreach (PackFile file in container.Files)
 							{
-								using (FileStream fileSrc = File.OpenRead(Path.Combine(file.BaseDir, file.Name)))
+								using (FileStream fileSrc = File.OpenRead(QQnPath.Combine(file.BaseDir, file.Name)))
 								using (Stream fileBlob = containerWriter.CreateStream(fileCreateArgs))
 								{
 									QQnPath.CopyStream(fileSrc, fileBlob);
@@ -423,7 +423,7 @@ namespace QQn.TurtlePackage
 
 			ExtractFiles(args, delegate(PackFile file, Stream fileStream)
 			{
-				using (Stream s = File.Create(Path.Combine(directory, file.RelativePath)))
+				using (Stream s = File.Create(QQnPath.Combine(directory, file.RelativePath)))
 				{
 					QQnPath.CopyStream(fileStream, s);
 				}

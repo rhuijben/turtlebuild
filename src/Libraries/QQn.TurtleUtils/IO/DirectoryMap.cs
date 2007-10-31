@@ -33,7 +33,7 @@ namespace QQn.TurtleUtils.IO
 			//_dirInfo = dirInfo;
 			_directory = dirInfo.FullName;
 
-			string mapFile = Path.Combine(dirInfo.FullName, DirectoryMapData.DirMapFile);
+			string mapFile = QQnPath.Combine(dirInfo.FullName, DirectoryMapData.DirMapFile);
 
 			DirectoryMapData mapData = null;
 			if (File.Exists(mapFile))
@@ -73,7 +73,7 @@ namespace QQn.TurtleUtils.IO
 
 			path = Path.GetFullPath(path);
 
-			return Directory.Exists(path) && File.Exists(Path.Combine(path, ".tDirMap"));
+			return Directory.Exists(path) && File.Exists(QQnPath.Combine(path, ".tDirMap"));
 		}
 
 		DirectoryMapFile DoGetFile(string name)
@@ -208,7 +208,7 @@ namespace QQn.TurtleUtils.IO
 			if(string.IsNullOrEmpty(directory))
 				throw new ArgumentNullException("directory");
 
-			directory = Path.GetFullPath(Path.Combine(_directory, directory)); // Gets directory with separator
+			directory = Path.GetFullPath(QQnPath.Combine(_directory, directory)); // Gets directory with separator
 
 			if(!directory.StartsWith(_directory))
 				throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "Directory {0} is not below root", directory), "directory");
@@ -357,7 +357,7 @@ namespace QQn.TurtleUtils.IO
 			if (string.IsNullOrEmpty(path))
 				throw new ArgumentNullException("path");
 			
-			string fullPath = Path.Combine(_directory, path);
+			string fullPath = QQnPath.Combine(_directory, path);
 			path = QQnPath.MakeRelativePath(_directory, fullPath);
 
 			if (_data.Files.Contains(path))
@@ -388,7 +388,7 @@ namespace QQn.TurtleUtils.IO
 			if (string.IsNullOrEmpty(path))
 				throw new ArgumentNullException("path");
 
-			string fullPath = Path.Combine(_directory, path);
+			string fullPath = QQnPath.Combine(_directory, path);
 			path = QQnPath.MakeRelativePath(_directory, fullPath);
 
 			if (_data.Files.Contains(path) || File.Exists(fullPath))

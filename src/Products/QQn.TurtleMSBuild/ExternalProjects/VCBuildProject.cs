@@ -5,6 +5,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.XPath;
 using QQn.TurtleBuildUtils;
+using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleMSBuild.ExternalProjects
 {
@@ -89,7 +90,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
                 string keyFile = KeyFile;
 
                 if(!string.IsNullOrEmpty(keyFile))
-                    keyFile = Path.Combine(ProjectPath, keyFile);
+					keyFile = QQnPath.Combine(ProjectPath, keyFile);
 
 				AssemblyUtils.RefreshVersionInfoFromAttributes(targetFile, keyFile, KeyContainer);
 			}

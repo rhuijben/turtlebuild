@@ -47,7 +47,7 @@ namespace QQn.TurtlePackage
 				if (item.IsShared)
 					continue;
 
-				PackFile pf = projectOutput.Files.AddItem(QQnPath.MakeRelativePath(projectOutput.BaseDir, Path.Combine(projectDir, item.Src)));
+				PackFile pf = projectOutput.Files.AddItem(QQnPath.MakeRelativePath(projectOutput.BaseDir, QQnPath.Combine(projectDir, item.Src)));
 			}
 
 			PackContainer projectContent = p.Containers.AddItem("#ProjectContent");
@@ -60,7 +60,7 @@ namespace QQn.TurtlePackage
 
 			foreach (TBLogItem item in config.Content.Items)
 			{
-				PackFile pf = projectContent.Files.AddItem(QQnPath.MakeRelativePath(projectContent.BaseDir, Path.Combine(projectDir,item.Src)));
+				PackFile pf = projectContent.Files.AddItem(QQnPath.MakeRelativePath(projectContent.BaseDir, QQnPath.Combine(projectDir, item.Src)));
 			}
 
 			PackContainer projectScripts = p.Containers.AddItem("#ProjectScripts");
@@ -73,11 +73,11 @@ namespace QQn.TurtlePackage
 
 			foreach (TBLogItem item in config.Content.Items)
 			{
-				PackFile pf = projectContent.Files.AddItem(QQnPath.MakeRelativePath(projectContent.BaseDir, Path.Combine(projectDir, item.Src)));
+				PackFile pf = projectContent.Files.AddItem(QQnPath.MakeRelativePath(projectContent.BaseDir, QQnPath.Combine(projectDir, item.Src)));
 			}
 
 			if (config.Target.KeySrc != null)
-				p.StrongNameKey = StrongNameKey.LoadFrom(Path.Combine(log.Project.Path, config.Target.KeySrc));
+				p.StrongNameKey = StrongNameKey.LoadFrom(QQnPath.Combine(log.Project.Path, config.Target.KeySrc));
 			else if (config.Target.KeyContainer != null)
 				p.StrongNameKey = StrongNameKey.LoadFromContainer(config.Target.KeyContainer, false);
 

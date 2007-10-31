@@ -20,7 +20,7 @@ namespace TurtleTests
 			{
 				if (_snkFile == null)
 				{
-					_snkFile = Path.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\Libraries\\QQn.TurtleUtils\\QQn.TurtleUtils.snk");
+					_snkFile = QQnPath.Combine(Environment.CurrentDirectory, "..\\..\\..\\..\\Libraries\\QQn.TurtleUtils\\QQn.TurtleUtils.snk");
 
 					Assert.That(File.Exists(_snkFile), "Snk file exists");
 				}

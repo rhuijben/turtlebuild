@@ -106,7 +106,7 @@ namespace QQn.TurtlePackage
 				string basePath = BaseDir;
 
 				if (basePath != null)
-					return Path.Combine(basePath, Name);
+					return QQnPath.Combine(basePath, Name);
 				else
 					return Name;
 			}
@@ -122,7 +122,7 @@ namespace QQn.TurtlePackage
 				string basePath = BaseDir;
 
 				if (basePath != null)
-					return Path.Combine(basePath, Name);
+					return QQnPath.Combine(basePath, Name);
 				else
 					return Name;
 			}

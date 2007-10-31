@@ -137,9 +137,17 @@ namespace QQn.TurtleUtils.IO
 			return path;
 		}
 
-		public static bool IsDirectorySeparator(char c)
+		/// <summary>
+		/// Determines whether the specified character is either <see cref="Path.DirectorySeparatorChar"/> or
+		/// <see cref="Path.AltDirectorySeparatorChar"/>
+		/// </summary>
+		/// <param name="character">The character to test.</param>
+		/// <returns>
+		/// 	<c>true</c> if the specified character is a directory separator; otherwise, <c>false</c>.
+		/// </returns>
+		public static bool IsDirectorySeparator(char character)
 		{
-			return (c == Path.DirectorySeparatorChar) || (c == Path.AltDirectorySeparatorChar);
+			return (character == Path.DirectorySeparatorChar) || (character == Path.AltDirectorySeparatorChar);
 		}
 
 		/// <summary>
