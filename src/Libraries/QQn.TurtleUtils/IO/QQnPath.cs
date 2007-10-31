@@ -204,7 +204,7 @@ namespace QQn.TurtleUtils.IO
 
 			string result = Path.Combine(path, item);
 
-			if (!string.IsNullOrEmpty(result) && IsRelativeViaRootPath(result) && Path.IsPathRooted(path))
+			if (!string.IsNullOrEmpty(result) && IsRelativeViaRootPath(result) && IsAbsolutePath(path))
 			{
 				// .Net combines @"f:\tools" and @"\test.txt" to @"\test.txt", removing the relative path origin of path
 				if (result.Length == 1 || !IsDirectorySeparator(result[1])) // No UNC path
