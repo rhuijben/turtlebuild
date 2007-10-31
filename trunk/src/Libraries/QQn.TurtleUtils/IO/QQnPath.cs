@@ -512,6 +512,27 @@ namespace QQn.TurtleUtils.IO
 		}
 
 		/// <summary>
+		/// Determines whether the specified path has the specified extension.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <param name="extension">The extension.</param>
+		/// <returns>
+		/// 	<c>true</c> if the specified path has the extension; otherwise, <c>false</c>.
+		/// </returns>
+		public bool HasExtension(string path, string extension)
+		{
+			if (string.IsNullOrEmpty(fileName))
+				throw new ArgumentNullException("fileName");
+			else if (string.IsNullOrEmpty(extension))
+				throw new ArgumentNullException("extension");
+
+			if (extension[0] != '.')
+				extension = '.' + extension;
+
+			return string.Equals(Path.GetExtension(path), extension, StringComparison.OrdinalIgnoreCase);
+		}
+
+		/// <summary>
 		/// Compares the specified paths
 		/// </summary>
 		/// <param name="path1">The path1.</param>
