@@ -63,7 +63,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// <value>The full SRC.</value>
 		public string FullSrc
 		{
-			get { return _container != null ? QQnPath.Combine(_container.BasePath, Src) : null; }
+			get { return (_container != null && !string.IsNullOrEmpty(Src)) ? QQnPath.Combine(_container.BasePath, Src) : null; }
 		}
 
 		/// <summary>
@@ -72,7 +72,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// <value>The full from SRC.</value>
 		public string FullFromSrc
 		{
-			get { return _container != null ? QQnPath.Combine(_container.BasePath, Src) : null; }
+			get { return (_container != null && !string.IsNullOrEmpty(FromSrc)) ? QQnPath.Combine(_container.BasePath, FromSrc) : null; }
 		}
 
 		/// <summary>

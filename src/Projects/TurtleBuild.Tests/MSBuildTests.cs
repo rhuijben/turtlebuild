@@ -314,7 +314,7 @@ namespace TurtleTests
 			if (!File.Exists(logFile))
 				BuildInternal();
 
-			TBLogCollection logCollection = new TBLogCollection(LoggerPath);
+			TBLogCache logCollection = new TBLogCache(LoggerPath);
 			logCollection.LoadAll();
 
 			PackageArgs args = new PackageArgs();

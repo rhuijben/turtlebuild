@@ -156,5 +156,82 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Gets all project output from all configurations
+		/// </summary>
+		/// <value>All project output.</value>
+		/// <remarks>Project output should not contain duplicates</remarks>
+		public IEnumerable<TBLogItem> AllProjectOutput
+		{
+			get
+			{
+				foreach (TBLogConfiguration config in Configurations)
+				{
+					foreach (TBLogItem item in config.ProjectOutput.Items)
+						yield return item;
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets all contents from all configurations (Filtered union)
+		/// </summary>
+		/// <value>All contents.</value>
+		/// <remarks>List is filtered for duplicates</remarks>
+		public IEnumerable<TBLogItem> AllContents
+		{
+			get
+			{
+				SortedFileList files = new SortedFileList();
+				files.BaseDirectory = ProjectPath;
+
+				foreach (TBLogConfiguration config in Configurations)
+				{
+					foreach (TBLogItem item in config.Content.Items)
+					{
+						if (files.Contains(item.Src))
+							continue;
+						
+						files.Add(item.Src);
+						yield return item;
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Gets all publish items (Filtered union of all ProjectOutput and Contents)
+		/// </summary>
+		/// <value>All publication items.</value>
+		public IEnumerable<TBLogItem> AllPublishItems
+		{
+			get
+			{
+				SortedFileList files = new SortedFileList();
+				files.BaseDirectory = ProjectPath;
+
+				foreach (TBLogConfiguration config in Configurations)
+				{
+					foreach (TBLogItem item in config.ProjectOutput.Items)
+					{
+						if (files.Contains(item.Src))
+							continue;
+
+						files.Add(item.Src);
+						yield return item;
+					}
+
+					foreach (TBLogItem item in config.Content.Items)
+					{
+						if (files.Contains(item.Src))
+							continue;
+
+						files.Add(item.Src);
+						yield return item;
+					}
+				}
+			}
+		}
 	}
 }

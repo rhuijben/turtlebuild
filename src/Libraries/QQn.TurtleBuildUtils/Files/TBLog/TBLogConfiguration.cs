@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using QQn.TurtleUtils.Tokens;
-using System.Collections.ObjectModel;
+
+[module: SuppressMessage("Microsoft.Design", "CA1023:IndexersShouldNotBeMultidimensional", Scope = "member", Target = "QQn.TurtleBuildUtils.Files.TBLog.TBLogConfigurationCollection.Item[System.String,System.String]")]
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
@@ -21,7 +24,6 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		string _outputPath;
 		string _basePath;
 		TBLogFile _logFile;
-		#region IHasFullPath Members
 
 		/// <summary>
 		/// Gets or sets the log file containing this configurations
@@ -32,8 +34,6 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 			get { return _logFile; }
 			internal set { _logFile = value; }
 		}
-
-		#endregion
 
 		/// <summary>
 		/// Gets or sets the target.
@@ -154,14 +154,10 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// </summary>
 	public class TBLogConfigurationCollection : Collection<TBLogConfiguration>
 	{
-		TBLogFile _logFile;
-
 		internal TBLogFile LogFile
 		{
-			get { return _logFile; }
 			set
 			{
-				_logFile = value;
 				foreach (TBLogConfiguration c in this)
 					c.LogFile = value;
 			}

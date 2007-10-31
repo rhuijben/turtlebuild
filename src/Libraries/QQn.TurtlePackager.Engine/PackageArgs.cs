@@ -9,7 +9,7 @@ namespace QQn.TurtlePackager
 	public sealed class PackageArgs
 	{
 		SortedFileList _projectsToPackage;
-		TBLogCollection _logCollection;
+		TBLogCache _logCollection;
 		string _buildRoot;
 		bool _dontUseProjectDependencies;
 
@@ -26,11 +26,11 @@ namespace QQn.TurtlePackager
 		/// Gets or sets the log cache to use
 		/// </summary>
 		/// <value>The log cache.</value>
-		public TBLogCollection LogCache
+		public TBLogCache LogCache
 		{
 			get 
 			{ 
-				return _logCollection ?? (_logCollection = new TBLogCollection()); 
+				return _logCollection ?? (_logCollection = new TBLogCache()); 
 			}
 			set { _logCollection = value; }
 		}

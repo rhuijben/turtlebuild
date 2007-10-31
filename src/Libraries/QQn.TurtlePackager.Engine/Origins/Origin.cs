@@ -5,9 +5,27 @@ using System.Collections.ObjectModel;
 
 namespace QQn.TurtlePackager.Origins
 {
+	enum DependencyType
+	{
+		/// <summary>
+		/// Hard linked to a specific version
+		/// </summary>
+		HardLinked,
+
+		/// <summary>
+		/// Linked to the library
+		/// </summary>
+		LinkedTo,
+
+		/// <summary>
+		/// A compatible version of the dependency is required
+		/// </summary>
+		Required
+	}
+
 	class Origin
 	{
-		Collection<Origin> _dependencies = new Collection<Origin>();
+		Dictionary<Origin, DependencyType> _dependencies = new Dictionary<Origin,DependencyType>();
 		/// <summary>
 		/// Publishes the output files.
 		/// </summary>
@@ -21,7 +39,7 @@ namespace QQn.TurtlePackager.Origins
 			
 		}
 
-		public Collection<Origin> Dependencies
+		public IDictionary<Origin, DependencyType> Dependencies
 		{
 			get { return _dependencies; }
 		}

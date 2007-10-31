@@ -11,7 +11,6 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	{
 		TBLogConfiguration _configuration;
 		TBLogFile _file;
-		#region IHasFullPath Members
 
 		/// <summary>
 		/// Gets the full path.
@@ -27,8 +26,6 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 					return LogFile.BasePath;
 			}
 		}
-
-		#endregion
 
 		/// <summary>
 		/// Gets or sets the configuration.

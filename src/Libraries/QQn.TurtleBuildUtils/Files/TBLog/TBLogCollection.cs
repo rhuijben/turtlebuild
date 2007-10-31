@@ -1,24 +1,29 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Text;
+
 using QQn.TurtleUtils.IO;
+
+[module: SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Scope = "type", Target = "QQn.TurtleBuildUtils.Files.TBLog.TBLogCollection")]
+[module: SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Scope = "type", Target = "QQn.TurtleBuildUtils.Files.TBLog.TBLogCollection")]
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
 	/// <summary>
 	/// A cache of <see cref="TBLogFile"/> instances within a directory
 	/// </summary>
-	public class TBLogCollection : SortedFileList<TBLogFile>
+	public class TBLogCache : SortedFileList<TBLogFile>
 	{
 		string _logPath;
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TBLogCollection"/> class.
+		/// Initializes a new instance of the <see cref="TBLogCache"/> class.
 		/// </summary>
 		/// <param name="logPath">The log path.</param>
-		public TBLogCollection(string logPath)
+		public TBLogCache(string logPath)
 		{
 			if (string.IsNullOrEmpty("logPath"))
 				throw new ArgumentNullException("logPath");
@@ -28,9 +33,9 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="TBLogCollection"/> class.
+		/// Initializes a new instance of the <see cref="TBLogCache"/> class.
 		/// </summary>
-		public TBLogCollection()
+		public TBLogCache()
 		{
 		}
 
