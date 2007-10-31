@@ -22,7 +22,7 @@ namespace QQn.TurtleUtils.Cryptography
 		{
 			if (bytes == null)
 				throw new ArgumentNullException("bytes");
-			StringBuilder sb = new StringBuilder(bytes.Length * 2+2);
+			StringBuilder sb = new StringBuilder(bytes.Length * 2);
 
 			foreach (byte b in bytes)
 				sb.AppendFormat(CultureInfo.InvariantCulture, "{0:x2}", b);
