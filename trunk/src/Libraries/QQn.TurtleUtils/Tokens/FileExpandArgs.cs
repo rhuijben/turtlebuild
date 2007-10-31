@@ -72,7 +72,7 @@ namespace QQn.TurtleUtils.Tokens
 		public bool MatchHiddenFiles
 		{
 			get { return _matchHidden; }
-			set { _matchHidden = true; }
+			set { _matchHidden = value; }
 		}
 
 		/// <summary>
@@ -83,7 +83,7 @@ namespace QQn.TurtleUtils.Tokens
 		public bool MatchSystemFiles
 		{
 			get { return _matchSystem; }
-			set { _matchSystem = true; }
+			set { _matchSystem = value; }
 		}
 
 		/// <summary>

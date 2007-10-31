@@ -9,7 +9,7 @@ namespace QQn.TurtlePackager
 {
 	class PackageState
 	{
-		readonly TBLogCollection _logCache;
+		readonly TBLogCache _logCache;
 		readonly Collection<TBLogFile> _logFiles = new Collection<TBLogFile>();
 		readonly Collection<Origin> _origins = new Collection<Origin>();
 		readonly FileDataList _files = new FileDataList();
@@ -42,7 +42,7 @@ namespace QQn.TurtlePackager
 			get { return _buildRoot; }
 		}
 
-		public TBLogCollection LogCache
+		public TBLogCache LogCache
 		{
 			get { return _logCache; }
 		}
@@ -61,6 +61,11 @@ namespace QQn.TurtlePackager
 		{
 			get { return _files; }
 		}
+
+		public bool DontUseProjectDependencies
+		{
+			get { return _dontUseProjectDependencies; }
+		} 
 
 		public void CreateBuildOrigins()
 		{
@@ -85,12 +90,9 @@ namespace QQn.TurtlePackager
 
 		public void CalculateDependencies()
 		{
-			if (!_dontUseProjectDependencies) // Allow disabling to test semi-non MSBuild projects (MC++, etc.)
+			foreach (Origin o in Origins)
 			{
-				foreach (Origin o in Origins)
-				{
-					o.ApplyProjectDependencies(this);
-				}
+				o.ApplyProjectDependencies(this);
 			}
 		}
 	}

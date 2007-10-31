@@ -11,8 +11,15 @@ namespace QQn.TurtleUtils.Cryptography
 	/// An in-memory wrapper of a StrongKeyName (aka Snk file)
 	/// </summary>
 	[DebuggerDisplay("PublicKeyToken={PublicKeyToken}, PublicOnly={PublicOnly}")]
-	public sealed class StrongNameKey
+	public sealed class StrongNameKey : IDisposable
 	{
+		readonly RSACryptoServiceProvider _rcsp;
+		string _publicKeyToken;
+		string _hashAlgorithmName;
+		HashType _hashType;
+		string _algorithmOid;
+		bool _disposed;
+
 		/// <summary>
 		/// Loads an Snk file
 		/// </summary>
@@ -87,8 +94,6 @@ namespace QQn.TurtleUtils.Cryptography
 			return new StrongNameKey(new RSACryptoServiceProvider(csp));
 		}
 
-
-		readonly RSACryptoServiceProvider _rcsp;
 		StrongNameKey(RSACryptoServiceProvider rcsp)
 		{
 			if (rcsp == null)
@@ -108,6 +113,8 @@ namespace QQn.TurtleUtils.Cryptography
 				throw new ArgumentNullException("hash");
 			else if (PublicOnly)
 				throw new InvalidOperationException();
+			else if (_disposed)
+				throw new ObjectDisposedException("StrongNameKey");
 
 			return _rcsp.SignHash(hash, HashAlgorithmOID);
 		}
@@ -124,6 +131,8 @@ namespace QQn.TurtleUtils.Cryptography
 				throw new ArgumentNullException("hash");
 			else if (signature == null)
 				throw new ArgumentNullException("signature");
+			else if (_disposed)
+				throw new ObjectDisposedException("StrongNameKey");
 
 			return _rcsp.VerifyHash(hash, HashAlgorithmOID, signature);
 		}		
@@ -134,10 +143,12 @@ namespace QQn.TurtleUtils.Cryptography
 		/// <returns></returns>
 		public byte[] GetPublicKeyData()
 		{
+			if (_disposed)
+				throw new ObjectDisposedException("StrongNameKey");
+
 			return _rcsp.ExportCspBlob(false);
 		}
 
-		string _publicKeyToken;
 		/// <summary>
 		/// Gets the public key token from the public key. This matches the public key token of assemblies signed with the same key
 		/// </summary>
@@ -147,7 +158,7 @@ namespace QQn.TurtleUtils.Cryptography
 			{
 				if (_publicKeyToken == null)
 				{
-					// We use the StronNameKeyPair class to orden the public key the way .Net does
+					// We use the StrongNameKeyPair class to orden the public key the way .Net does
 					StrongNameKeyPair snkp = new StrongNameKeyPair(GetPublicKeyData());
 					byte[] publicKeyHash;
 					using (SHA1 sha = SHA1.Create())
@@ -170,6 +181,9 @@ namespace QQn.TurtleUtils.Cryptography
 		{
 			get
 			{
+				if (_disposed)
+					throw new ObjectDisposedException("StrongNameKey");
+
 				return _rcsp.KeySize / 8;
 			}
 		}
@@ -187,16 +201,24 @@ namespace QQn.TurtleUtils.Cryptography
 		/// </summary>
 		public bool PublicOnly
 		{
-			get { return _rcsp.PublicOnly; }
-		}
+			get 
+			{
+				if (_disposed)
+					throw new ObjectDisposedException("StrongNameKey");
 
-		string _hashAlgorithmName;
+				return _rcsp.PublicOnly; 
+			}
+		}
+		
 		string HashAlgorithmName
 		{
 			get
 			{
+				if (_disposed)
+					throw new ObjectDisposedException("StrongNameKey");
+
 				if (_hashAlgorithmName == null)
-				{
+				{						
 					string algorithm = _rcsp.SignatureAlgorithm;
 
 					int dash = algorithm.LastIndexOf('#');
@@ -209,8 +231,7 @@ namespace QQn.TurtleUtils.Cryptography
 				return _hashAlgorithmName;
 			}
 		}
-
-		HashType _hashType;
+		
 		/// <summary>
 		/// Gets the type of the hash.
 		/// </summary>
@@ -219,13 +240,14 @@ namespace QQn.TurtleUtils.Cryptography
 		{
 			get
 			{
-				if (_hashType == HashType.None)
+				if (_disposed)
+					throw new ObjectDisposedException("StrongNameKey");
+				else if (_hashType == HashType.None)
 					_hashType = (HashType)Enum.Parse(typeof(HashType), HashAlgorithmName, true);
 				return _hashType;
 			}
 		}
-
-		string _algorithmOid;
+				
 		/// <summary>
 		/// Gets the hash algorithm OID.
 		/// </summary>
@@ -234,7 +256,9 @@ namespace QQn.TurtleUtils.Cryptography
 		{
 			get
 			{
-				if(_algorithmOid == null)
+				if (_disposed)
+					throw new ObjectDisposedException("StrongNameKey");
+				else if(_algorithmOid == null)
 					_algorithmOid = CryptoConfig.MapNameToOID(HashAlgorithmName);
 
 				return _algorithmOid;
@@ -247,7 +271,27 @@ namespace QQn.TurtleUtils.Cryptography
 		/// <returns></returns>
 		public HashAlgorithm CreateHasher()
 		{
+			if (_disposed)
+				throw new ObjectDisposedException("StrongNameKey");
+
 			return QQnCryptoHelpers.CreateHashAlgorithm(HashType);
 		}
+
+		#region IDisposable Members
+
+		/// <summary>
+		/// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+		/// </summary>
+		/// <remarks>Closes the cryptoprovider</remarks>
+		public void Dispose()
+		{
+			if (!_disposed)
+			{
+				_disposed = true;
+				_rcsp.Clear();
+			}
+		}
+
+		#endregion
 	}
 }

@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Collections.ObjectModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using QQn.TurtleUtils.IO;
-using System.Diagnostics.CodeAnalysis;
 
 [module: SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Scope = "type", Target = "QQn.TurtleBuildUtils.SortedFileList")]
 [module: SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Scope = "type", Target = "QQn.TurtleBuildUtils.SortedFileList`1")]
@@ -23,7 +22,7 @@ namespace QQn.TurtleBuildUtils
 		/// Initializes a new instance of the <see cref="SortedFileList&lt;T&gt;"/> class.
 		/// </summary>
 		public SortedFileList()
-			: base(StringComparer.OrdinalIgnoreCase)
+			: base(QQnPath.PathStringComparer)
 		{
 		}
 
@@ -186,14 +185,13 @@ namespace QQn.TurtleBuildUtils
 						yield return key;
 				}
 			}
-		}
-
-		
+		}	
 	}
+
 	/// <summary>
 	/// 
 	/// </summary>
-	public class SortedFileList : SortedFileList<string>
+	public class SortedFileList : SortedFileList<string>, ICollection<string>
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="SortedFileList"/> class.
@@ -205,10 +203,10 @@ namespace QQn.TurtleBuildUtils
 		/// <summary>
 		/// Adds the specified filename.
 		/// </summary>
-		/// <param name="filename">The filename.</param>
-		public virtual void Add(string filename)
+		/// <param name="item">The filename.</param>
+		public virtual void Add(string item)
 		{
-			string relative = EnsureRelative(filename);
+			string relative = EnsureRelative(item);
 			base.Add(relative, relative);
 		}
 
@@ -223,82 +221,35 @@ namespace QQn.TurtleBuildUtils
 			if (!ContainsKey(relative))
 				Add(relative, relative);
 		}
-	}
 
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	public abstract class KeyedFileCollection<T> : SortedFileList<T>
-	{
-		/// <summary>
-		/// Extracts the key from the specified element
-		/// </summary>
-		/// <param name="item">The item.</param>
-		/// <returns></returns>
-		protected abstract string GetKeyForItem(T item);
+		#region ICollection<string> Members
 
 		/// <summary>
-		/// Adds the specified item.
+		/// Copies the elements of the <see cref="T:System.Collections.Generic.ICollection`1"/> to an <see cref="T:System.Array"/>, starting at a particular <see cref="T:System.Array"/> index.
 		/// </summary>
-		/// <param name="item">The item.</param>
-		public virtual void Add(T item)
+		/// <param name="array">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.Generic.ICollection`1"/>. The <see cref="T:System.Array"/> must have zero-based indexing.</param>
+		/// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+		/// <exception cref="T:System.ArgumentNullException">
+		/// 	<paramref name="array"/> is null.</exception>
+		/// <exception cref="T:System.ArgumentOutOfRangeException">
+		/// 	<paramref name="arrayIndex"/> is less than 0.</exception>
+		/// <exception cref="T:System.ArgumentException">
+		/// 	<paramref name="array"/> is multidimensional.-or-<paramref name="arrayIndex"/> is equal to or greater than the length of <paramref name="array"/>.-or-The number of elements in the source <see cref="T:System.Collections.Generic.ICollection`1"/> is greater than the available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.-or-Type <paramref name="T"/> cannot be cast automatically to the type of the destination <paramref name="array"/>.</exception>
+		public void CopyTo(string[] array, int arrayIndex)
 		{
-			Add(GetKeyForItem(item), item);
+			Keys.CopyTo(array, arrayIndex);
 		}
 
 		/// <summary>
-		/// Adds the specified file if it was not already added
+		/// Gets a value indicating whether the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.
 		/// </summary>
-		/// <param name="item">The filename.</param>
-		public virtual void AddUnique(T item)
+		/// <value></value>
+		/// <returns>true if the <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only; otherwise, false.</returns>
+		bool ICollection<string>.IsReadOnly
 		{
-			string key = GetKeyForItem(item);
-
-			if(!ContainsKey(key))
-				Add(key, item);
+			get { return false; }
 		}
 
-		/// <summary>
-		/// Determines whether the list contains the specified item.
-		/// </summary>
-		/// <param name="item">The item.</param>
-		/// <returns>
-		/// 	<c>true</c> if the list contains the specified item; otherwise, <c>false</c>.
-		/// </returns>
-		public bool Contains(T item)
-		{
-			return Contains(GetKeyForItem(item));
-		}
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	public interface IHasFileName
-	{
-		/// <summary>
-		/// Gets the name of the file.
-		/// </summary>
-		/// <value>The name of the file.</value>
-		string FileName { get; }
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	public class FileCollection<T> : KeyedFileCollection<T>
-		where T : IHasFileName
-	{
-		/// <summary>
-		/// Extracts the key from the specified element
-		/// </summary>
-		/// <param name="item">The item.</param>
-		/// <returns></returns>
-		protected override string GetKeyForItem(T item)
-		{
-			return (item != null) ? item.FileName : null;
-		}
+		#endregion
 	}
 }

@@ -33,42 +33,14 @@ namespace QQn.TurtlePackager.Origins
 			get { return _log.Project.Name; }
 		}
 
+		public override string ToString()
+		{
+			return "BuildOrigin: " + ProjectName;
+		}
+
 		public override void PublishOriginalFiles(PackageState state)
 		{
-			foreach (TBLogConfiguration config in LogFile.Configurations)
-			{
-				foreach (TBLogItem item in config.ProjectOutput.Items)
-				{
-					if (item.IsShared)
-						continue;
-
-					FileData fd = new FileData(item.FullSrc, state.Files);
-
-					if(!string.IsNullOrEmpty(item.FromSrc))
-						fd.CopiedFrom = item.FullFromSrc;
-
-					fd.Origin = this;
-
-					state.Files.Add(fd);
-				}
-
-				foreach (TBLogItem item in config.Content.Items)
-				{
-					if (item.IsShared)
-						continue;
-
-					FileData fd = new FileData(item.FullSrc, state.Files);
-
-					if (!string.IsNullOrEmpty(item.FromSrc))
-						fd.CopiedFrom = item.FullFromSrc;
-
-					fd.Origin = this;
-
-					state.Files.AddUnique(fd);
-				}
-			}
-
-			foreach (TBLogItem item in LogFile.Scripts.Items)
+			foreach (TBLogItem item in LogFile.AllProjectOutput)
 			{
 				if (item.IsShared)
 					continue;
@@ -82,63 +54,113 @@ namespace QQn.TurtlePackager.Origins
 
 				state.Files.Add(fd);
 			}
+
+			foreach (TBLogItem item in LogFile.AllContents)
+			{
+				if (item.IsShared)
+					continue;
+
+				FileData fd = new FileData(item.FullSrc, state.Files);
+
+				if (!string.IsNullOrEmpty(item.FromSrc))
+					fd.CopiedFrom = item.FullFromSrc;
+
+				fd.Origin = this;
+
+				state.Files.AddUnique(fd);
+			}
 		}
 
 		public override void PublishRequiredFiles(PackageState state)
 		{
-			foreach (TBLogConfiguration config in LogFile.Configurations)
+			foreach (TBLogItem item in LogFile.AllPublishItems)
 			{
-				foreach (TBLogItem item in config.ProjectOutput.Items)
-				{
-					if (!item.IsShared)
-						continue;
+				if (!item.IsShared)
+					continue;
 
-					FileData fd = new FileData(item.FullSrc, state.Files);
+				FileData fd = new FileData(item.FullSrc, state.Files);
 
-					if (!string.IsNullOrEmpty(item.FromSrc))
-						fd.CopiedFrom = item.FullFromSrc;
+				if (!string.IsNullOrEmpty(item.FromSrc))
+					fd.CopiedFrom = item.FullFromSrc;
 
-					fd.FindOrigin = true;
+				fd.FindOrigin = true;
+				fd.Origin = this;
 
-					state.Files.Add(fd);
-				}
-
-				foreach (TBLogItem item in config.Content.Items)
-				{
-					if (item.IsShared)
-						continue;
-
-					FileData fd = new FileData(item.FullSrc, state.Files);
-
-					if (!string.IsNullOrEmpty(item.FromSrc))
-						fd.CopiedFrom = item.FullFromSrc;
-
-					fd.FindOrigin = true;
-
-					state.Files.AddUnique(fd);
-				}
+				state.Files.Add(fd); // Output files must be unique
 			}
 		}
 
 		public override void ApplyProjectDependencies(PackageState state)
 		{
-			foreach (TBLogConfiguration config in LogFile.Configurations)
+			if (state.DontUseProjectDependencies) // Allow disabling for testing
 			{
-				foreach(TBLogProjectReference project in config.References.Projects)
+				// Add an initial set of dependencies directly from the project files
+				foreach (TBLogConfiguration config in LogFile.Configurations)
 				{
-					string src = QQnPath.NormalizePath(project.FullSrc);
-
-					foreach (Origin o in state.Origins)
+					foreach (TBLogProjectReference project in config.References.Projects)
 					{
-						BuildOrigin bo = o as BuildOrigin;
-						if (bo == null)
-							continue;
+						string src = QQnPath.NormalizePath(project.FullSrc);
 
-						if (QQnPath.Equals(bo.ProjectFile, src) && !Dependencies.Contains(o))
-							Dependencies.Add(o);
+						foreach (Origin o in state.Origins)
+						{
+							BuildOrigin bo = o as BuildOrigin;
+							if (bo == null)
+								continue;
+
+							if (QQnPath.Equals(bo.ProjectFile, src) && !Dependencies.ContainsKey(o))
+								EnsureDependency(o, DependencyType.LinkedTo);
+						}
 					}
 				}
 			}
+
+			foreach (TBLogItem item in LogFile.AllProjectOutput)
+			{
+				FileData fd = state.Files[item.FullSrc];
+
+				if (!string.IsNullOrEmpty(fd.CopiedFrom))
+				{
+					FileData src;
+
+					if (state.Files.TryGetValue(fd.CopiedFrom, out src))
+					{
+						if (src.Origin != this)
+						{
+							EnsureDependency(src.Origin, item.IsCopy ? DependencyType.Required : DependencyType.LinkedTo);
+						}
+					}
+				}
+			}
+
+			foreach (TBLogItem item in LogFile.AllContents)
+			{
+				FileData fd = state.Files[item.FullSrc];
+
+				if (!string.IsNullOrEmpty(fd.CopiedFrom))
+				{
+					FileData src;
+
+					if (state.Files.TryGetValue(fd.CopiedFrom, out src))
+					{
+						if (src.Origin != this)
+						{
+							EnsureDependency(src.Origin, DependencyType.Required);
+						}
+					}
+				}
+			}
+		}
+
+		private void EnsureDependency(Origin origin, DependencyType dtSet)
+		{
+			DependencyType dt;
+			if (Dependencies.TryGetValue(origin, out dt))
+			{
+				if (dtSet >= dt)
+					return;
+			}
+
+			Dependencies[origin] = dtSet;
 		}
 
 		public string ProjectFile
