@@ -7,8 +7,7 @@ using System.Text;
 
 using QQn.TurtleUtils.IO;
 
-[module: SuppressMessage("Microsoft.Naming", "CA1711:IdentifiersShouldNotHaveIncorrectSuffix", Scope = "type", Target = "QQn.TurtleBuildUtils.Files.TBLog.TBLogCollection")]
-[module: SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Scope = "type", Target = "QQn.TurtleBuildUtils.Files.TBLog.TBLogCollection")]
+[module: SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Scope = "type", Target = "QQn.TurtleBuildUtils.Files.TBLog.TBLogCache")]
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
