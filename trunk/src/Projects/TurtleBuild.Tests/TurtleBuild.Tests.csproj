@@ -42,6 +42,7 @@
     <Compile Include="AsmInfoTests.cs" />
     <Compile Include="DirMapTests.cs" />
     <Compile Include="PackTests.cs" />
+    <Compile Include="PathTests.cs" />
     <Compile Include="UtilTests.cs" />
     <Compile Include="VersionResourceTests.cs" />
     <Compile Include="CryptoTests.cs" />
