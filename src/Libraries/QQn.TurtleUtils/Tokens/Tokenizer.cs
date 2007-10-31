@@ -9,6 +9,7 @@ using System.Xml.XPath;
 using System.Text.RegularExpressions;
 using QQn.TurtleUtils.Tokens.Definitions;
 using QQn.TurtleUtils.Tokens.Tokenizers;
+using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleUtils.Tokens
 {
@@ -336,14 +337,29 @@ namespace QQn.TurtleUtils.Tokens
 
 					Regex fileRegex = ParseFileEx(rootDir, rest, args.FileExpandMode);
 
+					bool checkAttr = !args.MatchHiddenFiles || !args.MatchSystemFiles;
+
+					FileAttributes attrMask = (FileAttributes)0;
+					if(!args.MatchHiddenFiles)
+						attrMask |= FileAttributes.Hidden;
+					if(!args.MatchSystemFiles)
+						attrMask |= FileAttributes.System;
+					
 					SearchOption si = (args.FileExpandMode == FileExpandMode.DirectoryWildCards) ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
 					bool foundOne = true;
+
+					SortedList<string, DirectoryInfo> visibleDirs = new SortedList<string, DirectoryInfo>(QQnPath.PathStringComparer);
 
 					if (args.MatchDirectories)
 						foreach (DirectoryInfo fsi in rootDir.GetDirectories("*", si))
 						{
 							if (fileRegex.Match(fsi.FullName).Success)
 							{
+								if (checkAttr && 0 != (fsi.Attributes & attrMask))
+									continue;
+								else if (checkAttr && !DirectoryVisible(fsi, attrMask, visibleDirs))
+									continue;
+
 								fileList.Insert(i++, fsi.FullName);
 								foundOne = true;
 							}
@@ -353,6 +369,11 @@ namespace QQn.TurtleUtils.Tokens
 						{
 							if (fileRegex.Match(fsi.FullName).Success)
 							{
+								if (checkAttr && 0 != (fsi.Attributes & attrMask))
+									continue;
+								else if (checkAttr && !DirectoryVisible(fsi, attrMask, visibleDirs))
+									continue;
+
 								fileList.Insert(i++, fsi.FullName);
 								foundOne = true;
 							}
@@ -369,6 +390,30 @@ namespace QQn.TurtleUtils.Tokens
 				}
 			}
 			return true;
+		}
+
+		private static bool DirectoryVisible(FileInfo fsi, FileAttributes attrMask, SortedList<string, DirectoryInfo> visibleDirs)
+		{
+			DirectoryInfo dir;
+			if (!visibleDirs.TryGetValue(fsi.DirectoryName, out dir))
+			{
+				dir = fsi.Directory;
+				visibleDirs.Add(dir.FullName, dir);
+			}
+
+			return 0 == (dir.Attributes & attrMask);
+		}
+
+		private static bool DirectoryVisible(DirectoryInfo fsi, FileAttributes attrMask, SortedList<string, DirectoryInfo> visibleDirs)
+		{
+			DirectoryInfo dir;
+			if (!visibleDirs.TryGetValue(fsi.Parent.FullName, out dir))
+			{
+				dir = fsi.Parent;
+				visibleDirs.Add(dir.FullName, dir);
+			}
+
+			return 0 == (dir.Attributes & attrMask);
 		}
 
 		private static Regex ParseFileEx(DirectoryInfo rootDir, string rest, FileExpandMode fileExpandMode)
