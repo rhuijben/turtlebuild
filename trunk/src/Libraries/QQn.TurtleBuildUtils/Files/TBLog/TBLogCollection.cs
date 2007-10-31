@@ -74,7 +74,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 				return this[name];
 
 			if (!string.IsNullOrEmpty(_logPath))
-				name = Path.Combine(_logPath, name);
+				name = QQnPath.Combine(_logPath, name);
 
 			TBLogFile logFile = TBLogFile.Load(name);
 			Add(name, logFile);

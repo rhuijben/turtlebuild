@@ -96,7 +96,7 @@ namespace QQn.TurtleUtils.IO
 			else if (verifyData == null)
 				throw new ArgumentNullException("verifyData");
 
-			string path = Path.Combine(baseDirectory, verifyData.Filename);
+			string path = QQnPath.Combine(baseDirectory, verifyData.Filename);
 
 			FileInfo fif = new FileInfo(path);
 
@@ -195,7 +195,7 @@ namespace QQn.TurtleUtils.IO
 			else if (verifyData == null)
 				throw new ArgumentNullException("verifyData");
 
-			FileInfo fif = new FileInfo(Path.Combine(baseDirectory, verifyData.Filename));
+			FileInfo fif = new FileInfo(QQnPath.Combine(baseDirectory, verifyData.Filename));
 			if (!fif.Exists)
 				return;
 

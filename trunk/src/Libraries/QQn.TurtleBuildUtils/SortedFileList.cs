@@ -57,7 +57,7 @@ namespace QQn.TurtleBuildUtils
 					Clear();
 					foreach (KeyValuePair<string, T> v in values)
 					{
-						Add(hadBase ? Path.Combine(oldBase, v.Key) : v.Key, v.Value);
+						Add(hadBase ? QQnPath.Combine(oldBase, v.Key) : v.Key, v.Value);
 					}
 				}
 
@@ -181,7 +181,7 @@ namespace QQn.TurtleBuildUtils
 				foreach (string key in Keys)
 				{
 					if (hasBase)
-						yield return Path.Combine(BaseDirectory, key);
+						yield return QQnPath.Combine(BaseDirectory, key);
 					else
 						yield return key;
 				}

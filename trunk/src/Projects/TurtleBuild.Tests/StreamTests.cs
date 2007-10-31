@@ -81,7 +81,7 @@ namespace TurtleTests
 
 			Uri codeBase = new Uri(a.CodeBase);
 
-			container.AddFile(codeBase.LocalPath, Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(),"../..")));
+			container.AddFile(codeBase.LocalPath, Path.GetFullPath(QQnPath.Combine(Directory.GetCurrentDirectory(),"../..")));
 
 			XmlDocument doc = new XmlDocument();
 

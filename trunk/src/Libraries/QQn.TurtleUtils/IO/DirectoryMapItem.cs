@@ -212,7 +212,7 @@ namespace QQn.TurtleUtils.IO
 		/// <value>The full name.</value>
 		public string FullName
 		{
-			get { return Path.Combine(_map.FullPath, Filename); }
+			get { return QQnPath.Combine(_map.FullPath, Filename); }
 		}
 
 		internal DirectoryMapData Map

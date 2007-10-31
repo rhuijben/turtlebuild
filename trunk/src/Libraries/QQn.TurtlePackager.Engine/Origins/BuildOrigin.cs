@@ -20,7 +20,7 @@ namespace QQn.TurtlePackager.Origins
 				throw new ArgumentNullException("logFile");
 
 			_log = logFile;
-			_projectFile = Path.Combine(logFile.ProjectPath, logFile.Project.File);
+			_projectFile = QQnPath.Combine(logFile.ProjectPath, logFile.Project.File);
 		}
 
 		public TBLogFile LogFile

@@ -5,6 +5,7 @@ using QQn.TurtleUtils.Tokens;
 using QQn.TurtleMSBuild.ExternalProjects;
 using Microsoft.Build.Framework;
 using System.Xml;
+using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleMSBuild
 {
@@ -79,7 +80,7 @@ namespace QQn.TurtleMSBuild
 
 						Guid projectType = new Guid(words[0].Substring(8).TrimEnd(')').Trim('\"'));
 						string projectName = FilterWord(words[2]);
-						string projectFile = Path.Combine(solution.ProjectPath, FilterWord(words[3]));
+						string projectFile = QQnPath.Combine(solution.ProjectPath, FilterWord(words[3]));
 						Guid projectGuid = new Guid(FilterWord(words[4]));
 
 						if (projectType != solutionItem && File.Exists(projectFile))

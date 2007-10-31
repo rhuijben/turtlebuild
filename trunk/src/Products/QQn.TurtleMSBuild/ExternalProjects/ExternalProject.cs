@@ -208,7 +208,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 							Assembly asm = null;
 							try
 							{
-								asm = Assembly.ReflectionOnlyLoadFrom(Path.Combine(ProjectPath, target.Target));
+								asm = Assembly.ReflectionOnlyLoadFrom(QQnPath.Combine(ProjectPath, target.Target));
 
 								if (asm == null)
 									continue;

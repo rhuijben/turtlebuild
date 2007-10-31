@@ -64,7 +64,7 @@ namespace QQn.TurtleUtils.IO
 
 			path = Path.GetFullPath(path);
 
-			using(FileStream fs = File.OpenRead(Path.Combine(path, DirMapFile)))
+			using (FileStream fs = File.OpenRead(QQnPath.Combine(path, DirMapFile)))
 			{
 				XPathDocument doc = new XPathDocument(fs);
 
@@ -86,7 +86,7 @@ namespace QQn.TurtleUtils.IO
 
 		public void Write()
 		{
-			string file = Path.Combine(_directory, DirMapFile);
+			string file = QQnPath.Combine(_directory, DirMapFile);
 			FileInfo fif = new FileInfo(file);
 
 			if (fif.Exists && (fif.Attributes & (FileAttributes.Hidden | FileAttributes.ReadOnly)) != 0)

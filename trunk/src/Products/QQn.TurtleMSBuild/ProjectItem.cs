@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Microsoft.Build.Framework;
+using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleMSBuild
 {
@@ -56,7 +57,7 @@ namespace QQn.TurtleMSBuild
 		/// <value>The full path.</value>
 		public string FullPath
 		{
-			get { return Path.Combine(_project.ProjectPath, Include); }
+			get { return QQnPath.Combine(_project.ProjectPath, Include); }
 		}
 
 		/// <summary>
@@ -116,7 +117,7 @@ namespace QQn.TurtleMSBuild
 					value = FullPath;
 					return true;
 				case "RootDir":
-					value = Path.GetPathRoot(Path.Combine(_project.ProjectPath, Include));
+					value = Path.GetPathRoot(QQnPath.Combine(_project.ProjectPath, Include));
 					return true;
 				case "Filename":
 					value = Filename;
@@ -129,7 +130,7 @@ namespace QQn.TurtleMSBuild
 					value = (n >= 0) ? Include.Substring(0, n + 1) : "";
 					return true;
 				case "Directory":
-					value = Path.Combine(_project.ProjectPath, Include);
+					value = QQnPath.Combine(_project.ProjectPath, Include);
 					n = value.LastIndexOfAny(new char[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar });
 					value = (n >= 0) ? Include.Substring(0, n + 1) : "";
 					value = value.Substring(Path.GetPathRoot(value).Length);
@@ -141,13 +142,13 @@ namespace QQn.TurtleMSBuild
 					value = Include;
 					return true;
 				case "ModifiedTime":
-					value = new DirectoryInfo(Path.Combine(_project.ProjectPath, Include)).LastWriteTime.ToString("u");
+					value = new DirectoryInfo(QQnPath.Combine(_project.ProjectPath, Include)).LastWriteTime.ToString("u");
 					return true;
 				case "CreatedTime":
-					value = new DirectoryInfo(Path.Combine(_project.ProjectPath, Include)).CreationTime.ToString("u");
+					value = new DirectoryInfo(QQnPath.Combine(_project.ProjectPath, Include)).CreationTime.ToString("u");
 					return true;
 				case "AccessedTime":
-					value = new DirectoryInfo(Path.Combine(_project.ProjectPath, Include)).LastAccessTime.ToString("u");
+					value = new DirectoryInfo(QQnPath.Combine(_project.ProjectPath, Include)).LastAccessTime.ToString("u");
 					return true;
 				default:
 					value = null;

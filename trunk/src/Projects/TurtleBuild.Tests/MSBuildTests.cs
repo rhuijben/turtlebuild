@@ -29,7 +29,7 @@ namespace TurtleTests
 			get
 			{
 				if (_msBuild == null)
-					_msBuild = Path.Combine(Path.GetDirectoryName(typeof(int).Module.FullyQualifiedName), "MSBuild.exe");
+					_msBuild = QQnPath.Combine(Path.GetDirectoryName(typeof(int).Module.FullyQualifiedName), "MSBuild.exe");
 				return _msBuild;
 			}
 		}
@@ -104,7 +104,7 @@ namespace TurtleTests
 			get
 			{
 				if(_logger == null)
-					_logger = Path.GetFullPath(Path.Combine(typeof(MSBuildTests).Module.FullyQualifiedName, string.Format("../../../../../Products/QQn.TurtleMSBuild/bin/{0}/QQn.TurtleMSBuild.dll", ThisConfiguration)));
+					_logger = Path.GetFullPath(QQnPath.Combine(typeof(MSBuildTests).Module.FullyQualifiedName, string.Format("../../../../../Products/QQn.TurtleMSBuild/bin/{0}/QQn.TurtleMSBuild.dll", ThisConfiguration)));
 
 				return _logger;
 			}
@@ -116,7 +116,7 @@ namespace TurtleTests
 			get
 			{
 				if (_loggerPath == null)
-					_loggerPath = Path.Combine(Path.GetTempPath(), "BuildLogger");
+					_loggerPath = QQnPath.Combine(Path.GetTempPath(), "BuildLogger");
 
 				return _loggerPath;
 			}
@@ -128,7 +128,7 @@ namespace TurtleTests
 			get
 			{
 				if (_packagePath == null)
-					_packagePath = Path.Combine(Path.GetTempPath(), "TBPackages");
+					_packagePath = QQnPath.Combine(Path.GetTempPath(), "TBPackages");
 
 				return _packagePath;
 			}
@@ -140,7 +140,7 @@ namespace TurtleTests
 			get
 			{
 				if (_extractPath == null)
-					_extractPath = Path.Combine(Path.GetTempPath(), "ExtractTBP");
+					_extractPath = QQnPath.Combine(Path.GetTempPath(), "ExtractTBP");
 
 				return _extractPath;
 			}
@@ -176,9 +176,9 @@ namespace TurtleTests
 				
 			}
 
-			Assert.That(File.Exists(Path.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog")), Is.True, "Logfile created");
+			Assert.That(File.Exists(QQnPath.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog")), Is.True, "Logfile created");
 
-			XPathDocument doc = new XPathDocument(Path.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog"));
+			XPathDocument doc = new XPathDocument(QQnPath.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog"));
 
 			XPathNavigator nav = doc.CreateNavigator();
 			XmlNamespaceManager nsMgr = new XmlNamespaceManager(nav.NameTable);
@@ -186,7 +186,7 @@ namespace TurtleTests
 			Assert.That(nav.SelectSingleNode("/tb:TurtleBuildData/tb:Configuration", nsMgr).GetAttribute("outputPath", ""), Is.Not.EqualTo(""), "outputPath is set");
 			//doc.CreateNavigator().SelectSingleNode("
 
-			TBLogFile file = TBLogFile.Load(Path.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog"));
+			TBLogFile file = TBLogFile.Load(QQnPath.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog"));
 
 			Assert.That(file, Is.Not.Null);
 			Assert.That(file.Configurations.Count, Is.GreaterThanOrEqualTo(1), "Configurations available");
@@ -236,7 +236,7 @@ namespace TurtleTests
 		[Test]
 		public void MakePackage()
 		{
-			string logFile = Path.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog");
+			string logFile = QQnPath.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog");
 			if(!File.Exists(logFile))
 				BuildInternal();
 
@@ -276,8 +276,8 @@ namespace TurtleTests
 
 			Assert.That(PackUtils.TryCreatePack(log, out pack));
 
-			string path = Path.Combine(PackagePath, "QQn.TurtleMSBuild.tbPkg");
-			TPack.Create(Path.Combine(PackagePath, "QQn.TurtleMSBuild.tbPkg"), pack);
+			string path = QQnPath.Combine(PackagePath, "QQn.TurtleMSBuild.tbPkg");
+			TPack.Create(QQnPath.Combine(PackagePath, "QQn.TurtleMSBuild.tbPkg"), pack);
 
 			using (TPack pkg = TPack.OpenFrom(path, VerificationMode.Full))
 			using(DirectoryMap dm = DirectoryMap.Get(ExtractPath))
@@ -310,7 +310,7 @@ namespace TurtleTests
 
 		public void CalculatePackage(bool useProjectReferences)
 		{
-			string logFile = Path.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog");
+			string logFile = QQnPath.Combine(LoggerPath, "QQn.TurtleMSBuild.tbLog");
 			if (!File.Exists(logFile))
 				BuildInternal();
 
