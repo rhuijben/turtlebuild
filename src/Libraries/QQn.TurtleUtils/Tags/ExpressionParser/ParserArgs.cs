@@ -4,7 +4,10 @@ using System.Text;
 
 namespace QQn.TurtleUtils.Tags.ExpressionParser
 {
-	class ParserArgs
+	/// <summary>
+	/// 
+	/// </summary>
+	public sealed class ParserArgs
 	{ 
 		bool _allowProperties;
 		bool _allowTags;
@@ -38,6 +41,16 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		{
 			get { return _allowItems; }
 			set { _allowItems = value; }
+		}
+
+		/// <summary>
+		/// Clones this instance.
+		/// </summary>
+		/// <returns>A <see cref="ParserArgs"/> instance with all settings copied</returns>
+		public ParserArgs Clone()
+		{
+			ParserArgs a = (ParserArgs)MemberwiseClone();
+			return a;
 		}
 	}
 }

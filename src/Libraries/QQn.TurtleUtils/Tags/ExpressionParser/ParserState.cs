@@ -4,7 +4,7 @@ using System.Text;
 
 namespace QQn.TurtleUtils.Tags.ExpressionParser
 {
-	class ParserState
+	internal class ParserState
 	{
 		readonly string _expression;
 		readonly ParserArgs _args;
@@ -19,14 +19,14 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 				throw new ArgumentNullException("args");
 
 			_expression = expression;
-			_args = args;			
+			_args = args.Clone();			
 		}
 
 		/// <summary>
 		/// Gets the next character and advances the position
 		/// </summary>
 		/// <returns></returns>
-		public char NextChar()
+		internal char NextChar()
 		{
 			if (_pos < _expression.Length)
 				return _expression[_pos++];
@@ -144,11 +144,11 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// <param name="tokenType">Type of the token.</param>
 		/// <param name="value">The value.</param>
 		/// <returns></returns>
-		internal Token CreateToken(TokenType tokenType, string value)
+		internal TagToken CreateToken(TagTokenType tokenType, string value)
 		{
 			int lt = _lastToken;
 			_lastToken = _pos;
-			return new Token(tokenType, lt, _pos - lt, value);
+			return new TagToken(tokenType, lt, _pos - lt, value);
 		}
 
 		/// <summary>
@@ -156,12 +156,12 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// </summary>
 		/// <param name="p">The p.</param>
 		/// <returns></returns>
-		internal Token CreateToken(char p)
+		internal TagToken CreateToken(char p)
 		{
 			int lt = _lastToken;
 			_lastToken = _pos;
 
-			return new Token((TokenType)p, lt, 1, null);
+			return new TagToken((TagTokenType)p, lt, 1, null);
 		}
 
 		/// <summary>
@@ -198,6 +198,59 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		public int TokenStartPosition
 		{
 			get { return _lastToken; }
-		}		
+		}
+
+		IEnumerator<TagToken> _tokenEnumerator;
+		TagToken _peekToken;
+		TagToken _currentToken;
+		internal TagToken NextToken()
+		{
+			if (_tokenEnumerator == null)
+				_tokenEnumerator = Lexer.WalkTokens(this).GetEnumerator();
+
+			if (_peekToken != null)
+			{
+				_currentToken = _peekToken;
+				_peekToken = null;
+			}
+			else
+			{
+				if (_tokenEnumerator.MoveNext())
+					_currentToken = _tokenEnumerator.Current;
+				else
+					_currentToken = null;
+			}
+
+			return _currentToken;
+		}
+
+		internal TagToken CurrentToken
+		{
+			get { return _currentToken; }
+		}
+
+		internal TagToken PeekToken()
+		{
+			if (_tokenEnumerator == null)
+				_tokenEnumerator = Lexer.WalkTokens(this).GetEnumerator();
+
+			if (_peekToken == null)
+			{
+				if (_tokenEnumerator.MoveNext())
+					_peekToken = _tokenEnumerator.Current;
+			}
+
+			return _peekToken;
+		}
+
+		internal TagTokenType PeekTokenType()
+		{
+			TagToken peekToken = PeekToken();
+
+			if(peekToken != null)
+				return peekToken.TokenType;
+			else
+				return TagTokenType.AtEof;
+		}
 	}
 }

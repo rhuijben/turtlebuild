@@ -8,12 +8,12 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 	/// 
 	/// </summary>
 	[Serializable]
-	public class LexerException : ExpressionException
+	public class ParserException : ExpressionException
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LexerException"/> class.
 		/// </summary>
-		public LexerException()
+		public ParserException()
 		{
 		}
 
@@ -23,23 +23,18 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// <param name="message">The message.</param>
 		/// <param name="expression">The expression.</param>
 		/// <param name="position">The position.</param>
-		public LexerException(string message, string expression, int position)			
-			: base(string.Format("{0} while parsing '{1}' at position '{2}'", message, expression, position))
-		{
-		}
-
-		internal LexerException(string message, ParserState state)
-			: this(message, state.Expression, state.TokenStartPosition)
+		internal ParserException(string message, TagToken token, ParserState state)			
+			: base(string.Format("{0} while parsing '{1}'", token))
 		{
 		}
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="LexerException"/> class.
+		/// Initializes a new instance of the <see cref="ParserException"/> class.
 		/// </summary>
 		/// <param name="message">The message.</param>
-		/// <param name="inner">The inner.</param>
-		public LexerException(string message, Exception inner)
-			: base(message, inner)
+		/// <param name="state">The state.</param>
+		internal ParserException(string message, ParserState state)
+			: base(string.Format("{0} while parsing '{1}'", state.Expression))
 		{
 		}
 	}

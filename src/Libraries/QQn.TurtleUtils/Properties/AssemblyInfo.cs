@@ -43,3 +43,5 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 [assembly: AssemblyVersion("1.0.*")]
 [assembly: NeutralResourcesLanguageAttribute("en")]
+[assembly: InternalsVisibleTo("TurtleBuild.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100839ea6b2c9937a00f7c4ff670b2d2db277ef7c10267c3583c622928a3a66e72a2a858b24b48606e9d13e1e357aaaef5cdc16ef2ce45359ce9e46d567427a53f265d5a1751df7b56bc3e32efb92a86e25689e46ac60539c4b5fa2c2676c9b3a21ed925f701c44c66f3ff8f9be4b26075ac34caf95d07af65df5f45f51dc296695")]
+

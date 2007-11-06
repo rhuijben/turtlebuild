@@ -14,7 +14,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// </summary>
 		/// <param name="state">The state.</param>
 		/// <returns></returns>
-		static Token GetNextToken(ParserState state)
+		internal static TagToken GetNextToken(ParserState state)
 		{
 			state.SkipWhitespace();
 
@@ -28,7 +28,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 					if(state.PeekChar == '=')
 					{
 						state.Next();
-						return state.CreateToken(TokenType.IsLte, "<=");
+						return state.CreateToken(TagTokenType.IsLte, "<=");
 					}
 					else
 						return state.CreateToken('<');
@@ -37,7 +37,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 					if (state.PeekChar == '=')
 					{
 						state.Next();
-						return state.CreateToken(TokenType.IsGte, ">=");
+						return state.CreateToken(TagTokenType.IsGte, ">=");
 					}
 					else
 						return state.CreateToken('>');
@@ -46,7 +46,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 					if (state.PeekChar == '=')
 					{
 						state.Next();
-						return state.CreateToken(TokenType.IsNot, "!=");
+						return state.CreateToken(TagTokenType.IsNot, "!=");
 					}
 					else
 						return state.CreateToken('!');
@@ -54,7 +54,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 					if (state.PeekChar == '=')
 					{
 						state.Next();
-						return state.CreateToken(TokenType.IsEqual, "==");
+						return state.CreateToken(TagTokenType.IsEqual, "==");
 					}
 
 					throw new LexerException("Ill formatted equals in expression", state);
@@ -69,13 +69,13 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 					if (!state.Args.AllowProperties)
 						throw new LexerException("A property reference is not allowed at this point", state);
 
-					return ParsePropertyOrTag(state, TokenType.Property);
+					return ParsePropertyOrTag(state, TagTokenType.Property);
 
 				case '%':
 					if (!state.Args.AllowTags)
 						throw new LexerException("A tag reference is not allowed at this point", state);
 
-					return ParsePropertyOrTag(state, TokenType.Tag);
+					return ParsePropertyOrTag(state, TagTokenType.Tag);
 				
 				case '@':
 					if(!state.Args.AllowItems)
@@ -93,7 +93,35 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			}
 		}
 
-		static Token ParseLiteral(ParserState state, char c)
+		/// <summary>
+		/// Walks the tokens.
+		/// </summary>
+		/// <param name="state">The state.</param>
+		/// <returns></returns>
+		internal static IEnumerable<TagToken> WalkTokens(ParserState state)
+		{
+			TagToken tk;
+
+			while (null != (tk = GetNextToken(state)))
+			{
+				yield return tk;
+			}
+		}
+
+		/// <summary>
+		/// Walks the tokens.
+		/// </summary>
+		/// <param name="expression">The expression.</param>
+		/// <param name="args">The args.</param>
+		/// <returns></returns>
+		public static IEnumerable<TagToken> WalkTokens(string expression, ParserArgs args)
+		{
+			ParserState state = new ParserState(expression, args);
+
+			return WalkTokens(new ParserState(expression, args));
+		}
+
+		static TagToken ParseLiteral(ParserState state, char c)
 		{
 			// We skipped whitespace at this point
 			if (c == '_' || char.IsLetter(c))
@@ -101,20 +129,18 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 				state.SkipLiteralChars();
 
 				if(state.LiteralEquals("and"))
-					return state.CreateToken(TokenType.And, state.CurrentTokenText);
+					return state.CreateToken(TagTokenType.And, "and");
 				else if(state.LiteralEquals("or"))
-					return state.CreateToken(TokenType.Or, state.CurrentTokenText);
+					return state.CreateToken(TagTokenType.Or, "or");
 
 				string name = state.CurrentTokenText;
 
 				state.SkipWhitespace();
 
 				if (state.PeekChar == '(')
-				{
-					state.CreateToken(TokenType.Function, name.Trim());
-				}
+					return state.CreateToken(TagTokenType.Function, name.Trim());
 				else
-					state.CreateToken(TokenType.Literal, name.Trim());
+					return state.CreateToken(TagTokenType.Literal, name.Trim());
 			}
 			else if ((c == '+') || (c == '-') || (c == '.') || char.IsDigit(c))
 			{
@@ -124,7 +150,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			throw new LexerException(string.Format("Unexpected character '{0}' in expression", c), state);
 		}
 
-		static Token ParseNumber(ParserState state, char c)
+		static TagToken ParseNumber(ParserState state, char c)
 		{
 			if (c == '0' && state.PeekChar == 'x' || state.PeekChar == 'X')
 			{
@@ -133,7 +159,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 				// Scanning 0x0E3F hex string
 				state.SkipHexDigits(); // Bug: 0x is a valid value!
 
-				return state.CreateToken(TokenType.Number, state.CurrentTokenText);
+				return state.CreateToken(TagTokenType.Number, state.CurrentTokenText);
 			}
 			else if (c == '+' || c == '-')
 			{
@@ -151,27 +177,24 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 				state.SkipDigits();
 			}
 
-			return state.CreateToken(TokenType.Number, state.CurrentTokenText);
+			return state.CreateToken(TagTokenType.Number, state.CurrentTokenText);
 		}
 
-		static Token ParseItem(ParserState state)
+		static TagToken ParseItem(ParserState state)
 		{
 			ParseItemInternal(state);
 
-			throw new Exception();
+			return state.CreateToken(TagTokenType.Item, state.CurrentTokenText);
 		}
 
-		static void ParseItemInternal(ParserState state)
+		static TagToken ParsePropertyOrTag(ParserState state, TagTokenType type)
 		{
- 			throw new Exception("The method or operation is not implemented.");
+			ParsePropertyOrTagInternal(state);
+
+			return state.CreateToken(type, state.CurrentTokenText);
 		}
 
-		static Token ParsePropertyOrTag(ParserState state, TokenType type)
-		{
-			throw new Exception();
-		}
-
-		static Token ScanQuoteString(ParserState state)
+		static TagToken ScanQuoteString(ParserState state)
 		{
 			char c;
 			do
@@ -186,7 +209,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 					case '%':
 						if(state.Args.AllowTags && state.PeekChar == '(')
 						{
-							ParseTagInternal(state);
+							ParsePropertyOrTagInternal(state);
 							continue;
 						}
 						goto default;
@@ -200,7 +223,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 					case '$':
 						if(state.Args.AllowProperties && state.PeekChar == '(')
 						{
-							ParsePropertyInternal(state);
+							ParsePropertyOrTagInternal(state);
 							continue;
 						}
 						goto default;
@@ -213,7 +236,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 
 			if(c == '\'')
 			{
-				return state.CreateToken(TokenType.String, state.CurrentTokenText);
+				return state.CreateToken(TagTokenType.String, state.CurrentTokenText);
 			}
 			else if(state.AtEnd)
 				throw new LexerException("Unexpected end of expression in string", state);
@@ -221,14 +244,45 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 				throw new LexerException(string.Format("Unexpected character '{0}' in string", c), state);
 		}
 
-		private static void ParseTagInternal(ParserState state)
+		private static void ParsePropertyOrTagInternal(ParserState state)
 		{
-			throw new Exception("The method or operation is not implemented.");
+			char c = state.NextChar();
+
+			if(c != '(')
+				throw new LexerException("Expected '('", state);
+
+			while(!state.AtEnd)
+			{
+				c = state.NextChar();
+
+				if(c == ')')
+					break;
+			}
+
+			if(c != ')')
+				throw new LexerException("Expected ')' before the end of the expression", state);
 		}
 
-		private static void ParsePropertyInternal(ParserState state)
+		static void ParseItemInternal(ParserState state)
 		{
-			throw new Exception("The method or operation is not implemented.");
+			char c = state.NextChar();
+
+			if (c != '(')
+				throw new LexerException("Expected '('", state);
+
+			bool quote = false;
+			while (!state.AtEnd)
+			{
+				c = state.NextChar();
+
+				if (c == '\'')
+					quote = !quote;
+				else if (c == ')' && !quote)
+					break;
+			}
+
+			if (c != ')' || quote)
+				throw new LexerException("Expected ')' before the end of the expression", state);
 		}
 	}
 }

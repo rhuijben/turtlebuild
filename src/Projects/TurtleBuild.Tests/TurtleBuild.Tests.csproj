@@ -8,7 +8,9 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TurtleTests</RootNamespace>
-    <AssemblyName>TurtleTests</AssemblyName>
+    <AssemblyName>TurtleBuild.Tests</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>TurtleBuild.Tests.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,6 +45,8 @@
     <Compile Include="DirMapTests.cs" />
     <Compile Include="PackTests.cs" />
     <Compile Include="PathTests.cs" />
+    <Compile Include="Tags\LexerTests.cs" />
+    <Compile Include="Tags\ParserTests.cs" />
     <Compile Include="UtilTests.cs" />
     <Compile Include="VersionResourceTests.cs" />
     <Compile Include="CryptoTests.cs" />
@@ -76,6 +80,9 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{B4F97281-0DBD-4835-9ED8-7DFB966E87FF}" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TurtleBuild.Tests.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

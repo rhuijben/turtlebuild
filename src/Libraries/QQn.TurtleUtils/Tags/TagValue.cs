@@ -7,7 +7,7 @@ namespace QQn.TurtleUtils.Tags
 	/// <summary>
 	/// 
 	/// </summary>
-	public abstract class TagExpression
+	public abstract class TagValue
 	{
 		TagEnvironment _environment;
 
