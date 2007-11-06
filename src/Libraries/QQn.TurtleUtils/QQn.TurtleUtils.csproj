@@ -98,6 +98,7 @@
     <None Include="QQn.TurtleUtils.snk" />
     <Compile Include="Cryptography\QQnHashComparer.cs" />
     <Compile Include="Globalization\QQnDateUtils.cs" />
+    <Compile Include="Items\ICollectionItem.cs" />
     <Compile Include="IO\DirectoryMap.cs" />
     <Compile Include="IO\DirectoryMapData.cs" />
     <Compile Include="IO\DirectoryMapDirectory.cs" />
@@ -108,6 +109,19 @@
     <Compile Include="IO\QQnPath.cs" />
     <Compile Include="IO\SeekableStream.cs" />
     <Compile Include="IO\DeleteOnCloseStream.cs" />
+    <Compile Include="Items\ItemCollection.cs" />
+    <Compile Include="Items\KeyedItemCollection.cs" />
+    <Compile Include="Tags\ExpressionParser\Lexer.cs" />
+    <Compile Include="Tags\ExpressionParser\LexerException.cs" />
+    <Compile Include="Tags\ExpressionParser\ParserArgs.cs" />
+    <Compile Include="Tags\ExpressionParser\ParserState.cs" />
+    <Compile Include="Tags\ExpressionParser\Token.cs" />
+    <Compile Include="Tags\TagContext.cs" />
+    <Compile Include="Tags\TagItem.cs" />
+    <Compile Include="Tags\TagItemKey.cs" />
+    <Compile Include="Tags\TagProperty.cs" />
+    <Compile Include="Tags\TagEnvironment.cs" />
+    <Compile Include="Tags\TagValue.cs" />
     <Compile Include="Tokens\Converters\UtcDateTimeConverter.cs" />
     <Compile Include="Tokens\Converters\VersionConverter.cs" />
     <Compile Include="Tokens\ITokenizerInitialize.cs" />

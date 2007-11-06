@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections.ObjectModel;
 using QQn.TurtleUtils.Tokens;
+using QQn.TurtleUtils.Items;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
@@ -18,7 +19,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// </summary>
 		public TBLogReferences()
 		{
-			_projectReferences = new TBReferenceCollection<TBLogProjectReference>(this);
+			_projectReferences = new TBLogItemCollection<TBLogProjectReference>(this);
 		}
 
 		/// <summary>
@@ -30,12 +31,14 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		{
 			get { return _projectReferences; }
 		}
+
+		
 	}
 
 	/// <summary>
 	/// 
 	/// </summary>
-	public class TBLogProjectReference : TBLogItem
+	public class TBLogProjectReference : TBLogItem, ICollectionItem<TBLogProjectReference>
 	{
 		string _name;
 
@@ -50,5 +53,33 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 			set { _name = value; }
 		}
 
+
+		#region ICollectionItem<TBLogProjectReference> Members
+
+		Collection<TBLogProjectReference> _collection;
+		Collection<TBLogProjectReference> ICollectionItem<TBLogProjectReference>.Collection
+		{
+			get { return _collection; }
+			set { _collection = value; }
+		}
+
+		#endregion
+
+		/// <summary>
+		/// Gets the container.
+		/// </summary>
+		/// <value>The container.</value>
+		public override TBLogContainer Container
+		{
+			get 
+			{
+				TBLogItemCollection<TBLogProjectReference> collection = _collection as TBLogItemCollection<TBLogProjectReference>;
+
+				if (collection == null)
+					return null;
+
+				return collection.Container;
+			}
+		}
 	}
 }
