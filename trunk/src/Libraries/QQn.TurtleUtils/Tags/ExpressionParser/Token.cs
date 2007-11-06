@@ -4,12 +4,48 @@ using System.Text;
 
 namespace QQn.TurtleUtils.Tags.ExpressionParser
 {
-	enum TokenType
+	/// <summary>
+	/// 
+	/// </summary>
+	public enum TagTokenType
 	{
-		Zero=0,
+		/// <summary>
+		/// End of expression token
+		/// </summary>
+		AtEof=0,
 
+		/// <summary>
+		/// &lt;
+		/// </summary>
+		IsLt='<',
+		/// <summary>
+		/// &gt;
+		/// </summary>
+		IsGt = '>',
+
+		/// <summary>
+		/// ,
+		/// </summary>
+		Comma = ',',
+
+		/// <summary>
+		/// (
+		/// </summary>
+		ParenOpen = '(',
+		/// <summary>
+		/// )
+		/// </summary>
+		ParenClose = ')',
+
+		/// <summary>
+		/// !
+		/// </summary>
+		Not = '!',
 		
 		// Skip characters
+		/// <summary>
+		/// 
+		/// </summary>
 		LastCharacter = Char.MaxValue,
 		/// <summary>
 		/// &lt;=
@@ -65,17 +101,25 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// <summary>
 		/// $(aaaaa)
 		/// </summary>
-		Property
+		Property,
+
+		/// <summary>
+		/// @(ProjectOutput)
+		/// </summary>
+		Item
 	}
 
-	class Token
+	/// <summary>
+	/// 
+	/// </summary>
+	public class TagToken
 	{
-		readonly TokenType _type;
+		readonly TagTokenType _type;
 		int _offset;
 		int _len;
 		string _value;
 
-		public Token(TokenType type, int position, int len, string value)
+		internal TagToken(TagTokenType type, int position, int len, string value)
 		{
 			_type = type;
 			_offset = position;
@@ -83,22 +127,41 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			_value = value;
 		}
 
-		public Token(char token, int offset)
+		internal TagToken(char token, int offset)
 		{
-			_type = (TokenType)token;
+			_type = (TagTokenType)token;
 			_offset = offset;
 		}
 
+		/// <summary>
+		/// Returns a <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+		/// </summary>
+		/// <returns>
+		/// A <see cref="T:System.String"/> that represents the current <see cref="T:System.Object"/>.
+		/// </returns>
 		public override string ToString()
 		{
 			return Value;
 		}
 
+		/// <summary>
+		/// Gets the type of the token.
+		/// </summary>
+		/// <value>The type of the token.</value>
+		public TagTokenType TokenType
+		{
+			get { return _type; }
+		}
+
+		/// <summary>
+		/// Gets the value.
+		/// </summary>
+		/// <value>The value.</value>
 		public string Value
 		{
 			get
 			{
-				return _value ?? ((_type <= TokenType.LastCharacter) ? ((char)_type).ToString() : _type.ToString());
+				return _value ?? ((_type <= TagTokenType.LastCharacter) ? ((char)_type).ToString() : _type.ToString());
 			}
 		}
 	}
