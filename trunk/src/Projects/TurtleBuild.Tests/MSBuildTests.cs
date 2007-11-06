@@ -253,14 +253,14 @@ namespace TurtleTests
 						case ".DLL":
 							if (reference == null)
 							{
-								reference = AssemblyUtils.GetDebugReference(item.FullFromSrc);
+								reference = AssemblyUtils.GetDebugReference(item.FullSrc);
 
 								Assert.That(reference, Is.Not.Null);
 								Assert.That(reference.PdbFile, Is.Not.Null);
 							}
 							else
 							{
-								DebugReference dr = AssemblyUtils.GetDebugReference(item.FullFromSrc);
+								DebugReference dr = AssemblyUtils.GetDebugReference(item.FullSrc);
 
 								Assert.That(dr, Is.Not.Null);
 								// Path does not have to equal; the pdb information contains the sourcepath (obj directory for c# code)

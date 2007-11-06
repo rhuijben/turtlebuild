@@ -12,13 +12,13 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// </summary>
 	public class TBLogContent : TBLogContainer
 	{
-		readonly TBReferenceCollection<TBLogItem> _items;
+		readonly TBLogItemCollection<TBLogItem> _items;
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TBLogContent"/> class.
 		/// </summary>
 		public TBLogContent()
 		{
-			 _items = new TBReferenceCollection<TBLogItem>(this);
+			_items = new TBLogItemCollection<TBLogItem>(this);
 		}
 
 		/// <summary>

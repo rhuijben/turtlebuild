@@ -4,6 +4,7 @@ using System.Text;
 using QQn.TurtleUtils.Tokens;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using QQn.TurtleUtils.Items;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
@@ -12,14 +13,14 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// </summary>
 	public class TBLogProjectOutput : TBLogContainer
 	{
-		readonly TBReferenceCollection<TBLogItem> _items;
+		readonly TBLogItemCollection<TBLogItem> _items;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TBLogProjectOutput"/> class.
 		/// </summary>
 		public TBLogProjectOutput()
 		{
-			_items = new TBReferenceCollection<TBLogItem>(this);
+			_items = new TBLogItemCollection<TBLogItem>(this);
 		}
 
 		/// <summary>
@@ -33,36 +34,6 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		{
 			[DebuggerStepThrough]
 			get { return _items; }
-		}
-	}
-
-	class TBReferenceCollection<T> : TBLogItemCollection<T>
-		where T : TBLogItem
-	{
-		readonly TBLogContainer _parent;
-
-		public TBReferenceCollection(TBLogContainer parent)
-		{
-			_parent = parent;
-		}
-
-		protected override void InsertItem(int index, T item)
-		{
-			base.InsertItem(index, item);
-			item.Container = _parent;
-		}
-
-		protected override void SetItem(int index, T item)
-		{
-			this[index].Container = null;
-			base.SetItem(index, item);
-			item.Container = _parent;
-		}
-
-		protected override void RemoveItem(int index)
-		{
-			this[index].Container = null;
-			base.RemoveItem(index);
 		}
 	}
 }

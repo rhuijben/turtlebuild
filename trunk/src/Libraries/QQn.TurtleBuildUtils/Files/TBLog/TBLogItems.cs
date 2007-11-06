@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Collections.ObjectModel;
 using QQn.TurtleUtils.IO;
+using QQn.TurtleUtils.Items;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
@@ -13,9 +14,8 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// 
 	/// </summary>
 	[DebuggerDisplay("src={Src}, fromSrc={FromSrc}")]
-	public class TBLogItem
+	public class TBLogItem : ICollectionItem<TBLogItem>
 	{
-		TBLogContainer _container;
 		string _src;
 		string _fromSrc;
 
@@ -63,7 +63,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// <value>The full SRC.</value>
 		public string FullSrc
 		{
-			get { return (_container != null && !string.IsNullOrEmpty(Src)) ? QQnPath.Combine(_container.BasePath, Src) : null; }
+			get { return (Container != null && !string.IsNullOrEmpty(Src)) ? QQnPath.Combine(Container.BasePath, Src) : null; }
 		}
 
 		/// <summary>
@@ -72,17 +72,35 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// <value>The full from SRC.</value>
 		public string FullFromSrc
 		{
-			get { return (_container != null && !string.IsNullOrEmpty(FromSrc)) ? QQnPath.Combine(_container.BasePath, FromSrc) : null; }
+			get { return (Container != null && !string.IsNullOrEmpty(FromSrc)) ? QQnPath.Combine(Container.BasePath, FromSrc) : null; }
 		}
 
+		#region ICollectionItem<TBLogItem> Members
+
+		Collection<TBLogItem> _collection;
+		Collection<TBLogItem> ICollectionItem<TBLogItem>.Collection
+		{
+			get { return _collection; }
+			set { _collection = value; }
+		}
+
+		#endregion
+
 		/// <summary>
-		/// Gets or sets the container.
+		/// Gets the container.
 		/// </summary>
 		/// <value>The container.</value>
-		public TBLogContainer Container
+		public virtual TBLogContainer Container
 		{
-			get { return _container; }
-			internal set { _container = value; }
+			get 
+			{
+				TBLogItemCollection<TBLogItem> collection = _collection as TBLogItemCollection<TBLogItem>;
+
+				if (collection == null)
+					return null;
+
+				return collection.Container;
+			}
 		}
 	}
 
@@ -90,15 +108,20 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// Collection of <see cref="TBLogItem"/> instances, indexed by <see cref="TBLogItem.Src"/>
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
-	public class TBLogItemCollection<T> : KeyedCollection<string, T>
-		where T : TBLogItem
+	public class TBLogItemCollection<T> : KeyedItemCollection<string, T>
+		where T : TBLogItem, ICollectionItem<T>
 	{
+		readonly TBLogContainer _container;
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TBLogItemCollection&lt;T&gt;"/> class.
 		/// </summary>
-		public TBLogItemCollection()
-			: base(StringComparer.OrdinalIgnoreCase, 16)
+		public TBLogItemCollection(TBLogContainer container)
+			: base(QQnPath.PathStringComparer, 16)
 		{
+			if (container == null)
+				throw new ArgumentNullException("container");
+
+			_container = container;
 		}
 
 		/// <summary>
@@ -109,6 +132,15 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		protected override string GetKeyForItem(T item)
 		{
 			return item.Src;
+		}
+
+		/// <summary>
+		/// Gets the container.
+		/// </summary>
+		/// <value>The container.</value>
+		public TBLogContainer Container
+		{
+			get { return _container; }
 		}
 	}
 

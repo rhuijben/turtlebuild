@@ -19,6 +19,7 @@ namespace QQn.TurtleMSBuild
 			_itemSpec = itemSpec;
 			_metaData = new NameValueCollection();
 		}
+
 		#region ITaskItem Members
 
 		/// <summary>
