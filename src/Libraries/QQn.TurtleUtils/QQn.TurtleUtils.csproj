@@ -111,7 +111,7 @@
     <Compile Include="IO\DeleteOnCloseStream.cs" />
     <Compile Include="Items\ItemCollection.cs" />
     <Compile Include="Items\KeyedItemCollection.cs" />
-    <Compile Include="Tags\ExpressionParser\AndExpression.cs" />
+    <Compile Include="Tags\ExpressionParser\AndOrExpression.cs" />
     <Compile Include="Tags\ExpressionParser\BinaryExpression.cs" />
     <Compile Include="Tags\ExpressionParser\CompareExpression.cs" />
     <Compile Include="Tags\ExpressionParser\DynamicStringExpression.cs" />
@@ -121,7 +121,6 @@
     <Compile Include="Tags\ExpressionParser\LexerException.cs" />
     <Compile Include="Tags\ExpressionParser\NotExpression.cs" />
     <Compile Include="Tags\ExpressionParser\NumberExpression.cs" />
-    <Compile Include="Tags\ExpressionParser\OrExpression.cs" />
     <Compile Include="Tags\ExpressionParser\ParenExpression.cs" />
     <Compile Include="Tags\ExpressionParser\Parser.cs" />
     <Compile Include="Tags\ExpressionParser\ParserArgs.cs" />

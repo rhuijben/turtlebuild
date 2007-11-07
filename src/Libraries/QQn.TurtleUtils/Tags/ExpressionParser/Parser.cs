@@ -34,34 +34,121 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			TagExpression expr = CompleteExpression(state);
 
 			if (expr != null)
-			{
-				return ResolveAndOrConflicts(expr, state);
-			}
+				ResolveAndOrConflicts(expr, state);
 
-			return null;
+			return expr;
 		}
 
-		private static TagExpression ResolveAndOrConflicts(TagExpression expr, ParserState state)
+		internal static void ResolveAndOrConflicts(TagExpression expr, ParserState state)
 		{
-			return expr;
+			if (expr == null)
+				throw new ArgumentNullException("expr");
+
+			AndOrExpression andOr = expr as AndOrExpression;
+			if(andOr != null && (andOr.LeftHand is AndOrExpression || andOr.RightHand is AndOrExpression))
+			{
+				List<TagToken> tokens = new List<TagToken>();
+				List<TagExpression> exprs = new List<TagExpression>();
+
+				AddAndOr(andOr, tokens, exprs); // Create a list of tokens and separating expressions
+
+				if (exprs.Count != tokens.Count + 1)
+					throw new InvalidOperationException(); // Not a valid token chain
+
+				TagTokenType tt = tokens[0].TokenType;
+
+				bool hasConflict = false;
+				for(int i = 1; i < tokens.Count; i++)
+					if(tokens[i].TokenType != tt)
+					{
+						if(!state.Args.ApplyAndOrPriority)
+							throw new PriorityException("And or conflict; please resolve using parens", tokens[i], state);
+						else
+						{
+							hasConflict = true;
+						}
+					}
+
+				if (hasConflict)
+				{
+					// We re-orden the children to prioritize 'and' above 'or'
+
+					// We assume: we have at least one 'and' at least one 'or'
+
+					int i;
+
+					// Re-create all groups of and-s, from the back
+					while (0 <= (i = LastToken(tokens, TagTokenType.And)))
+					{
+						exprs[i] = new AndOrExpression(tokens[i], exprs[i], exprs[i + 1]);
+						tokens.RemoveAt(i);
+						exprs.RemoveAt(i + 1);
+					}
+
+					// Re-create all groups of or-s, from the back
+					while (1 <= (i = LastToken(tokens, TagTokenType.Or)))
+					{
+						exprs[i] = new AndOrExpression(tokens[i], exprs[i], exprs[i + 1]);
+						tokens.RemoveAt(i);
+						exprs.RemoveAt(i + 1);
+					}
+
+					if (exprs.Count != 2 && tokens.Count != 1)
+						throw new InvalidOperationException();
+
+					andOr.ForceExpression(tokens[0], exprs[0], exprs[1]);
+				}				
+			}
+
+			
+			TagExpression[] te = expr.SubExpressions;
+
+			if (te != null)
+			{				
+				foreach (TagExpression ee in te)
+					ResolveAndOrConflicts(ee, state);
+			}
+		}
+
+		private static int LastToken(List<TagToken> tokens, TagTokenType tokenType)
+		{
+			for (int i = tokens.Count - 1; i >= 0; i--)
+			{
+				if (tokens[i].TokenType == tokenType)
+					return i;
+			}
+			return -1;
+		}
+
+		private static void AddAndOr(TagExpression tagExpression, List<TagToken> tokens, List<TagExpression> exprs)
+		{
+			AndOrExpression andOr = tagExpression as AndOrExpression;
+
+			if (andOr != null)
+			{
+				AddAndOr(andOr.LeftHand, tokens, exprs);
+				tokens.Add(andOr.Token);
+				AddAndOr(andOr.RightHand, tokens, exprs);
+			}
+			else
+				exprs.Add(tagExpression);
 		}
 
 		internal static TagExpression CompleteExpression(ParserState state)
 		{
-			TagExpression expr = BooleanExpression(state);
+			TagExpression expr = Expr(state);
 
 			while (state.PeekTokenType() != TagTokenType.AtEof)
 			{
 				TagToken tk = state.NextToken();
-
 				switch (tk.TokenType)
 				{
 					case TagTokenType.Or:
-						expr = new OrExpression(tk, expr, BooleanExpression(state));
+						expr = new AndOrExpression(tk, expr, BooleanExpression(state));
 						break;
 
 					case TagTokenType.And:
-						expr = new AndExpression(tk, expr, BooleanExpression(state));
+						expr = new AndOrExpression(tk, expr, BooleanExpression(state));
 						break;
 
 					default:
@@ -79,6 +166,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			if (baseExpression == null)
 				return null; // Should not happen
 
+			TagToken token;
 			switch (state.PeekTokenType())
 			{
 				case TagTokenType.IsEqual:
@@ -87,9 +175,10 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 				case TagTokenType.IsLt:
 				case TagTokenType.IsGt:
 				case TagTokenType.IsGte:
-					TagToken expression = state.NextToken();
+					token = state.NextToken();
 
-					return new CompareExpression(expression, baseExpression, Part(state));
+					return new CompareExpression(token, baseExpression, Part(state));				
+
 				default:
 					return baseExpression;
 			}			
@@ -197,7 +286,17 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 
 		private static TagExpression Expr(ParserState state)
 		{
-			throw new Exception("The method or operation is not implemented.");
+			TagExpression expr = BooleanExpression(state);
+
+			switch(state.PeekTokenType())
+			{
+				case TagTokenType.Or:
+					return new AndOrExpression(state.NextToken(), expr, BooleanExpression(state));
+				case TagTokenType.And:
+					return new AndOrExpression(state.NextToken(), expr, BooleanExpression(state));
+				default:
+					return expr;
+			}
 		}
 
 

@@ -21,10 +21,10 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// Initializes a new instance of the <see cref="LexerException"/> class.
 		/// </summary>
 		/// <param name="message">The message.</param>
-		/// <param name="expression">The expression.</param>
-		/// <param name="position">The position.</param>
+		/// <param name="token">The token.</param>
+		/// <param name="state">The state.</param>
 		internal ParserException(string message, TagToken token, ParserState state)			
-			: base(string.Format("{0} while parsing '{1}'", token))
+			: base(string.Format("{0} while parsing '{1}'", message, token))
 		{
 		}
 
@@ -34,7 +34,39 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// <param name="message">The message.</param>
 		/// <param name="state">The state.</param>
 		internal ParserException(string message, ParserState state)
-			: base(string.Format("{0} while parsing '{1}'", state.Expression))
+			: base(string.Format("{0} while parsing '{1}'", message, state.Expression))
+		{
+		}
+	}
+
+	[Serializable]
+	public class PriorityException : ParserException
+	{
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LexerException"/> class.
+		/// </summary>
+		public PriorityException()
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="LexerException"/> class.
+		/// </summary>
+		/// <param name="message">The message.</param>
+		/// <param name="token">The token.</param>
+		/// <param name="state">The state.</param>
+		internal PriorityException(string message, TagToken token, ParserState state)			
+			: base(message, token, state)
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ParserException"/> class.
+		/// </summary>
+		/// <param name="message">The message.</param>
+		/// <param name="state">The state.</param>
+		internal PriorityException(string message, ParserState state)
+			: base(message, state)
 		{
 		}
 	}

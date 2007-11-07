@@ -31,6 +31,10 @@ namespace QQn.TurtleUtils.Tags
 	{
 		readonly TagToken _token;
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="TagExpression"/> class.
+		/// </summary>
+		/// <param name="token">The token.</param>
 		protected TagExpression(TagToken token)
 		{
 			if (token == null)
@@ -54,7 +58,7 @@ namespace QQn.TurtleUtils.Tags
 		/// Gets the token.
 		/// </summary>
 		/// <value>The token.</value>
-		public TagToken Token
+		public virtual TagToken Token
 		{
 			get { return _token; }
 		}
@@ -65,7 +69,7 @@ namespace QQn.TurtleUtils.Tags
 		/// <value>The type of the token.</value>
 		public virtual TagTokenType TokenType
 		{
-			get { return _token.TokenType; }
+			get { return Token.TokenType; }
 		}
 
 		/// <summary>

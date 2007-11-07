@@ -129,9 +129,9 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 				state.SkipLiteralChars();
 
 				if(state.LiteralEquals("and"))
-					return state.CreateToken(TagTokenType.And, "and");
+					return state.CreateToken(TagTokenType.And, "AND");
 				else if(state.LiteralEquals("or"))
-					return state.CreateToken(TagTokenType.Or, "or");
+					return state.CreateToken(TagTokenType.Or, "OR");
 
 				string name = state.CurrentTokenText;
 
