@@ -6,8 +6,9 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 {
 	class BinaryExpression : TagExpression
 	{
-		readonly TagExpression _lhs;
-		readonly TagExpression _rhs;
+		TagExpression _lhs; // Only editted by and and or-reordering
+		TagExpression _rhs;
+		bool _editable;
 
 		public BinaryExpression(TagToken token, TagExpression lhs, TagExpression rhs)
 			: base(token)
@@ -37,6 +38,12 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		public TagExpression LeftHand
 		{
 			get { return _lhs; }
+			internal set
+			{
+				if (!_editable)
+					throw new InvalidOperationException();
+				_lhs = value;
+			}
 		}
 
 		/// <summary>
@@ -46,6 +53,21 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		public TagExpression RightHand
 		{
 			get { return _rhs; }
+			internal set
+			{
+				if (!_editable)
+					throw new InvalidOperationException();
+				_rhs = value;
+			}
+		}
+
+		/// <summary>
+		/// Sets the LeftHand and RightHand editable state
+		/// </summary>
+		/// <param name="value">if set to <c>true</c> [value].</param>
+		internal void SetEditable(bool value)
+		{
+			_editable = value;
 		}
 
 		public override string ToString()

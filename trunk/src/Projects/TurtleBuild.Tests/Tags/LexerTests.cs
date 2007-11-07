@@ -86,7 +86,7 @@ namespace TurtleTests.Tags
 			tk = Lexer.GetNextToken(state);
 
 			Assert.That(tk.TokenType, Is.EqualTo(TagTokenType.Or));
-			Assert.That(tk.Value, Is.EqualTo("or"));
+			Assert.That(tk.Value, Is.EqualTo("OR"));
 
 			tk = Lexer.GetNextToken(state);
 

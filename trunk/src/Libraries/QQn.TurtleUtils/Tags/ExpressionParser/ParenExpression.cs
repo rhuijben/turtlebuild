@@ -10,5 +10,10 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			: base(token, inner)
 		{
 		}
+
+		public override string ToString()
+		{
+			return InnerExpression.ToString();
+		}
 	}
 }

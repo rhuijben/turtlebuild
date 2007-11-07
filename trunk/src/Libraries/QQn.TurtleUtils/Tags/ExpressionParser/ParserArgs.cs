@@ -12,6 +12,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		bool _allowProperties;
 		bool _allowTags;
 		bool _allowItems;
+		bool _applyAndOr;
 
 		/// <summary>
 		/// Gets or sets a value indicating whether to allow properties.
@@ -41,6 +42,17 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		{
 			get { return _allowItems; }
 			set { _allowItems = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets a value indicating whether to apply and-or priority.
+		/// </summary>
+		/// <value><c>true</c> if and-or priority should be applied; otherwise, <c>false</c>.</value>
+		/// <remarks>MSBuild does not support and-or priority resolving. This value should be set to false to stay compatible</remarks>
+		public bool ApplyAndOrPriority
+		{
+			get { return _applyAndOr; }
+			set { _applyAndOr = value; }
 		}
 
 		/// <summary>

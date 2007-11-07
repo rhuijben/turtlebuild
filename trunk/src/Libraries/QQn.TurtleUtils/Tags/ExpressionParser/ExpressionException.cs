@@ -4,6 +4,9 @@ using System.Text;
 
 namespace QQn.TurtleUtils.Tags.ExpressionParser
 {
+	/// <summary>
+	/// 
+	/// </summary>
 	[Serializable]
 	public class ExpressionException : Exception
 	{
