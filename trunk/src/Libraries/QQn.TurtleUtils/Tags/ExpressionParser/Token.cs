@@ -17,11 +17,11 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// <summary>
 		/// &lt;
 		/// </summary>
-		IsLt='<',
+		IsLessThan='<',
 		/// <summary>
 		/// &gt;
 		/// </summary>
-		IsGt = '>',
+		IsGreaterThan = '>',
 
 		/// <summary>
 		/// ,
@@ -112,11 +112,11 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 	/// <summary>
 	/// 
 	/// </summary>
-	public class TagToken
+	public sealed class TagToken
 	{
 		readonly TagTokenType _type;
-		int _offset;
-		int _len;
+		readonly int _offset;
+		readonly int _len;
 		string _value;
 
 		internal TagToken(TagTokenType type, int position, int len, string value)
@@ -163,6 +163,24 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			{
 				return _value ?? ((_type <= TagTokenType.LastCharacter) ? ((char)_type).ToString() : _type.ToString());
 			}
+		}
+
+		/// <summary>
+		/// Gets the length of the token within the original expression
+		/// </summary>
+		/// <value>The length.</value>
+		public int Length
+		{
+			get { return _len; }
+		}
+
+		/// <summary>
+		/// Gets the offset of the token within the original expression
+		/// </summary>
+		/// <value>The offset.</value>
+		public int Offset
+		{
+			get { return _offset; }
 		}
 	}
 }

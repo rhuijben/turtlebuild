@@ -4,7 +4,7 @@ using System.Text;
 
 namespace QQn.TurtleUtils.Tags.ExpressionParser
 {
-	class NumberExpression : TagExpression
+	sealed class NumberExpression : TagExpression
 	{
 		public NumberExpression(TagToken token)
 			: base(token)

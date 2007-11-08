@@ -131,8 +131,8 @@ namespace TurtleTests.Tags
 			Assert.That(Lexer.GetNextToken(state).TokenType, Is.EqualTo(TagTokenType.IsEqual));
 			Assert.That(Lexer.GetNextToken(state).TokenType, Is.EqualTo(TagTokenType.IsNot));
 			Assert.That(Lexer.GetNextToken(state).TokenType, Is.EqualTo(TagTokenType.IsLte));
-			Assert.That(Lexer.GetNextToken(state).TokenType, Is.EqualTo(TagTokenType.IsLt));
-			Assert.That(Lexer.GetNextToken(state).TokenType, Is.EqualTo(TagTokenType.IsGt));
+			Assert.That(Lexer.GetNextToken(state).TokenType, Is.EqualTo(TagTokenType.IsLessThan));
+			Assert.That(Lexer.GetNextToken(state).TokenType, Is.EqualTo(TagTokenType.IsGreaterThan));
 			Assert.That(Lexer.GetNextToken(state).TokenType, Is.EqualTo(TagTokenType.IsGte));
 			Assert.That(Lexer.GetNextToken(state).TokenType, Is.EqualTo(TagTokenType.Not));
 			Assert.That(Lexer.GetNextToken(state).TokenType, Is.EqualTo(TagTokenType.Or));
@@ -141,6 +141,32 @@ namespace TurtleTests.Tags
 			Assert.That(Lexer.GetNextToken(state).TokenType, Is.EqualTo(TagTokenType.ParenClose));
 
 			Assert.That(Lexer.GetNextToken(state), Is.Null);
+		}
+
+		[Test]
+		public void TagEscapes()
+		{
+			Assert.That(TagExpander.ItemRegex, Is.Not.Null);
+			Assert.That(TagExpander.KeyRegex, Is.Not.Null);
+			Assert.That(TagExpander.PropertyRegex, Is.Not.Null);
+
+			Assert.That(TagExpander.Escape("ba%nana"), Is.EqualTo("ba%nana"));
+			Assert.That(TagExpander.Escape("ba%20nana"), Is.EqualTo("ba%2520nana"));
+			Assert.That(TagExpander.Escape("ba%AQnana%"), Is.EqualTo("ba%25AQnana%"));
+			Assert.That(TagExpander.Escape("ba%(nana%a"), Is.EqualTo("ba%25(nana%25a"));
+
+			Assert.That(TagExpander.Unescape(TagExpander.Escape("ba%nana")), Is.EqualTo("ba%nana"));
+			Assert.That(TagExpander.Unescape(TagExpander.Escape("ba%20nana")), Is.EqualTo("ba%20nana"));
+			Assert.That(TagExpander.Unescape(TagExpander.Escape("ba%AQnana%")), Is.EqualTo("ba%AQnana%"));
+			Assert.That(TagExpander.Unescape(TagExpander.Escape("ba%(nana%a")), Is.EqualTo("ba%(nana%a"));
+
+			Assert.That(TagExpander.Escape("ba%(na)na"), Is.EqualTo("ba%25(na)na"));
+			Assert.That(TagExpander.Escape("ba%(na)na", true, false), Is.EqualTo("ba%(na)na"));
+
+
+			Assert.That(TagExpander.Unescape("ba@(na->'%qq%nn%27a')na", false), Is.EqualTo("ba@(na->'%qq%nn'a')na"));
+			Assert.That(TagExpander.Unescape("ba@(na->'%qq%nn%27a')na", true), Is.EqualTo("ba@(na->'%qq%nn%27a')na"));
+			Assert.That(TagExpander.Unescape("ba@( na -> '%qq%nn%27%25a' , '%25' )na", true), Is.EqualTo("ba@( na -> '%qq%nn%27%25a' , '%25' )na"));
 		}
 	}
 }

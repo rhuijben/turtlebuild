@@ -16,7 +16,7 @@ namespace QQn.TurtleUtils.Items
 		/// <summary>
 		/// Initializes a new instance of the <see cref="KeyedItemCollection&lt;TKey, TValue&gt;"/> class.
 		/// </summary>
-		public KeyedItemCollection()
+		protected KeyedItemCollection()
 			: base()
 		{
 		}
@@ -25,7 +25,7 @@ namespace QQn.TurtleUtils.Items
 		/// Initializes a new instance of the <see cref="KeyedItemCollection&lt;TKey, TValue&gt;"/> class.
 		/// </summary>
 		/// <param name="comparer">The comparer.</param>
-		public KeyedItemCollection(IEqualityComparer<TKey> comparer)
+		protected KeyedItemCollection(IEqualityComparer<TKey> comparer)
 			: base(comparer)
 		{
 		}
@@ -35,7 +35,7 @@ namespace QQn.TurtleUtils.Items
 		/// </summary>
 		/// <param name="comparer">The comparer.</param>
 		/// <param name="dictionaryCreationTreshold">The dictionary creation treshold.</param>
-		public KeyedItemCollection(IEqualityComparer<TKey> comparer, int dictionaryCreationTreshold)
+		protected KeyedItemCollection(IEqualityComparer<TKey> comparer, int dictionaryCreationTreshold)
 			: base(comparer, dictionaryCreationTreshold)
 		{
 		}

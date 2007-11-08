@@ -50,7 +50,7 @@ namespace QQn.TurtleUtils.Tags
 			if (string.IsNullOrEmpty(value))
 				throw new ArgumentNullException("value");
 
-			Value = value;
+			_value = value;
 		}
 
 		/// <summary>

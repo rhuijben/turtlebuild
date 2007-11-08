@@ -130,6 +130,7 @@
     <Compile Include="Tags\ExpressionParser\Token.cs" />
     <Compile Include="Tags\ExpressionParser\UnaryExpression.cs" />
     <Compile Include="Tags\TagContext.cs" />
+    <Compile Include="Tags\ExpressionParser\TagExpander.cs" />
     <Compile Include="Tags\TagExpression.cs" />
     <Compile Include="Tags\TagItem.cs" />
     <Compile Include="Tags\TagItemKey.cs" />

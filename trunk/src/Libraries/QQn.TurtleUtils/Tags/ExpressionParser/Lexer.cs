@@ -116,8 +116,6 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// <returns></returns>
 		public static IEnumerable<TagToken> WalkTokens(string expression, ParserArgs args)
 		{
-			ParserState state = new ParserState(expression, args);
-
 			return WalkTokens(new ParserState(expression, args));
 		}
 

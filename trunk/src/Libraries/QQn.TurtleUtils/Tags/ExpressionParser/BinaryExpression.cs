@@ -26,7 +26,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// Gets all sub expressions.
 		/// </summary>
 		/// <value>The sub expressions.</value>
-		protected internal override TagExpression[] SubExpressions
+		protected internal override IEnumerable<TagExpression> SubExpressions
 		{
 			get { return new TagExpression[] { _lhs, _rhs }; }
 		}
