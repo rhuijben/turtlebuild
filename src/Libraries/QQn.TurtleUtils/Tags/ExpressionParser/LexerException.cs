@@ -8,7 +8,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 	/// 
 	/// </summary>
 	[Serializable]
-	public class LexerException : ExpressionException
+	public sealed class LexerException : ExpressionException
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="LexerException"/> class.

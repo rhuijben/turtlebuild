@@ -8,25 +8,6 @@ namespace QQn.TurtleUtils.Tags
 	/// <summary>
 	/// 
 	/// </summary>
-	public enum TagValueType
-	{
-		/// <summary>
-		/// 
-		/// </summary>
-		String,
-		/// <summary>
-		/// 
-		/// </summary>
-		Number,
-		/// <summary>
-		/// 
-		/// </summary>
-		Bool
-	}
-
-	/// <summary>
-	/// 
-	/// </summary>
 	public class TagExpression
 	{
 		readonly TagToken _token;
@@ -72,13 +53,15 @@ namespace QQn.TurtleUtils.Tags
 			get { return Token.TokenType; }
 		}
 
+
+		static readonly IEnumerable<TagExpression> _emptyEnumerable = new TagExpression[0];
 		/// <summary>
 		/// Gets all sub expressions.
 		/// </summary>
 		/// <value>The sub expressions.</value>
-		protected internal virtual TagExpression[] SubExpressions
+		protected internal virtual IEnumerable<TagExpression> SubExpressions
 		{
-			get { return null; }
+			get { return _emptyEnumerable; }
 		}
 	}
 }

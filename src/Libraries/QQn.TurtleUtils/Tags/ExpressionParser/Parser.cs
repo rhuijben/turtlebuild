@@ -100,17 +100,11 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 				}				
 			}
 
-			
-			TagExpression[] te = expr.SubExpressions;
-
-			if (te != null)
-			{				
-				foreach (TagExpression ee in te)
-					ResolveAndOrConflicts(ee, state);
-			}
+			foreach (TagExpression ee in expr.SubExpressions)
+				ResolveAndOrConflicts(ee, state);
 		}
 
-		private static int LastToken(List<TagToken> tokens, TagTokenType tokenType)
+		static int LastToken(List<TagToken> tokens, TagTokenType tokenType)
 		{
 			for (int i = tokens.Count - 1; i >= 0; i--)
 			{
@@ -120,7 +114,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			return -1;
 		}
 
-		private static void AddAndOr(TagExpression tagExpression, List<TagToken> tokens, List<TagExpression> exprs)
+		static void AddAndOr(TagExpression tagExpression, List<TagToken> tokens, List<TagExpression> exprs)
 		{
 			AndOrExpression andOr = tagExpression as AndOrExpression;
 
@@ -172,8 +166,8 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 				case TagTokenType.IsEqual:
 				case TagTokenType.IsNot:
 				case TagTokenType.IsLte:
-				case TagTokenType.IsLt:
-				case TagTokenType.IsGt:
+				case TagTokenType.IsLessThan:
+				case TagTokenType.IsGreaterThan:
 				case TagTokenType.IsGte:
 					token = state.NextToken();
 

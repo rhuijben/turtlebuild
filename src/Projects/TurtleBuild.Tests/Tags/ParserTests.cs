@@ -6,7 +6,7 @@ using QQn.TurtleUtils.Tags;
 using QQn.TurtleUtils.Tags.ExpressionParser;
 using NUnit.Framework.SyntaxHelpers;
 
-namespace TurtleTests.Tags
+namespace QQn.TurtleUtils.Tags.ExpressionParser
 {
 	[TestFixture]
 	public class ParserTests

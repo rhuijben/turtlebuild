@@ -49,7 +49,7 @@ namespace QQn.TurtleUtils.Tags
 			if (string.IsNullOrEmpty(include))
 				throw new ArgumentNullException("include");
 
-			Include = include;
+			_include = include;
 		}
 
 		/// <summary>

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace QQn.TurtleUtils.Tags.ExpressionParser
 {
-	class FunctionExpression : TagExpression
+	sealed class FunctionExpression : TagExpression
 	{
 		readonly IList<TagExpression> _args;
 

@@ -18,6 +18,15 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		}
 
 		/// <summary>
+		/// Initializes a new instance of the <see cref="ParserException"/> class.
+		/// </summary>
+		/// <param name="message">The message.</param>
+		public ParserException(string message)
+			: base(message)
+		{
+		}
+
+		/// <summary>
 		/// Initializes a new instance of the <see cref="LexerException"/> class.
 		/// </summary>
 		/// <param name="message">The message.</param>
@@ -39,6 +48,9 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		}
 	}
 
+	/// <summary>
+	/// 
+	/// </summary>
 	[Serializable]
 	public class PriorityException : ParserException
 	{
@@ -46,6 +58,15 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// Initializes a new instance of the <see cref="LexerException"/> class.
 		/// </summary>
 		public PriorityException()
+		{
+		}
+
+		/// <summary>
+		/// Initializes a new instance of the <see cref="PriorityException"/> class.
+		/// </summary>
+		/// <param name="message">The message.</param>
+		public PriorityException(string message)
+			: base(message)
 		{
 		}
 
