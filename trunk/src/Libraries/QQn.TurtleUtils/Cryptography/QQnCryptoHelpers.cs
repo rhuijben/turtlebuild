@@ -423,7 +423,7 @@ namespace QQn.TurtleUtils.Cryptography
 			Byte clockSeqHi = hash[8];
 			Byte clockSeqLow = hash[9];
 
-			return new Guid(timeLow, timeMid, (short)((timeHiAndVersion & 0xFFF) | (5 << 12)), (byte)((clockSeqHi & 0x35) | 0x80), clockSeqLow, hash[10], hash[11], hash[12], hash[13], hash[14], hash[15]);
+			return new Guid(timeLow, timeMid, (short)((timeHiAndVersion & 0xFFF) | (5 << 12)), (byte)((clockSeqHi & 0x3F) | 0x80), clockSeqLow, hash[10], hash[11], hash[12], hash[13], hash[14], hash[15]);
 		}
 
 		/// <summary>
