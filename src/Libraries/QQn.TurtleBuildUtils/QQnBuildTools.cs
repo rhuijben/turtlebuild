@@ -72,14 +72,12 @@ namespace QQn.TurtleBuildUtils
 			using (StreamReader sr = File.OpenText(solution))
 			{
 				string line = sr.ReadLine();
-				
+
 				// First line should be empty
-				if ((line == null) || line.Trim().Length != 0)
-					return null;
+				while (line != null && line.Trim().Length == 0)
+					line = sr.ReadLine();
 
-				line = sr.ReadLine();
 				string start = "Microsoft Visual Studio Solution File, Format Version ";
-
 				if (line.StartsWith(start, StringComparison.InvariantCultureIgnoreCase))
 				{
 					return new Version(line.Substring(start.Length).Trim());
