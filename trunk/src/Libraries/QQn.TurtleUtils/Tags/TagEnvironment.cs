@@ -41,5 +41,33 @@ namespace QQn.TurtleUtils.Tags
 		{
 			get { return _items; }
 		}
+
+		/// <summary>
+		/// Runs the batch.
+		/// </summary>
+		/// <typeparam name="TKey">The type of the key.</typeparam>
+		/// <param name="definition">The definition.</param>
+		/// <returns></returns>
+		public IEnumerable<TagBatchInstance<TKey>> RunBatch<TKey>(TagBatchDefinition<TKey> definition)
+			where TKey: class
+		{
+			if(definition == null)
+				throw new ArgumentNullException("definition");
+
+			// We delegate to an implementation fuction to allow validating the parameters before the first for each step
+
+			definition.Prepare();
+			// TODO: Check if we have a single instance result or a result list
+			//definition.
+			return RunBatchInternal(definition);
+		
+		}
+
+		private IEnumerable<TagBatchInstance<TKey>> RunBatchInternal<TKey>(TagBatchDefinition<TKey> definition)
+			where TKey : class
+		{
+			// TODO: Create results
+			yield break;
+		}
 	}
 }

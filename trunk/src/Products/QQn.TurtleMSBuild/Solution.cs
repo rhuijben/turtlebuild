@@ -31,7 +31,7 @@ namespace QQn.TurtleMSBuild
 			Refresh();
 
 			if (UsedVCBuild)
-				VCBuildHandler.HandleProject(this);
+				ExternalBuildHandler.HandleProject(this);
 		}
 	}
 }

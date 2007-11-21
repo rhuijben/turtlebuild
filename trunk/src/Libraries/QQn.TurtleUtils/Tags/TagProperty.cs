@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Collections.ObjectModel;
 using QQn.TurtleUtils.Items;
 using System.ComponentModel;
+using QQn.TurtleUtils.Tags.ExpressionParser;
+using System.Text.RegularExpressions;
 
 namespace QQn.TurtleUtils.Tags
 {
@@ -142,6 +144,15 @@ namespace QQn.TurtleUtils.Tags
 				return collection.Environment;
 			}
 		}
+	
+		/// <summary>
+		/// Returns the value applied via <see cref="TagPropertyCollection.ExpandProperties(String)"/>
+		/// </summary>
+		/// <returns></returns>
+		public virtual string ExpandedValue()
+		{
+ 			return Value;
+		}
 	}
 
 	/// <summary>
@@ -163,7 +174,7 @@ namespace QQn.TurtleUtils.Tags
 		/// Initializes a new instance of the <see cref="TagPropertyCollection"/> class.
 		/// </summary>
 		/// <param name="environment">The environment.</param>
-		public TagPropertyCollection(TagEnvironment environment)
+		internal TagPropertyCollection(TagEnvironment environment)
 			: base(StringComparer.OrdinalIgnoreCase)
 		{
 			_environment = environment;
@@ -186,7 +197,7 @@ namespace QQn.TurtleUtils.Tags
 		/// <returns>The name for the specified element.</returns>
 		protected override string GetKeyForItem(TagProperty item)
 		{
-			return item.Value;
+			return item.Name;
 		}
 
 		/// <summary>
@@ -201,6 +212,82 @@ namespace QQn.TurtleUtils.Tags
 			Add(property);
 
 			return property;
+		}
+
+		/// <summary>
+		/// Sets the specified property to the specified value
+		/// </summary>
+		/// <param name="key">The key.</param>
+		/// <param name="value">The value.</param>
+		public void Set(string key, string value)
+		{
+			if (Contains(key))
+				this[key].Value = value;
+			else
+				this.Add(new TagProperty(key, value));
+		}
+
+		/// <summary>
+		/// Loads the environment variables of the current process in the collection
+		/// </summary>
+		/// <remarks>Skips properties duplicate properties and properties which already exist</remarks>
+		public void LoadEnvironmentVariables()
+		{
+			System.Collections.IDictionary vars = System.Environment.GetEnvironmentVariables();
+
+			foreach (string key in vars.Keys)
+			{
+				if (!Contains(key))
+					Add(key, (string)vars[key]);
+			}
+		}
+
+		/// <summary>
+		/// Expands the properties.
+		/// </summary>
+		/// <param name="value">The value.</param>
+		/// <param name="emptyUndefined">if set to <c>true</c> use "" for undefined properties, otherwise throw an argumentexception is thrown.</param>
+		/// <returns></returns>
+		public string ExpandProperties(string value, bool emptyUndefined)
+		{
+			if (value == null)
+				throw new ArgumentNullException("value");
+			else if (value.Length == 0)
+				return "";
+
+			return TagExpander.PropertyRegex.Replace(value,
+				emptyUndefined ? new MatchEvaluator(ApplyPropertyEmpty) : new MatchEvaluator(ApplyPropertyException));
+		}
+
+		/// <summary>
+		/// Expands the properties, using "" for undefined properties.
+		/// </summary>
+		/// <param name="value">The value.</param>
+		/// <returns></returns>
+		public string ExpandProperties(string value)
+		{
+			return ExpandProperties(value, true);
+		}
+
+
+		string ApplyPropertyEmpty(Match match)
+		{
+			string key = match.Groups[TagExpander.RegexGroupProperty].Value;
+
+			if (Contains(key))
+				return this[key].ExpandedValue();
+			else
+				return "";
+		}
+
+		string ApplyPropertyException(Match match)
+		{
+			string key = match.Groups[TagExpander.RegexGroupProperty].Value;
+
+			if (Contains(key))
+				return this[key].ExpandedValue();
+			else
+				throw new ArgumentException(string.Format("Invalid property reference: '{0}'", key), "key");
 		}
 	}
 }

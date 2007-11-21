@@ -51,6 +51,7 @@ namespace QQn.TurtleUtils.Items
 		{
 			base.InsertItem(index, item);
 			item.Collection = this;
+			_allKeys = null;
 		}
 
 		/// <summary>
@@ -63,6 +64,7 @@ namespace QQn.TurtleUtils.Items
 		{
 			this[index].Collection = null;
 			base.RemoveItem(index);
+			_allKeys = null;
 		}
 
 		/// <summary>
@@ -74,6 +76,7 @@ namespace QQn.TurtleUtils.Items
 				t.Collection = null;
 
 			base.ClearItems();
+			_allKeys = null;
 		}
 
 		/// <summary>
@@ -86,6 +89,30 @@ namespace QQn.TurtleUtils.Items
 			this[index].Collection = null;
 			base.SetItem(index, item);
 			item.Collection = this;
+			_allKeys = null;
+		}
+
+		ReadOnlyCollection<TKey> _allKeys;
+		/// <summary>
+		/// Gets a readonly collection containing all keys
+		/// </summary>
+		/// <value>All keys.</value>
+		
+		public ReadOnlyCollection<TKey> AllKeys
+		{
+			get { return _allKeys ?? (_allKeys = new KeyedItemKeyCollection(this)); }
+		}
+
+		sealed class KeyedItemKeyCollection : ReadOnlyCollection<TKey>
+		{
+			public KeyedItemKeyCollection(KeyedItemCollection<TKey, TValue> from)
+				: base(new List<TKey>())
+			{
+				foreach (TValue tv in from)
+				{
+					this.Items.Add(from.GetKeyForItem(tv));
+				}
+			}
 		}
 	}
 }

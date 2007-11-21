@@ -1,4 +1,4 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -11,6 +11,11 @@
     <AssemblyName>QQn.TurtleUtils</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>QQn.TurtleUtils.snk</AssemblyOriginatorKeyFile>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -129,6 +134,10 @@
     <Compile Include="Tags\ExpressionParser\StringExpression.cs" />
     <Compile Include="Tags\ExpressionParser\Token.cs" />
     <Compile Include="Tags\ExpressionParser\UnaryExpression.cs" />
+    <Compile Include="Tags\ITagItem.cs" />
+    <Compile Include="Tags\TagBatchDefinition.cs" />
+    <Compile Include="Tags\TagBatchInstance.cs" />
+    <Compile Include="Tags\TagBatchItem.cs" />
     <Compile Include="Tags\TagContext.cs" />
     <Compile Include="Tags\ExpressionParser\TagExpander.cs" />
     <Compile Include="Tags\TagExpression.cs" />

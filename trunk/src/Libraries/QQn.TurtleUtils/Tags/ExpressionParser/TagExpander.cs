@@ -11,22 +11,52 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 	/// </summary>
 	public static class TagExpander
 	{
-		const RegexOptions _reOptions = RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.CultureInvariant |RegexOptions.ExplicitCapture;
+		const RegexOptions _reOptions = RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.CultureInvariant |RegexOptions.ExplicitCapture | RegexOptions.Compiled;
 		// Regexes have an extra paren around them for allowing combinations
-		const string _itemRegex = @"(@\( \s* (?<ITEM>[A-Z_][A-Z0-9_-]*]*) \s* (-\> \s* '(?<TRANSFORM>[^']*)' \s* )? (\, \s* '(?<ITEM_SEPARATOR>[^']*)' \s*)? \))";
-		const string _keyRegex = @"(%\( \s* ((?<ITEM>[A-Z_][A-Z0-9-]*) \s* \. \s*)? (?<KEY>[A-Z_][A-Z0-9]*) \s* \))";
-		const string _propertyRegex = @"(\$\( \s* (?<PROPERTY>[A-Z_[A-Z0-9_-]&) \s* \))";
+		const string _itemRegex = @"(@\( \s* (?<ITEM>[A-Z_][A-Z0-9_-]*]*) \s* (\[ \s* (?<ITEM_CONDITION> ([^\]']|'[^']*'])* ) \s* \] \s*)?  (-\> \s* '(?<TRANSFORM>[^']*)' \s* )? (\, \s* '(?<ITEM_SEPARATOR>[^']*)' \s*)? \))";
+		const string _keyRegex = @"(%\( \s* ((?<ITEM_PREFIX>[A-Z_][A-Z0-9-]*) \s* \. \s*)? (?<KEY>[A-Z_][A-Z0-9]*) \s* \))";
+		const string _propertyRegex = @"(\$\( \s* (?<PROPERTY>[A-Z_][A-Z0-9_-]*) \s* \))";
 
 		static Regex _itemR;
 		static Regex _keyR;
 		static Regex _propertyR;
 		static Regex _ItemKeyOrPropertyR;
 
-
+		#region Public Regex definitions
+		/// <summary>
+		/// The name of the Item regex result in <see cref="ItemRegex"/>
+		/// </summary>
+		public const string RegexGroupItem = "ITEM";
+		/// <summary>
+		/// The name of the Item prefix regex result in <see cref="KeyRegex"/>
+		/// </summary>
+		public const string RegexGroupItemPrefix = "ITEM_PREFIX";
+		/// <summary>
+		/// The name of the Transform regex group in <see cref="ItemRegex"/>
+		/// </summary>
+		public const string RegexGroupTransform = "TRANSFORM";
+		/// <summary>
+		/// The name of the Separator regex group in <see cref="ItemRegex"/>
+		/// </summary>
+		public const string RegexGroupSeparator = "ITEM_SEPARATOR";
+		/// <summary>
+		/// The name of the Item condition regex group in <see cref="ItemRegex"/>
+		/// </summary>
+		public const string RegexGroupItemCondition = "ITEM_CONDITION";
+		/// <summary>
+		/// The name of the Key regex group in <see cref="KeyRegex"/>
+		/// </summary>
+		public const string RegexGroupKey = "KEY";
+		/// <summary>
+		/// The name of the Property regex group in <see cref="PropertyRegex"/>
+		/// </summary>
+		public const string RegexGroupProperty = "PROPERTY";
+		
 		/// <summary>
 		/// Gets the item regex.
 		/// </summary>
 		/// <value>The item regex.</value>
+		/// <remarks>Declares the groups <see cref="RegexGroupItem"/>, <see cref="RegexGroupSeparator"/> and <see cref="RegexGroupTransform"/></remarks>
 		public static Regex ItemRegex
 		{
 			get { return _itemR ?? (_itemR = new Regex(_itemRegex, _reOptions)); }
@@ -36,6 +66,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// Gets the key regex.
 		/// </summary>
 		/// <value>The key regex.</value>
+		/// <remarks>Declares the groups <see cref="RegexGroupKey"/> and <see cref="RegexGroupItemPrefix"/></remarks>
 		public static Regex KeyRegex
 		{
 			get { return _keyR ?? (_keyR = new Regex(_keyRegex, _reOptions)); }
@@ -45,6 +76,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// Gets the property regex.
 		/// </summary>
 		/// <value>The property regex.</value>
+		/// <remarks>Declares the group <see cref="RegexGroupProperty"/></remarks>
 		public static Regex PropertyRegex
 		{
 			get { return _propertyR ?? (_propertyR = new Regex(_propertyRegex, _reOptions)); }
@@ -54,10 +86,12 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// Gets the item key or property regex.
 		/// </summary>
 		/// <value>The item key or property regex.</value>
+		/// <remarks>Or-ed combination of <see cref="ItemRegex"/>, <see cref="KeyRegex"/> and <see cref="PropertyRegex"/></remarks>
 		static Regex ItemKeyOrPropertyRegex
 		{
 			get { return _ItemKeyOrPropertyR ?? (_ItemKeyOrPropertyR = new Regex(_itemRegex + "|" + _keyRegex + "|" + _propertyRegex, _reOptions)); }
 		}
+		#endregion
 
 		/// <summary>
 		/// Unescapes all %AA sequences in the string where A is a valid hexadecimal value
