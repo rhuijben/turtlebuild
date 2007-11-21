@@ -83,9 +83,9 @@ namespace TurtleTests
 				if (_testSolution == null)
 				{
 					DirectoryInfo di = new DirectoryInfo(Environment.CurrentDirectory);
-					while(di.Parent.FullName != di.FullName)
+					while(di.Parent.FullName != di.Root.FullName)
 					{
-						foreach(FileInfo f in di.GetFiles("*.sln", SearchOption.AllDirectories))
+						foreach(FileInfo f in di.GetFiles("*.sln", SearchOption.TopDirectoryOnly))
 						{
 							return _testSolution = f.FullName;
 						}
