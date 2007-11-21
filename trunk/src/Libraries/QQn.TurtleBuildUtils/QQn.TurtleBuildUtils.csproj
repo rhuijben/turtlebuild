@@ -56,6 +56,7 @@
     <Compile Include="Files\TBLog\TBLogTarget.cs" />
     <Compile Include="KeyedFileCollection.cs" />
     <Compile Include="NativeMethods.cs" />
+    <Compile Include="QQnBuildTools.cs" />
     <Compile Include="SortedFileList.cs" />
     <Compile Include="Files\TBLog\TBLogAssembly.cs" />
     <Compile Include="Files\TBLog\TBLogContent.cs" />
