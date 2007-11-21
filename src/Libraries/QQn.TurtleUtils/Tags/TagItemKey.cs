@@ -191,6 +191,20 @@ namespace QQn.TurtleUtils.Tags
 			return tik;
 		}
 
+		/// <summary>
+		/// Sets the specified key.
+		/// </summary>
+		/// <param name="key">The key.</param>
+		/// <param name="value">The value.</param>
+		/// <returns></returns>
+		public void Set(string key, string value)
+		{
+			if (Contains(key))
+				this[key].Value = value;
+			else
+				Add(key, value);
+		}
+
 		#region ICollection<KeyValuePair<string,string>> Members
 
 		void ICollection<KeyValuePair<string, string>>.Add(KeyValuePair<string, string> item)

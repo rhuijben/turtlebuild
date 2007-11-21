@@ -9,7 +9,7 @@ using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleMSBuild
 {
-	class VCBuildHandler
+	class ExternalBuildHandler
 	{
 		static string FilterWord(string word)
 		{
@@ -35,7 +35,7 @@ namespace QQn.TurtleMSBuild
 
 					if (node != null)
 					{
-						ep.FullProjectConfiguration = node.InnerText;
+						ep.AddBuildConfiguration(node.InnerText);
 					}
 				}
 			}

@@ -259,5 +259,10 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 				ProjectOutput.Add(new TargetItem(src, src, local ? type : (TargetType)((int)type | 0x10)));
 			}
 		}
+
+		protected internal virtual void AddBuildConfiguration(string configuration)
+		{
+			FullProjectConfiguration = configuration;			
+		}
 	}
 }

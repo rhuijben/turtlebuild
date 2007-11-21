@@ -65,12 +65,18 @@ namespace TurtleTests
 			DirectoryInfo di = new DirectoryInfo(Environment.CurrentDirectory);
 			while (di.Parent.FullName != di.Root.FullName)
 			{
+				bool breakOut = false;
 				foreach (FileInfo f in di.GetFiles("*.sln", SearchOption.TopDirectoryOnly))
 				{
 					Version v = QQnBuildTools.GetSolutionVersion(f.FullName);
 
 					Assert.That(v, Is.Not.Null);
+
+					Assert.That(v, Is.EqualTo(f.Name.Contains("2008") ? new Version("10.0") : new Version("9.0")));
+					breakOut = true;
 				}
+				if (breakOut)
+					break;
 				di = di.Parent;
 			}
 		}

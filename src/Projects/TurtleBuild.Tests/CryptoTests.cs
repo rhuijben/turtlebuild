@@ -94,6 +94,7 @@ namespace TurtleTests
 			calcGuid = QQnCryptoHelpers.GuidFromString(baseGuid, item);
 
 			Assert.That(calcGuid, Is.EqualTo(new Guid("014C3195-DE6C-5A19-9563-163716A49EC6")), "Calculated guids are equal");
+			
 		}
 	}
 }

@@ -6,6 +6,7 @@ using System.Xml;
 using System.Xml.XPath;
 using QQn.TurtleBuildUtils;
 using QQn.TurtleUtils.IO;
+using QQn.TurtleUtils.Tags;
 
 namespace QQn.TurtleMSBuild.ExternalProjects
 {
@@ -62,6 +63,13 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			}
 		}
 
+		List<string> _configs = new List<string>();
+		protected internal override void AddBuildConfiguration(string configuration)
+		{
+			_configs.Add(configuration);
+			base.AddBuildConfiguration(configuration);
+		}
+
 		public override void ParseBuildResult(Project parentProject)
 		{
 			base.ParseBuildResult(parentProject);
@@ -94,7 +102,54 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 				AssemblyUtils.RefreshVersionInfoFromAttributes(targetFile, keyFile, KeyContainer);
 			}
-		}		
+		}
+
+		TagPropertyCollection _props;
+
+		public TagPropertyCollection Properties
+		{
+			get { return _props ?? (_props = CreatePropertyCollection()); }
+		}
+
+		private TagPropertyCollection CreatePropertyCollection()
+		{
+			TagPropertyCollection tpc = new TagPropertyCollection();
+			tpc.LoadEnvironmentVariables();
+
+			tpc.Set("ConfigurationName", ProjectConfiguration);
+			tpc.Set("PlatformName", ProjectPlatform);
+
+			// tpc.Set("IntDir", QQnPath.NormalizePath(..., true));
+			// tpc.Set("OutDir", QQnPath.NormalizePath(..., true));
+			tpc.Set("ProjectDir", QQnPath.NormalizePath(Path.GetDirectoryName(ProjectFile)));
+			tpc.Set("ProjectPath", QQnPath.NormalizePath(ProjectFile));
+			tpc.Set("ProjectName", ProjectName);
+			tpc.Set("ProjectFileName", Path.GetFileName(ProjectFile));
+			tpc.Set("ProjectExt", Path.GetExtension(ProjectFile));
+			// tpc.Set("SolutionDir", QQnPath.NormalizePath(..., true));
+			// tpc.Set("SolutionPath", QQnPath.NormalizePath(...));
+			// tpc.Set("SolutionName", ...);
+			// tpc.Set("SolutionFileName", QQnPath.NormalizePath(...));
+
+			// tpc.Set("TargetDir", QQnPath.NormalizePath(..., true));
+			// tpc.Set("TargetPath", QQnPath.NormalizePath(...));
+			// tpc.Set("TargetName", ...);
+			// tpc.Set("TargetFileName", QQnPath.NormalizePath(...));
+			// tpc.Set("TargetExt", QQnPath.NormalizePath(...));
+
+			return tpc;
+		}
+
+		string ExpandProperties(string value)
+		{
+			if (value == null)
+				throw new ArgumentNullException("value");
+
+			if (value.Contains("$("))
+				return Properties.ExpandProperties(value);
+			
+			return value;
+		}
 
 		private void ParseProjectFile()
 		{
@@ -132,7 +187,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 				if(n != null)
 				{
-					KeyFile = EnsureRelativePath(n.GetAttribute("KeyFile", ""));
+					KeyFile = EnsureRelativePath(ExpandProperties(n.GetAttribute("KeyFile", "")));
 				}
 
 				n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + FullProjectConfiguration + "'] and @Name='VCLinkerTool' and @KeyContainer!='']");

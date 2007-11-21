@@ -264,8 +264,6 @@ namespace QQn.TurtleUtils.IO
 				path = Path.GetFullPath(path);
 				string root = Path.GetPathRoot(path);
 
-
-
 				path = root + RemoveDoubleSlash(path.Substring(root.Length), addEndSlash);
 			}
 			else

@@ -6,13 +6,15 @@ using System.Collections.ObjectModel;
 using System.Xml.Serialization;
 using QQn.TurtleUtils.Tokens;
 using System.ComponentModel;
+using System.IO;
+using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleUtils.Tags
 {
 	/// <summary>
 	/// 
 	/// </summary>
-	public class TagItem : ICollectionItem<TagItem>
+	public class TagItem : ICollectionItem<TagItem>, ITagItem
 	{
 		string _name;
 		string _include;
@@ -153,6 +155,57 @@ namespace QQn.TurtleUtils.Tags
 			}
 			return ti;
 		}
+
+		#region ITagItem Members
+
+		/// <summary>
+		/// Gets or sets the item specification.
+		/// </summary>
+		/// <value>The item specification</value>
+		string ITagItem.ItemSpec
+		{
+			get { return this.Include; }
+			set { this.Include = value; }
+		}
+
+		/// <summary>
+		/// Gets the number of metadata entries associated with the item.
+		/// </summary>
+		/// <value>The number of metadata entries associated with the item..</value>
+		int ITagItem.MetadataCount
+		{
+			get { return Keys.Count; }
+		}
+
+		/// <summary>
+		/// Gets the name of the TagItemKeys
+		/// </summary>
+		/// <value></value>
+		ICollection<string> ITagItem.KeyNames
+		{
+			get { return Keys.AllKeys; }
+		}
+
+		/// <summary>
+		/// Gets or sets the <see cref="System.String"/> with the specified key name.
+		/// </summary>
+		/// <value></value>
+		string ITagItem.this[string keyName]
+		{
+			get { return Keys[keyName].Value; }
+			set { Keys.Set(keyName, value); }
+		}
+
+		/// <summary>
+		/// Removes the key.
+		/// </summary>
+		/// <param name="keyName">Name of the key.</param>
+		void ITagItem.RemoveKey(string keyName)
+		{
+			Keys.Remove(keyName);
+		}
+
+		#endregion
 	}
 
 	/// <summary>
@@ -188,6 +241,26 @@ namespace QQn.TurtleUtils.Tags
 		{
 			TagItem item = new TagItem(name, include);
 			Add(item);
+			return item;
+		}
+
+		/// <summary>
+		/// Adds the file.
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <param name="include">The include.</param>
+		/// <param name="baseDirectory">The base directory.</param>
+		/// <returns></returns>
+		public TagItem AddFile(string name, string include, string baseDirectory)
+		{
+			baseDirectory = Path.GetFullPath(baseDirectory);
+			include = QQnPath.EnsureRelativePath(baseDirectory, include);
+
+			TagItem item = new TagItem(name, include);
+			item.Keys.Add("FileOrigin", baseDirectory);
+
+			Add(item);
+
 			return item;
 		}
 
