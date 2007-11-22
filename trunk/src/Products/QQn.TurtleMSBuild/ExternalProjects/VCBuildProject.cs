@@ -25,9 +25,9 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			{
 				if (_resolverType == null)
 				{
-					Type resolverType = Type.GetType("Microsoft.Build.Tasks.ResolveVCProjectOutput, Microsoft.Build.Tasks.v3.5", false, false);
-					if (resolverType == null)
-						resolverType = Type.GetType("Microsoft.Build.Tasks.ResolveVCProjectOutput, Microsoft.Build.Tasks", false, false);
+                    Type resolverType = Type.GetType("Microsoft.Build.Tasks.ResolveVCProjectOutput, Microsoft.Build.Tasks.v3.5, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", false, false);
+					if (resolverType == null || !typeof(ITask).IsAssignableFrom(resolverType))
+                        resolverType = Type.GetType("Microsoft.Build.Tasks.ResolveVCProjectOutput, Microsoft.Build.Tasks, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", false, false);
 
 					_resolverType = resolverType;
 				}
@@ -75,7 +75,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			base.ParseBuildResult(parentProject);
 
 			if (ResolverType == null || ResolverTask == null)
-				return;
+				throw new InvalidOperationException("Can't load MSBuild resolver tasks");
 
 			ITaskItem[] output = GetProjectOutput(parentProject.ProjectFile);
 
@@ -98,7 +98,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 		{
 			base.PostParseBuildResult();
 
-			if (Parameters.UpdateVCVersionInfo)
+			if (Parameters.UpdateVCVersionInfo && !string.IsNullOrEmpty(TargetPath))
 			{
 				string keyFile = KeyFile;
 
@@ -216,7 +216,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			SetTaskParameter(ResolverTask, "ProjectReferences", new ITaskItem[] { new SimpleTaskItem(ProjectFile) });
 
 			if (!ResolverTask.Execute())
-				return null;
+				throw new InvalidOperationException("Resolver failed");
 
 			ITaskItem[] resolvedOutputPaths = GetTaskParameter<ITaskItem[]>(ResolverTask, "ResolvedOutputPaths");
 			ITaskItem[] resolvedImportLibraryPaths = GetTaskParameter<ITaskItem[]>(ResolverTask, "ResolvedImportLibraryPaths");

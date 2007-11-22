@@ -48,10 +48,10 @@ namespace TurtleTests
 		[Test]
 		public void RuntimePaths()
 		{
-			DirectoryInfo dir11 = QQnBuildTools.GetFrameworkDirectory(new Version("1.1"));
-			DirectoryInfo dir20 = QQnBuildTools.GetFrameworkDirectory(new Version("2.0"));
-			DirectoryInfo dir30 = QQnBuildTools.GetFrameworkDirectory(new Version("3.0"));
-			DirectoryInfo dir35 = QQnBuildTools.GetFrameworkDirectory(new Version("3.5"));
+			DirectoryInfo dir11 = BuildTools.GetFrameworkDirectory(new Version("1.1"));
+			DirectoryInfo dir20 = BuildTools.GetFrameworkDirectory(new Version("2.0"));
+			DirectoryInfo dir30 = BuildTools.GetFrameworkDirectory(new Version("3.0"));
+			DirectoryInfo dir35 = BuildTools.GetFrameworkDirectory(new Version("3.5"));
 
 			Assert.That(dir11.Exists);
 			Assert.That(dir20.Exists);
@@ -68,7 +68,7 @@ namespace TurtleTests
 				bool breakOut = false;
 				foreach (FileInfo f in di.GetFiles("*.sln", SearchOption.TopDirectoryOnly))
 				{
-					Version v = QQnBuildTools.GetSolutionVersion(f.FullName);
+					Version v = BuildTools.GetSolutionVersion(f.FullName);
 
 					Assert.That(v, Is.Not.Null);
 

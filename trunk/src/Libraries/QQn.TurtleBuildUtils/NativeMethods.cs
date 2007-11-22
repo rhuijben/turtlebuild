@@ -70,7 +70,7 @@ namespace QQn.TurtleBuildUtils
 			{
 				handle = h;
 				return NativeMethods.EndUpdateResource(h, false);
-			}
+				}
 
 			return false;
 		}

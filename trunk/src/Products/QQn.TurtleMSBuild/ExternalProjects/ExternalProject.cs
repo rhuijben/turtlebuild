@@ -58,9 +58,9 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			{
 				if (_resolveAssemblyReferenceType == null)
 				{
-					Type resolveAssemblyReferenceType = Type.GetType("Microsoft.Build.Tasks.ResolveAssemblyReference, Microsoft.Build.Tasks.v3.5", false, false);
-					if (resolveAssemblyReferenceType == null)
-						resolveAssemblyReferenceType = Type.GetType("Microsoft.Build.Tasks.ResolveAssemblyReference, Microsoft.Build.Tasks", false, false);
+                    Type resolveAssemblyReferenceType = Type.GetType("Microsoft.Build.Tasks.ResolveAssemblyReference, Microsoft.Build.Tasks.v3.5, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", false, false);
+                    if (resolveAssemblyReferenceType == null || !typeof(ITask).IsAssignableFrom(resolveAssemblyReferenceType))
+                        resolveAssemblyReferenceType = Type.GetType("Microsoft.Build.Tasks.ResolveAssemblyReference, Microsoft.Build.Tasks, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", false, false);
 
 					_resolveAssemblyReferenceType = resolveAssemblyReferenceType;
 				}

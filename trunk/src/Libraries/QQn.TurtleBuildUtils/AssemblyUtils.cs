@@ -144,22 +144,30 @@ namespace QQn.TurtleBuildUtils
 				asmName.Name = "Tmp." + srcName.Name;
 
 				// Only create an on-disk assembly. We never have to execute anything
-				AssemblyBuilder newAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.Save | AssemblyBuilderAccess.ReflectionOnly, outputDirectory);
+				AssemblyBuilder newAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.ReflectionOnly, outputDirectory);
 
 				string extension = Path.GetExtension(file);
 				string tmpFile = Path.GetFileNameWithoutExtension(file) + ".resTmp" + extension;
 				newAssembly.DefineDynamicModule(asmName.Name, tmpFile);
 
-				// Load source assembly for reflection
-				Assembly srcAssembly = Assembly.ReflectionOnlyLoad(File.ReadAllBytes(file));
-				Assembly mscorlib = Assembly.ReflectionOnlyLoad(typeof(int).Assembly.FullName);
-				Assembly system = Assembly.ReflectionOnlyLoad(typeof(Uri).Assembly.FullName);
-
-
+				byte[] bytes = File.ReadAllBytes(file);
 				AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += new ResolveEventHandler(OnReflectionOnlyAssemblyResolve);
+				
 				try
 				{
-					Assembly systemAssembly = Assembly.ReflectionOnlyLoad(typeof(int).Assembly.FullName);
+					Assembly srcAssembly; // Load source assembly for reflection
+					try
+					{
+						srcAssembly = Assembly.ReflectionOnlyLoad(bytes);
+					}
+					catch (FileLoadException)
+					{
+						// The assembly '' has already loaded from a different location. It cannot be loaded from a new location within the same appdomain.
+						srcAssembly = Assembly.ReflectionOnlyLoad(AssemblyName.GetAssemblyName(file).FullName);
+					}
+
+					Assembly mscorlib = Assembly.ReflectionOnlyLoad(typeof(int).Assembly.FullName);
+					Assembly system = Assembly.ReflectionOnlyLoad(typeof(Uri).Assembly.FullName);
 
 					foreach (CustomAttributeData attr in CustomAttributeData.GetCustomAttributes(srcAssembly))
 					{
@@ -199,10 +207,6 @@ namespace QQn.TurtleBuildUtils
 				newAssembly.Save(tmpFile);
 
 				return QQnPath.Combine(outputDirectory, tmpFile);
-			}
-			catch (FileLoadException)
-			{
-				return null;
 			}
 			catch (IOException)
 			{
