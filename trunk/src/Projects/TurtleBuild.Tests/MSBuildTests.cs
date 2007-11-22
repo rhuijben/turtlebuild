@@ -220,11 +220,11 @@ namespace TurtleTests
 			Engine engine = new Engine(Path.GetDirectoryName(new Uri(typeof(int).Assembly.CodeBase).LocalPath));
 			MSBuildLogger logger = new MSBuildLogger();
 			engine.GlobalProperties.SetProperty("Configuration", OtherConfiguration);
-			logger.Parameters = string.Format("OutputPath={0};Indent=true", LoggerPath);
+			logger.Parameters = string.Format("OutputPath={0};Indent=true;VC-UpdateVersionInformation=true", LoggerPath);
 			engine.RegisterLogger(logger);
 
 			Project p = new Project(engine);
-			p.Load(Solution);
+			p.Load("f:\\wfh\\trunk\\src\\WinForms-Html.sln"/*Solution*/);
 			Assert.That(p.Build(), Is.True, "Build succeeded");
 		}
 

@@ -7,6 +7,7 @@ using System.Xml.XPath;
 using QQn.TurtleBuildUtils;
 using QQn.TurtleUtils.IO;
 using QQn.TurtleUtils.Tags;
+using System.Globalization;
 
 namespace QQn.TurtleMSBuild.ExternalProjects
 {
@@ -16,24 +17,6 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			: base(projectGuid, projectFile, projectName, parameters)
 		{
 			ProjectType = "VCProj";
-		}
-
-		Type _resolverType;
-		Type ResolverType
-		{
-			get
-			{
-				if (_resolverType == null)
-				{
-					Type resolverType;// = Type.GetType("Microsoft.Build.Tasks.ResolveVCProjectOutput, Microsoft.Build.Tasks.v3.5, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", false, false);
-					//if (resolverType == null || !typeof(ITask).IsAssignableFrom(resolverType))
-					resolverType = Type.GetType("Microsoft.Build.Tasks.ResolveVCProjectOutput, Microsoft.Build.Tasks, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", false, false);
-
-					_resolverType = resolverType;
-				}
-
-				return _resolverType;
-			}
 		}
 
 		public override string FullProjectConfiguration
@@ -49,20 +32,6 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			}
 		}
 
-		ITask _resolverTask;
-		ITask ResolverTask
-		{
-			get
-			{
-				if (_resolverTask == null && ResolverType != null)
-				{
-					_resolverTask = (ITask)Activator.CreateInstance(ResolverType);
-					_resolverTask.BuildEngine = new SimpleBuildEngine();
-				}
-				return _resolverTask;
-			}
-		}
-
 		List<string> _configs = new List<string>();
 		protected internal override void AddBuildConfiguration(string configuration)
 		{
@@ -74,29 +43,12 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 		{
 			base.ParseBuildResult(parentProject);
 
-			if (ResolverType == null || ResolverTask == null)
-				throw new InvalidOperationException("Can't load MSBuild resolver tasks");
+			ParseProjectFile(FullProjectConfiguration, parentProject);
 
-			ITaskItem[] output = GetProjectOutput(parentProject.ProjectFile);
-
-			if ((output == null) || (output.Length == 0))
+			if (string.IsNullOrEmpty(TargetPath))
 				return;
 
-			string targetFile = Path.GetFullPath(output[0].ItemSpec);
-			OutputPath = Path.GetDirectoryName(targetFile);
-			TargetName = Path.GetFileNameWithoutExtension(targetFile);
-			TargetExt = Path.GetExtension(targetFile);
-
-			ProjectOutput.BaseDirectory = ProjectPath;
-
-			ResolveToOutput(output);
-
-			ParseProjectFile();
-		}
-
-		public override void PostParseBuildResult()
-		{
-			if (Parameters.UpdateVCVersionInfo && !string.IsNullOrEmpty(TargetPath))
+			if (IsAssembly && Parameters.UpdateVCVersionInfo)
 			{
 				string keyFile = KeyFile;
 
@@ -110,6 +62,11 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 					Console.WriteLine("Refreshing attributes on {0} failed", targetFile);
 			}
 
+			ResolveAdditionalOutput();
+		}
+
+		public override void PostParseBuildResult()
+		{
 			base.PostParseBuildResult();
 		}
 
@@ -130,15 +87,8 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 			// tpc.Set("IntDir", QQnPath.NormalizePath(..., true));
 			// tpc.Set("OutDir", QQnPath.NormalizePath(..., true));
-			tpc.Set("ProjectDir", QQnPath.NormalizePath(Path.GetDirectoryName(ProjectFile)));
-			tpc.Set("ProjectPath", QQnPath.NormalizePath(ProjectFile));
-			tpc.Set("ProjectName", ProjectName);
-			tpc.Set("ProjectFileName", Path.GetFileName(ProjectFile));
-			tpc.Set("ProjectExt", Path.GetExtension(ProjectFile));
-			// tpc.Set("SolutionDir", QQnPath.NormalizePath(..., true));
-			// tpc.Set("SolutionPath", QQnPath.NormalizePath(...));
-			// tpc.Set("SolutionName", ...);
-			// tpc.Set("SolutionFileName", QQnPath.NormalizePath(...));
+			
+			
 
 			// tpc.Set("TargetDir", QQnPath.NormalizePath(..., true));
 			// tpc.Set("TargetPath", QQnPath.NormalizePath(...));
@@ -149,87 +99,193 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			return tpc;
 		}
 
-		string ExpandProperties(string value)
+		string _targetPath;
+
+		public override string TargetPath
 		{
-			if (value == null)
-				throw new ArgumentNullException("value");
+			get
+			{
+				return _targetPath ?? base.TargetPath;
+			}
+			internal set
+			{
+				_targetPath = value;
+			}
 
-			if (value.Contains("$("))
-				return Properties.ExpandProperties(value);
-
-			return value;
 		}
 
-		private void ParseProjectFile()
+		bool _isAssembly;
+		public bool IsAssembly
 		{
+			get { return _isAssembly; }
+			internal set { _isAssembly = value; }
+		}
+
+		private void ParseProjectFile(string fullConfiguration, Project parentProject)
+		{
+			TagPropertyCollection tpc = new TagPropertyCollection();
+
+			string[] items = fullConfiguration.Split('|');
+			ProjectConfiguration = items[0];
+			ProjectPlatform = items[1];
+
+			tpc.Set("PlatformName", ProjectPlatform);
+			tpc.Set("ConfigurationName", ProjectConfiguration);
+
+			Solution solution = parentProject as Solution;
+			if(solution != null)
+			{
+				tpc.Set("SolutionDir", QQnPath.NormalizePath(solution.ProjectPath, true));
+				tpc.Set("SolutionPath", QQnPath.NormalizePath(solution.ProjectFile));
+				tpc.Set("SolutionName", solution.ProjectName);
+				tpc.Set("SolutionFileName", Path.GetFileName(ProjectFile));
+			}
+
+			tpc.Set("ProjectDir", QQnPath.NormalizePath(ProjectPath, true));
+			tpc.Set("ProjectPath", QQnPath.NormalizePath(ProjectFile));
+			tpc.Set("ProjectName", ProjectName);
+			tpc.Set("ProjectFileName", Path.GetFileName(ProjectFile));
+			tpc.Set("ProjectExt", Path.GetExtension(ProjectFile));			
+
 			using (StreamReader sr = File.OpenText(ProjectFile))
 			{
 				XPathDocument doc = new XPathDocument(sr);
 
-				SortedList<string, string> extensions = new SortedList<string, string>(StringComparer.OrdinalIgnoreCase);
+				XPathNavigator dn = doc.CreateNavigator();
 
-				if (Parameters.ScriptExtensions != null)
-					foreach (string extension in Parameters.ScriptExtensions)
+				TargetName = dn.SelectSingleNode("/VisualStudioProject").GetAttribute("Name", "");
+				tpc.Set("TargetName", TargetName);
+
+				XPathNavigator config = dn.SelectSingleNode("//Configurations/Configuration[@Name='" + FullProjectConfiguration + "']");
+				XPathNavigator linker = config.SelectSingleNode("Tool[@Name='VCLinkerTool']");
+
+				if (string.IsNullOrEmpty(TargetName) || config == null || linker == null)
+					return; // No .Net assembly output
+
+				OutputPath = tpc.ExpandProperties(config.GetAttribute("OutputDirectory", ""));
+				tpc.Set("OutDir", QQnPath.NormalizePath(QQnPath.Combine(ProjectPath, OutputPath), true));
+
+				string intPath = tpc.ExpandProperties(config.GetAttribute("IntermediateDirectory", ""));
+				intPath = QQnPath.Combine(ProjectPath, intPath);
+				tpc.Set("IntDir", QQnPath.NormalizePath(intPath, true));
+
+				ProjectOutput.BaseDirectory = ProjectPath;
+
+				switch (int.Parse(config.GetAttribute("ConfigurationType", "").Trim(), NumberStyles.None))
+				{
+					case 1:
+						TargetExt = ".exe";
+						break;
+					case 4:
+						TargetExt = ".lib";
+						break;
+					case 2:
+					default:
+						TargetExt = ".dll";
+						break;	
+				}
+				tpc.Set("TargetExt", TargetExt);
+
+				string tp = linker.GetAttribute("OutputFile", "");
+
+				if (!string.IsNullOrEmpty(tp))
+				{
+					tp = tpc.ExpandProperties(tp);
+
+					if (!string.IsNullOrEmpty(tp))
 					{
-						string ext = extension;
+						tp = EnsureRelativePath(tp);
 
-						if (!ext.StartsWith("."))
-							ext = '.' + ext;
+						TargetName = Path.GetFileNameWithoutExtension(tp);
+						TargetExt = Path.GetExtension(tp);
+						tpc.Set("TargetExt", TargetExt);
 
-						if (!extensions.ContainsKey(ext))
-							extensions.Add(ext, "Item");
+						TargetPath = tp;
 					}
-
-				foreach (XPathNavigator nav in doc.CreateNavigator().Select("//File[@RelativePath]"))
-				{
-					string file = nav.GetAttribute("RelativePath", "");
-					bool deploymentContent = ("true" == nav.GetAttribute("DeploymentContent", ""));
-
-					if (deploymentContent)
-						ContentFiles.AddUnique(file);
-
-					if (extensions.ContainsKey(Path.GetExtension(file)))
-						ScriptFiles.AddUnique(file);
 				}
 
-				XPathNavigator n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + FullProjectConfiguration + "'] and @Name='VCLinkerTool' and @KeyFile!='']");
+				if (!File.Exists(QQnPath.Combine(ProjectPath, TargetPath)))
+				{
+					TargetName = null;
+					return; // Something went wrong.. Check project format
+				}
+
+				string mc = config.GetAttribute("ManagedExtensions", "");
+				if (!string.IsNullOrEmpty(mc))
+				{
+					switch (int.Parse(mc.Trim(), NumberStyles.None))
+					{
+						case 0:
+							break; // No clr?
+						case 1:
+						default:
+							IsAssembly = true;
+							break;
+					}
+				}
+
+				string targetFile = TargetPath;
+				ProjectOutput.Add(new TargetItem(targetFile, targetFile, TargetType.Item));
+
+				XPathNavigator n = config.SelectSingleNode("Tool[@Name='VCCLCompilerTool']");
 
 				if (n != null)
 				{
-					KeyFile = EnsureRelativePath(ExpandProperties(n.GetAttribute("KeyFile", "")));
+					if (string.Equals(n.GetAttribute("GenerateXMLDocumentationFiles", ""), "true", StringComparison.OrdinalIgnoreCase))
+					{
+						string xmlFile = Path.ChangeExtension(targetFile, ".xml");
+
+						if (File.Exists(QQnPath.Combine(ProjectPath, xmlFile)))
+							ProjectOutput.Add(new TargetItem(xmlFile, xmlFile, TargetType.Item));
+					}
 				}
 
-				n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + FullProjectConfiguration + "'] and @Name='VCLinkerTool' and @KeyContainer!='']");
+				FindContentAndScripts(doc);
 
-				if (n != null)
+				
+
+				string value = linker.GetAttribute("KeyFile", "");
+
+				if(!string.IsNullOrEmpty(value))
 				{
-					KeyContainer = n.GetAttribute("KeyContainer", "");
+					KeyFile = EnsureRelativePath(tpc.ExpandProperties(value));
 				}
 
-				// TODO: Find processor architecture				
+				value = linker.GetAttribute("KeyContainer", "");
+				if (!string.IsNullOrEmpty(value))
+				{
+					KeyContainer = value;
+				}
 			}
 		}
 
-		private ITaskItem[] GetProjectOutput(string solutionFile)
+		private void FindContentAndScripts(XPathDocument doc)
 		{
-			SetTaskParameter(ResolverTask, "Configuration", ProjectConfiguration);
-			SetTaskParameter(ResolverTask, "SolutionFile", new SimpleTaskItem(solutionFile));
-			SetTaskParameter(ResolverTask, "ProjectReferences", new ITaskItem[] { new SimpleTaskItem(ProjectFile) });
+			SortedList<string, string> extensions = new SortedList<string, string>(StringComparer.OrdinalIgnoreCase);
 
-			if (!ResolverTask.Execute())
-				throw new InvalidOperationException("Resolver failed");
+			if (Parameters.ScriptExtensions != null)
+				foreach (string extension in Parameters.ScriptExtensions)
+				{
+					string ext = extension;
 
-			ITaskItem[] resolvedOutputPaths = GetTaskParameter<ITaskItem[]>(ResolverTask, "ResolvedOutputPaths");
-			ITaskItem[] resolvedImportLibraryPaths = GetTaskParameter<ITaskItem[]>(ResolverTask, "ResolvedImportLibraryPaths");
+					if (!ext.StartsWith("."))
+						ext = '.' + ext;
 
-			if (resolvedOutputPaths == null || resolvedOutputPaths.Length == 0)
-				return null;
+					if (!extensions.ContainsKey(ext))
+						extensions.Add(ext, "Item");
+				}
 
-			List<ITaskItem> assemblies = new List<ITaskItem>();
-			assemblies.AddRange(resolvedOutputPaths);
-			assemblies.AddRange(resolvedImportLibraryPaths);
+			foreach (XPathNavigator nav in doc.CreateNavigator().Select("//File[@RelativePath]"))
+			{
+				string file = nav.GetAttribute("RelativePath", "");
+				bool deploymentContent = ("true" == nav.GetAttribute("DeploymentContent", ""));
 
-			return assemblies.ToArray();
+				if (deploymentContent)
+					ContentFiles.AddUnique(file);
+
+				if (extensions.ContainsKey(Path.GetExtension(file)))
+					ScriptFiles.AddUnique(file);
+			}
 		}
 	}
 }
