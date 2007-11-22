@@ -26,8 +26,13 @@ namespace QQn.TurtleBuildUtils
 		/// <returns></returns>
 		public static bool RefreshVersionInfoFromAttributes(string file, string keyFile, string keyContainer)
 		{
+			if (string.IsNullOrEmpty(file))
+				throw new ArgumentNullException("file");
+
 			if (!File.Exists(file))
 				throw new FileNotFoundException("File to update not found", file);
+			else if(!string.IsNullOrEmpty(keyFile) && !File.Exists(keyFile))
+				throw new FileNotFoundException("File to update not found", keyFile);
 
 			string tmpDir = QQnPath.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 			Directory.CreateDirectory(tmpDir);
@@ -138,7 +143,8 @@ namespace QQn.TurtleBuildUtils
 				AssemblyName asmName = new AssemblyName(srcName.FullName);
 				asmName.Name = "Tmp." + srcName.Name;
 
-				AssemblyBuilder newAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.RunAndSave, outputDirectory);
+				// Only create an on-disk assembly. We never have to execute anything
+				AssemblyBuilder newAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.Save | AssemblyBuilderAccess.ReflectionOnly, outputDirectory);
 
 				string extension = Path.GetExtension(file);
 				string tmpFile = Path.GetFileNameWithoutExtension(file) + ".resTmp" + extension;
