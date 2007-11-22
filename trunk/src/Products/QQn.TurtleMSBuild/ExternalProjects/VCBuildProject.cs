@@ -94,18 +94,20 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			ParseProjectFile();
 		}
 
-		public override void  PostParseBuildResult()
+		public override void PostParseBuildResult()
 		{
- 			base.PostParseBuildResult();
+			base.PostParseBuildResult();
 
 			if (Parameters.UpdateVCVersionInfo)
 			{
-                string keyFile = KeyFile;
+				string keyFile = KeyFile;
 
-                if(!string.IsNullOrEmpty(keyFile))
+				if (!string.IsNullOrEmpty(keyFile))
 					keyFile = QQnPath.Combine(ProjectPath, keyFile);
 
-				if (!AssemblyUtils.RefreshVersionInfoFromAttributes(QQnPath.Combine(ProjectPath, TargetPath), keyFile, KeyContainer))
+				string targetFile = QQnPath.Combine(ProjectPath, TargetPath);
+
+				if (!AssemblyUtils.RefreshVersionInfoFromAttributes(targetFile, keyFile, KeyContainer))
 					throw new InvalidOperationException("Failed to refresh attributes");
 			}
 		}
@@ -153,7 +155,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 			if (value.Contains("$("))
 				return Properties.ExpandProperties(value);
-			
+
 			return value;
 		}
 
@@ -165,17 +167,17 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 				SortedList<string, string> extensions = new SortedList<string, string>(StringComparer.OrdinalIgnoreCase);
 
-				if(Parameters.ScriptExtensions != null)
-				foreach (string extension in Parameters.ScriptExtensions)
-				{
-					string ext = extension;
+				if (Parameters.ScriptExtensions != null)
+					foreach (string extension in Parameters.ScriptExtensions)
+					{
+						string ext = extension;
 
-					if (!ext.StartsWith("."))
-						ext = '.' + ext;
+						if (!ext.StartsWith("."))
+							ext = '.' + ext;
 
-					if (!extensions.ContainsKey(ext))
-						extensions.Add(ext, "Item");
-				}
+						if (!extensions.ContainsKey(ext))
+							extensions.Add(ext, "Item");
+					}
 
 				foreach (XPathNavigator nav in doc.CreateNavigator().Select("//File[@RelativePath]"))
 				{
@@ -191,7 +193,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 				XPathNavigator n = doc.CreateNavigator().SelectSingleNode("//Tool[ancestor::Configuration[@Name='" + FullProjectConfiguration + "'] and @Name='VCLinkerTool' and @KeyFile!='']");
 
-				if(n != null)
+				if (n != null)
 				{
 					KeyFile = EnsureRelativePath(ExpandProperties(n.GetAttribute("KeyFile", "")));
 				}
@@ -205,8 +207,8 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 				// TODO: Find processor architecture				
 			}
-		}		
-		
+		}
+
 		private ITaskItem[] GetProjectOutput(string solutionFile)
 		{
 			SetTaskParameter(ResolverTask, "Configuration", ProjectConfiguration);
