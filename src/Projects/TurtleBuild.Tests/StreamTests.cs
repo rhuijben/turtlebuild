@@ -127,7 +127,7 @@ namespace TurtleTests
 		{
 			HttpWebRequest.DefaultCachePolicy = new RequestCachePolicy(RequestCacheLevel.Revalidate);
 
-			WebRequest request = WebRequest.Create(new Uri("file:///f:/fout.swf"));
+			WebRequest request = WebRequest.Create(new Uri("file:///" + MSBuildTests.Solution));
 			HttpWebRequest wr = request as HttpWebRequest;
 
 			if (wr != null)
