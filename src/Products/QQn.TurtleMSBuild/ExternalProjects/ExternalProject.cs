@@ -58,9 +58,9 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			{
 				if (_resolveAssemblyReferenceType == null)
 				{
-                    Type resolveAssemblyReferenceType = Type.GetType("Microsoft.Build.Tasks.ResolveAssemblyReference, Microsoft.Build.Tasks.v3.5, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", false, false);
-                    if (resolveAssemblyReferenceType == null || !typeof(ITask).IsAssignableFrom(resolveAssemblyReferenceType))
-                        resolveAssemblyReferenceType = Type.GetType("Microsoft.Build.Tasks.ResolveAssemblyReference, Microsoft.Build.Tasks, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", false, false);
+					//Type resolveAssemblyReferenceType = Type.GetType("Microsoft.Build.Tasks.ResolveAssemblyReference, Microsoft.Build.Tasks.v3.5, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", false, false);
+					//if (resolveAssemblyReferenceType == null || !typeof(ITask).IsAssignableFrom(resolveAssemblyReferenceType))
+					resolveAssemblyReferenceType = Type.GetType("Microsoft.Build.Tasks.ResolveAssemblyReference, Microsoft.Build.Tasks, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", false, false);
 
 					_resolveAssemblyReferenceType = resolveAssemblyReferenceType;
 				}
@@ -129,7 +129,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			searchPaths.Add("{RawFileName}");
 
 			SetTaskParameter(ResolveReferencesTask, "SearchPaths", searchPaths.ToArray());
-			SetTaskParameter(ResolveReferencesTask, "AssemblyFiles", files);			
+			SetTaskParameter(ResolveReferencesTask, "AssemblyFiles", files);
 			SetTaskParameter(ResolveReferencesTask, "FindRelatedFiles", true);
 			SetTaskParameter(ResolveReferencesTask, "FindSatellites", true);
 			SetTaskParameter(ResolveReferencesTask, "FindSerializationAssemblies", true);
@@ -178,7 +178,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 				foreach (ITaskItem item in GetTaskParameter<ITaskItem[]>(ResolveReferencesTask, "SerializationAssemblyFiles"))
 				{
 					AddItem(local, TargetType.Item, item);
-				}				
+				}
 
 				foreach (ITaskItem item in GetTaskParameter<ITaskItem[]>(ResolveReferencesTask, "RelatedFiles"))
 				{
@@ -215,10 +215,10 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 							}
 							catch (IOException)
 							{ } // Can't load file
-							catch(SystemException)
+							catch (SystemException)
 							{ } // Not an assembly
 
-							if(asm != null)
+							if (asm != null)
 								foreach (Module module in asm.GetModules(true))
 								{
 									string file = module.FullyQualifiedName;
@@ -234,9 +234,9 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 										extraCopyItems.AddUnique(file); // Don't edit projectoutput while walking through it
 									}
 								}
-						}						
+						}
 					}
-					if(extraCopyItems != null)
+					if (extraCopyItems != null)
 					{
 						foreach (string file in extraCopyItems)
 						{
@@ -262,7 +262,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 		protected internal virtual void AddBuildConfiguration(string configuration)
 		{
-			FullProjectConfiguration = configuration;			
+			FullProjectConfiguration = configuration;
 		}
 	}
 }
