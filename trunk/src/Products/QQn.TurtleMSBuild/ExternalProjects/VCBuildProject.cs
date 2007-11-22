@@ -92,6 +92,11 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			ResolveToOutput(output);
 
 			ParseProjectFile();
+		}
+
+		public override void  PostParseBuildResult()
+		{
+ 			base.PostParseBuildResult();
 
 			if (Parameters.UpdateVCVersionInfo)
 			{
@@ -100,7 +105,8 @@ namespace QQn.TurtleMSBuild.ExternalProjects
                 if(!string.IsNullOrEmpty(keyFile))
 					keyFile = QQnPath.Combine(ProjectPath, keyFile);
 
-				AssemblyUtils.RefreshVersionInfoFromAttributes(targetFile, keyFile, KeyContainer);
+				if (!AssemblyUtils.RefreshVersionInfoFromAttributes(QQnPath.Combine(ProjectPath, TargetPath), keyFile, KeyContainer))
+					throw new InvalidOperationException("Failed to refresh attributes");
 			}
 		}
 

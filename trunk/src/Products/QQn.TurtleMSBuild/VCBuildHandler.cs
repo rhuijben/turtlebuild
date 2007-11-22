@@ -85,12 +85,8 @@ namespace QQn.TurtleMSBuild
 
 						if (projectType != solutionItem && File.Exists(projectFile))
 						{
-							switch (Path.GetExtension(projectFile).ToUpperInvariant())
-							{
-								case ".VCPROJ":
-									externalProjects.Add(new VCBuildProject(projectGuid, projectFile, projectName, solution.Parameters));
-									break;
-							}
+							if(QQnPath.ExtensionEquals(projectFile, ".vcproj"))
+								externalProjects.Add(new VCBuildProject(projectGuid, projectFile, projectName, solution.Parameters));
 						}
 					}
 				}
