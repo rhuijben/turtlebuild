@@ -75,8 +75,8 @@ namespace TurtleTests
 			Directory.CreateDirectory(ExtractPath);
 		}
 
-		string _testSolution;
-		public string Solution
+		static string _testSolution;
+		public static string Solution
 		{
 			get
 			{
@@ -159,7 +159,7 @@ namespace TurtleTests
 		[Test]
 		public void BuildExternal()
 		{
-			ProcessStartInfo psi = new ProcessStartInfo(MSBuild, string.Format("/nologo \"{0}\" /v:q /p:Configuration={1} \"/logger:MSBuildLogger,{2};OutputDir={3};Indent=true;VC-UpdateVersionInformation=true\"", Solution, OtherConfiguration, Logger, LoggerPath));
+			ProcessStartInfo psi = new ProcessStartInfo(MSBuild, string.Format("/nologo \"{0}\" /v:q /p:Configuration={1} \"/logger:MSBuildLogger,{2};OutputDir={3};Indent=true\"", Solution, OtherConfiguration, Logger, LoggerPath));
 			psi.UseShellExecute = false;
 			psi.RedirectStandardOutput = true;
 			psi.RedirectStandardError = true;
