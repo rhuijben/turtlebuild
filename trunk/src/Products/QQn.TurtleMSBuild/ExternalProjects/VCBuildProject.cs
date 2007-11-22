@@ -96,8 +96,6 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 		public override void PostParseBuildResult()
 		{
-			base.PostParseBuildResult();
-
 			if (Parameters.UpdateVCVersionInfo && !string.IsNullOrEmpty(TargetPath))
 			{
 				string keyFile = KeyFile;
@@ -105,11 +103,14 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 				if (!string.IsNullOrEmpty(keyFile))
 					keyFile = QQnPath.Combine(ProjectPath, keyFile);
 
-				string targetFile = QQnPath.Combine(ProjectPath, TargetPath);
+				// Make sure there are no relative paths remaining
+				string targetFile = QQnPath.NormalizePath(QQnPath.Combine(ProjectPath, TargetPath));
 
 				if (!AssemblyUtils.RefreshVersionInfoFromAttributes(targetFile, keyFile, KeyContainer))
 					Console.WriteLine("Refreshing attributes on {0} failed", targetFile);
 			}
+
+			base.PostParseBuildResult();
 		}
 
 		TagPropertyCollection _props;
