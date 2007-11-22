@@ -105,20 +105,21 @@ namespace QQn.TurtleBuildUtils
 					}
 				}
 
-				ResourceUpdateHandle resHandle = NativeMethods.BeginUpdateResource(toFile, false);
-
-				if (resHandle != null)
+				using (ResourceUpdateHandle resHandle = NativeMethods.BeginUpdateResource(toFile, false))
 				{
-					bool ok = NativeMethods.UpdateResource(resHandle, (IntPtr)16, (IntPtr)1, 0, versionInfo, size);
-					ok = resHandle.Commit() && ok;
+					if (resHandle != null)
+					{
+						bool ok = NativeMethods.UpdateResource(resHandle, (IntPtr)16, (IntPtr)1, 0, versionInfo, size);
+						ok = resHandle.Commit() && ok;
 
-					if (ok && signFile)
-						ok = BuildTools.ResignAssemblyWithFileOrContainer(toFile, keyFile, keyContainer);
+						if (ok && signFile)
+							ok = BuildTools.ResignAssemblyWithFileOrContainer(toFile, keyFile, keyContainer);
 
-					return ok;
+						return ok;
+					}
+					else
+						return false;
 				}
-				else
-					return false;
 			}
 
 			return false;
@@ -152,20 +153,10 @@ namespace QQn.TurtleBuildUtils
 
 				byte[] bytes = File.ReadAllBytes(file);
 				AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += new ResolveEventHandler(OnReflectionOnlyAssemblyResolve);
-				
+
 				try
 				{
-					Assembly srcAssembly; // Load source assembly for reflection
-					try
-					{
-						srcAssembly = Assembly.ReflectionOnlyLoad(bytes);
-					}
-					catch (FileLoadException)
-					{
-						// The assembly '' has already loaded from a different location. It cannot be loaded from a new location within the same appdomain.
-						srcAssembly = Assembly.ReflectionOnlyLoad(AssemblyName.GetAssemblyName(file).FullName);
-					}
-
+					Assembly srcAssembly = Assembly.ReflectionOnlyLoad(bytes);
 					Assembly mscorlib = Assembly.ReflectionOnlyLoad(typeof(int).Assembly.FullName);
 					Assembly system = Assembly.ReflectionOnlyLoad(typeof(Uri).Assembly.FullName);
 
@@ -207,6 +198,10 @@ namespace QQn.TurtleBuildUtils
 				newAssembly.Save(tmpFile);
 
 				return QQnPath.Combine(outputDirectory, tmpFile);
+			}
+			catch (FileLoadException)
+			{
+				return null;
 			}
 			catch (IOException)
 			{

@@ -201,7 +201,7 @@ namespace QQn.TurtleMSBuild
 		/// Gets the target path.
 		/// </summary>
 		/// <value>The target path.</value>
-		public string TargetPath
+		public virtual string TargetPath
 		{
 			get 
 			{
@@ -213,6 +213,10 @@ namespace QQn.TurtleMSBuild
 					return null;
 
 				return QQnPath.Combine(OutputPath, TargetName + TargetExt);
+			}
+			internal set
+			{
+				throw new InvalidOperationException();
 			}
 		}
 

@@ -93,13 +93,11 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			return (T)task.GetType().InvokeMember(name, System.Reflection.BindingFlags.GetProperty, null, task, null);
 		}
 
-		protected void ResolveToOutput(ITaskItem[] files)
+		protected void ResolveAdditionalOutput()
 		{
-			ITaskItem primaryOutput = files[0];
-
 			List<string> searchPaths = new List<string>();
 
-			searchPaths.Add(Path.GetDirectoryName(primaryOutput.ItemSpec));
+			searchPaths.Add(Path.GetFullPath(QQnPath.Combine(ProjectPath, OutputPath)));
 			List<string> candidates = new List<string>();
 
 			foreach (ProjectItem pi in BuildItems)
@@ -129,7 +127,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			searchPaths.Add("{RawFileName}");
 
 			SetTaskParameter(ResolveReferencesTask, "SearchPaths", searchPaths.ToArray());
-			SetTaskParameter(ResolveReferencesTask, "AssemblyFiles", files);
+			SetTaskParameter(ResolveReferencesTask, "AssemblyFiles", new ITaskItem[] { new SimpleTaskItem(QQnPath.Combine(ProjectPath, TargetPath)) });
 			SetTaskParameter(ResolveReferencesTask, "FindRelatedFiles", true);
 			SetTaskParameter(ResolveReferencesTask, "FindSatellites", true);
 			SetTaskParameter(ResolveReferencesTask, "FindSerializationAssemblies", true);
