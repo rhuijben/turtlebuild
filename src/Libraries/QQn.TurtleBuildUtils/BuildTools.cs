@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using Microsoft.Win32;
 using QQn.TurtleUtils.IO;
+using System.Runtime.InteropServices;
 
 namespace QQn.TurtleBuildUtils
 {
@@ -115,7 +116,7 @@ namespace QQn.TurtleBuildUtils
 			else if(!File.Exists(strongNameFile))
 				throw new FileNotFoundException(string.Format(CultureInfo.InvariantCulture, "StrongNameFile not found: {0}", strongNameFile), strongNameFile);
 
-			ProcessStartInfo psi = new ProcessStartInfo(StrongNameToolPath, string.Format(CultureInfo.InvariantCulture, "-Ra \"{0}\" \"{1}\"", assembly, strongNameFile));
+			ProcessStartInfo psi = new ProcessStartInfo(StrongNameToolPath, string.Format(CultureInfo.InvariantCulture, "-q -Ra \"{0}\" \"{1}\"", assembly, strongNameFile));
 			psi.UseShellExecute = false;
 			psi.WindowStyle = ProcessWindowStyle.Hidden;
 			psi.CreateNoWindow = true;
@@ -142,7 +143,7 @@ namespace QQn.TurtleBuildUtils
 			else if (!File.Exists(assembly))
 				throw new FileNotFoundException("Assembly not found", assembly);
 
-			ProcessStartInfo psi = new ProcessStartInfo(StrongNameToolPath, string.Format(CultureInfo.InvariantCulture, "-Rca \"{0}\" \"{1}\"", assembly, container));
+			ProcessStartInfo psi = new ProcessStartInfo(StrongNameToolPath, string.Format(CultureInfo.InvariantCulture, "-q -Rca \"{0}\" \"{1}\"", assembly, container));
 			psi.UseShellExecute = false;
 			psi.WindowStyle = ProcessWindowStyle.Hidden;
 			psi.CreateNoWindow = true;
@@ -163,5 +164,80 @@ namespace QQn.TurtleBuildUtils
 			else
 				throw new ArgumentException("keyFile or keyContainer must be non-null");			
 		}
+
+        /// <summary>
+        /// Gets the framework path which best matches the specified version
+        /// </summary>
+        /// <param name="version">The version.</param>
+        /// <returns></returns>
+        public static DirectoryInfo GetFrameworkDirectory(Version version)
+        {
+            if (version == null)
+                throw new ArgumentNullException("version");
+
+            string runtimeDir = QQnPath.NormalizePath(RuntimeEnvironment.GetRuntimeDirectory());
+            string frameworkDir = Path.GetDirectoryName(runtimeDir);
+
+            DirectoryInfo dir = new DirectoryInfo(frameworkDir);
+            if (!dir.Exists)
+                return null;
+
+            DirectoryInfo[] dirs = dir.GetDirectories("v*.*", SearchOption.TopDirectoryOnly);
+
+            int start = 2;
+            if (version.Build >= 0)
+                start = 4;
+            else if (version.Revision >= 0)
+                start = 3;
+
+            for (int i = start; i >= 2; i--)
+            {
+                string name = "v" + version.ToString(i);
+
+                foreach (DirectoryInfo d in dirs)
+                {
+                    if (string.Equals(d.Name, name, StringComparison.InvariantCultureIgnoreCase))
+                        return d;
+                }
+
+                name += ".";
+
+                foreach (DirectoryInfo d in dirs)
+                {
+                    if (d.Name.StartsWith(name, StringComparison.InvariantCultureIgnoreCase))
+                        return d;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the solution version.
+        /// </summary>
+        /// <param name="solution">The solution.</param>
+        /// <returns></returns>
+        public static Version GetSolutionVersion(string solution)
+        {
+            if (string.IsNullOrEmpty("solution"))
+                throw new ArgumentNullException("solution");
+
+            using (StreamReader sr = File.OpenText(solution))
+            {
+                string line = sr.ReadLine();
+
+                // First line should be empty
+                while (line != null && line.Trim().Length == 0)
+                    line = sr.ReadLine();
+
+                string start = "Microsoft Visual Studio Solution File, Format Version ";
+                if (line.StartsWith(start, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return new Version(line.Substring(start.Length).Trim());
+                }
+                else
+                    return null;
+            }
+        }
 	}
 }

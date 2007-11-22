@@ -87,7 +87,8 @@ namespace TurtleTests
 					{
 						foreach(FileInfo f in di.GetFiles("*.sln", SearchOption.TopDirectoryOnly))
 						{
-							return _testSolution = f.FullName;
+                            if(BuildTools.GetSolutionVersion(f.FullName) < new Version(10,0))
+							    return _testSolution = f.FullName;
 						}
 						di = di.Parent;
 					}
@@ -158,7 +159,7 @@ namespace TurtleTests
 		[Test]
 		public void BuildExternal()
 		{
-			ProcessStartInfo psi = new ProcessStartInfo(MSBuild, string.Format("/nologo \"{0}\" /v:q /p:Configuration={1} \"/logger:MSBuildLogger,{2};OutputDir={3};Indent=true\"", Solution, OtherConfiguration, Logger, LoggerPath));
+			ProcessStartInfo psi = new ProcessStartInfo(MSBuild, string.Format("/nologo \"{0}\" /v:q /p:Configuration={1} \"/logger:MSBuildLogger,{2};OutputDir={3};Indent=true;VC-UpdateVersionInformation=true\"", Solution, OtherConfiguration, Logger, LoggerPath));
 			psi.UseShellExecute = false;
 			psi.RedirectStandardOutput = true;
 			psi.RedirectStandardError = true;
