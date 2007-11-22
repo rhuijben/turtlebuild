@@ -64,7 +64,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QQn.TurtlePackager.Engine",
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MCppTestApp", "Projects\MCppTestApp\MCppTestApp.vcproj", "{6E6E2EC5-4FF4-4361-B156-80B9B97B5684}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MCppTestApp", "Projects\RefreshAttrsMCppTest\RefreshAttrsMCppTestApp.vcproj", "{6E6E2EC5-4FF4-4361-B156-80B9B97B5684}"
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
