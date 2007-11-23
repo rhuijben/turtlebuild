@@ -20,6 +20,8 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			_projectGuid = projectGuid;
 			_buildItems = new List<ProjectItem>();
 			ProjectType = "External";
+			_projectReferences = new SortedFileList();
+			_projectReferences.BaseDirectory = ProjectPath;
 		}
 
 		/// <summary>
@@ -58,11 +60,16 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			{
 				if (_resolveAssemblyReferenceType == null)
 				{
-					Type resolveAssemblyReferenceType;// = Type.GetType("Microsoft.Build.Tasks.ResolveAssemblyReference, Microsoft.Build.Tasks.v3.5, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", false, false);
-					//if (resolveAssemblyReferenceType == null || !typeof(ITask).IsAssignableFrom(resolveAssemblyReferenceType))
-					resolveAssemblyReferenceType = Type.GetType("Microsoft.Build.Tasks.ResolveAssemblyReference, Microsoft.Build.Tasks, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", false, false);
+					Type resolveAssemblyReferenceType;
 
-					_resolveAssemblyReferenceType = resolveAssemblyReferenceType;
+					string name = typeof(ITask).Assembly.FullName.Contains("Version=3.5")
+						? "Microsoft.Build.Tasks.ResolveAssemblyReference, Microsoft.Build.Tasks.v3.5, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+						: "Microsoft.Build.Tasks.ResolveAssemblyReference, Microsoft.Build.Tasks, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a";
+
+					resolveAssemblyReferenceType = Type.GetType(name, false);
+
+					if(typeof(ITask).IsAssignableFrom(resolveAssemblyReferenceType))
+						_resolveAssemblyReferenceType = resolveAssemblyReferenceType;
 				}
 				return _resolveAssemblyReferenceType;
 
@@ -95,14 +102,53 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 		protected void ResolveAdditionalOutput()
 		{
+			ResolveAdditionalOutput(Assembly.ReflectionOnlyLoadFrom(GetFullPath(TargetPath)));
+		}
+
+		SortedFileList _projectReferences;
+		public SortedFileList ProjectReferences
+		{
+			get { return _projectReferences ?? (_projectReferences = new SortedFileList()); }
+		}
+
+		protected override void WriteProjectReferences(System.Xml.XmlWriter xw, bool forReadability)
+		{
+			base.WriteProjectReferences(xw, forReadability);
+
+			if (_projectReferences != null)
+			{
+				ProjectReferences.BaseDirectory = ProjectPath;
+
+				foreach (string src in ProjectReferences.Keys)
+				{
+					xw.WriteStartElement("Project");
+					xw.WriteAttributeString("src", src);
+					xw.WriteEndElement();
+				}
+			}
+		}
+
+		protected void ResolveAdditionalOutput(Assembly asm)
+		{
 			List<string> searchPaths = new List<string>();
 
-			searchPaths.Add(Path.GetFullPath(QQnPath.Combine(ProjectPath, OutputPath)));
+			searchPaths.Add(GetFullPath(TargetPath));
 			List<string> candidates = new List<string>();
+
+			List<ITaskItem> assemblyFiles = new List<ITaskItem>();
+			SortedList<string, string> refAssemblies = new SortedList<string,string>(StringComparer.Ordinal);
+
+			foreach (AssemblyName a in asm.GetReferencedAssemblies())
+			{
+				refAssemblies.Add(a.Name, a.FullName);
+			}
+
+			ITaskItem targetItem = new SimpleTaskItem(GetFullPath(TargetPath));
+			assemblyFiles.Add(targetItem);
 
 			foreach (ProjectItem pi in BuildItems)
 			{
-				string include = pi.Include;
+				string include = GetFullPath(pi.Include);
 
 				if (File.Exists(include))
 				{
@@ -113,21 +159,60 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 					if (!candidates.Contains(include))
 						candidates.Add(include);
+
+					string name = Path.GetFileNameWithoutExtension(include);
+					if (refAssemblies.ContainsKey(name))
+					{
+						AssemblyName aname = AssemblyName.GetAssemblyName(include);
+						string fullName = refAssemblies[name];
+
+						if (aname.FullName == fullName)
+						{
+							SimpleTaskItem sti = new SimpleTaskItem(include);
+							sti.SetMetadata("Private", "true"); // Set as Copy local, see Microsoft.Common.targets
+							sti.SetMetadata("FusionName", fullName); // Used by writing ResolvedDependencyFiles
+							assemblyFiles.Add(sti);
+							refAssemblies.Remove(name);
+							References.Add(new AssemblyReference(fullName, pi, this));
+						}
+					}
+				}
+
+				string origSpec = pi.GetMetadata("OriginalItemSpec");
+				if (!string.IsNullOrEmpty(origSpec))
+				{
+					ProjectReferences.AddUnique(EnsureRelativePath(origSpec));
 				}
 			}
 
+			foreach(KeyValuePair<string, string> k in refAssemblies)
+			{
+				References.Add(new AssemblyReference(k.Value, null, this));
+			}
+
+			/*foreach (AssemblyName a in refAssemblies)
+			{
+				string fileName = a.Name;
+
+				string dllPath = GetFullPath(Path.Combine(OutputPath, fileName + ".dll"));
+				if (File.Exists(dllPath))
+				{
+					SimpleTaskItem sti = new SimpleTaskItem(dllPath);
+					sti.SetMetadata("Private", "true"); // Is a copy local item
+				}
+			}*/
+
 			if (candidates.Count > 0)
 			{
-				searchPaths.Clear();
-				searchPaths.Insert(0, "{CandidateAssemblyFiles}");
+				searchPaths.Clear();				
 				SetTaskParameter(ResolveReferencesTask, "CandidateAssemblyFiles", candidates.ToArray());
 			}
 
+			searchPaths.Insert(0, "{CandidateAssemblyFiles}");
 			searchPaths.Add("{HintPathFromItem}");
 			searchPaths.Add("{RawFileName}");
 
-			SetTaskParameter(ResolveReferencesTask, "SearchPaths", searchPaths.ToArray());
-			SetTaskParameter(ResolveReferencesTask, "AssemblyFiles", new ITaskItem[] { new SimpleTaskItem(QQnPath.Combine(ProjectPath, TargetPath)) });
+			SetTaskParameter(ResolveReferencesTask, "SearchPaths", searchPaths.ToArray());			
 			SetTaskParameter(ResolveReferencesTask, "FindRelatedFiles", true);
 			SetTaskParameter(ResolveReferencesTask, "FindSatellites", true);
 			SetTaskParameter(ResolveReferencesTask, "FindSerializationAssemblies", true);
@@ -138,6 +223,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			{
 				bool local = (i == 0);
 
+				SetTaskParameter(ResolveReferencesTask, "AssemblyFiles", local ? new ITaskItem[] { targetItem } : assemblyFiles.ToArray());
 				SetTaskParameter(ResolveReferencesTask, "FindDependencies", !local);
 
 				if (!ResolveReferencesTask.Execute())
@@ -146,12 +232,6 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 				foreach (ITaskItem item in GetTaskParameter<ITaskItem[]>(ResolveReferencesTask, "ResolvedFiles"))
 				{
 					AddItem(local, TargetType.Item, item);
-
-					if (local)
-					{
-						string fusionName = item.GetMetadata("FusionName");
-						TargetAssembly = new AssemblyReference(fusionName, item, this);
-					}
 				}
 
 				if (!local)
@@ -192,57 +272,6 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 				{
 					AddItem(local, TargetType.Copy, item);
 				}
-
-				if (local)
-				{
-					// Resources assemblies are not found by the resolver code if FindDependencies is false
-					// So look through them 
-
-					SortedFileList extraCopyItems = null;
-					foreach (TargetItem target in ProjectOutput.Values)
-					{
-						if (target.Type == TargetType.Item && QQnPath.IsAssemblyFile(target.Target))
-						{
-							Assembly asm = null;
-							try
-							{
-								asm = Assembly.ReflectionOnlyLoadFrom(QQnPath.Combine(ProjectPath, target.Target));
-
-								if (asm == null)
-									continue;
-							}
-							catch (IOException)
-							{ } // Can't load file
-							catch (SystemException)
-							{ } // Not an assembly
-
-							if (asm != null)
-								foreach (Module module in asm.GetModules(true))
-								{
-									string file = module.FullyQualifiedName;
-
-									if (!ProjectOutput.ContainsKey(file))
-									{
-										if (extraCopyItems == null)
-										{
-											extraCopyItems = new SortedFileList();
-											extraCopyItems.BaseDirectory = ProjectOutput.BaseDirectory;
-										}
-
-										extraCopyItems.AddUnique(file); // Don't edit projectoutput while walking through it
-									}
-								}
-						}
-					}
-					if (extraCopyItems != null)
-					{
-						foreach (string file in extraCopyItems)
-						{
-							// Add resources as Item instead of Copy: Dependencies will see it as SharedItems
-							ProjectOutput.Add(new TargetItem(file, file, TargetType.Item));
-						}
-					}
-				}
 			}
 		}
 
@@ -251,10 +280,11 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			string path = item.ItemSpec;
 
 			string src = EnsureRelativePath(path);
+			string target = (item != null) ? EnsureRelativePath(CalculateTarget(item)) : src;
 
-			if (!ProjectOutput.ContainsKey(src))
+			if (!ProjectOutput.ContainsKey(target))
 			{
-				ProjectOutput.Add(new TargetItem(src, src, local ? type : (TargetType)((int)type | 0x10)));
+				ProjectOutput.Add(new TargetItem(target, src, local ? type : (TargetType)((int)type | 0x10)));
 			}
 		}
 

@@ -202,7 +202,7 @@ namespace QQn.TurtleMSBuild
 					case "NativeReferenceFile":
 						string fusionName = pi.GetMetadata("FusionName");
 						if (!string.IsNullOrEmpty(fusionName))
-							References.Add(new AssemblyReference(fusionName, pi, null));
+							References.Add(new AssemblyReference(fusionName, pi, this));
 
 						type = TargetType.SharedItem;
 						break;
@@ -247,19 +247,6 @@ namespace QQn.TurtleMSBuild
 			}
 		}
 
-		private string CalculateTarget(ProjectItem pi)
-		{
-			string target;
-			string destinationSubDirectory;
-
-			if (pi.TryGetMetaData("TargetPath", out target))
-				return QQnPath.Combine(OutputPath, target);
-			else if (pi.TryGetMetaData("DestinationSubDirectory", out destinationSubDirectory))
-				return QQnPath.Combine(OutputPath, destinationSubDirectory, pi.Filename);
-			else
-				return QQnPath.Combine(OutputPath, pi.Filename);
-		}
-
 		string _intermediateOutputPath;
 		public string IntermediateOutputPath
 		{
@@ -288,7 +275,7 @@ namespace QQn.TurtleMSBuild
 			{
 				try
 				{
-					AssemblyName name = AssemblyName.GetAssemblyName(QQnPath.Combine(ProjectPath, TargetPath));
+					AssemblyName name = AssemblyName.GetAssemblyName(GetFullPath(TargetPath));
 					if (name != null)
 						this.TargetAssembly = new AssemblyReference(name.FullName, null, this);
 				}
@@ -328,22 +315,19 @@ namespace QQn.TurtleMSBuild
 				if (i.Name == "Reference")
 				{
 					xw.WriteStartElement("Reference");
+					xw.WriteAttributeString("assembly", EnsureRelativePath(i.Include));
+					xw.WriteEndElement();
 				}
 				else if (i.Name == "ProjectReference")
 				{
 					xw.WriteStartElement("Project");
-					isProject = true;
+					xw.WriteAttributeString("src", EnsureRelativePath(i.Include));
+
+					if (!isProject && i.HasMetadata("HintPath"))
+						xw.WriteAttributeString("src", i.GetMetadata("HintPath"));
+
+					xw.WriteEndElement();
 				}
-				else
-					continue;
-
-				xw.WriteAttributeString(isProject ? "src" : "assembly", i.Include);
-				if (i.HasMetadata("Name"))
-					xw.WriteAttributeString("name", i.GetMetadata("Name"));
-				if (i.HasMetadata("HintPath"))
-					xw.WriteAttributeString("src", i.GetMetadata("HintPath"));
-
-				xw.WriteEndElement();
 			}
 		}
 

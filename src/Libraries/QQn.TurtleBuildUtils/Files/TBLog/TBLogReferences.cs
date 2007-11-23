@@ -12,14 +12,14 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// </summary>
 	public class TBLogReferences : TBLogContainer
 	{
-		readonly TBLogItemCollection<TBLogProjectReference> _projectReferences;
+		readonly TBLogItemCollection<TBLogItem> _projectReferences;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TBLogReferences"/> class.
 		/// </summary>
 		public TBLogReferences()
 		{
-			_projectReferences = new TBLogItemCollection<TBLogProjectReference>(this);
+			_projectReferences = new TBLogItemCollection<TBLogItem>(this);
 		}
 
 		/// <summary>
@@ -27,7 +27,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		/// </summary>
 		/// <value>The projects.</value>
 		[TokenGroup("Project")]
-		public TBLogItemCollection<TBLogProjectReference> Projects
+		public TBLogItemCollection<TBLogItem> Projects
 		{
 			get { return _projectReferences; }
 		}
@@ -35,7 +35,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		
 	}
 
-	/// <summary>
+	/*/// <summary>
 	/// 
 	/// </summary>
 	public class TBLogProjectReference : TBLogItem, ICollectionItem<TBLogProjectReference>
@@ -81,5 +81,5 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 				return collection.Container;
 			}
 		}
-	}
+	}*/
 }

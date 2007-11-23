@@ -46,8 +46,11 @@ namespace QQn.TurtleBuildUtils
 			get { return _baseDirectory; }
 			set
 			{
+				if (_baseDirectory == value)
+					return;
+
 				if (Count > 0)
-				{
+				{					
 					List<KeyValuePair<string, T>> values = new List<KeyValuePair<string, T>>(this);
 					bool hadBase = !string.IsNullOrEmpty(_baseDirectory);
 					string oldBase = _baseDirectory;

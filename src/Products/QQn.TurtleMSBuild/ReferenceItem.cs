@@ -69,6 +69,17 @@ namespace QQn.TurtleMSBuild
 				_src = project.EnsureRelativePath(item.ItemSpec);
 		}
 
+		public AssemblyReference(string assemblyName, TargetItem item)
+		{
+			if (assemblyName == null)
+				throw new ArgumentNullException("assemblyName");
+			else if (item == null)
+				throw new ArgumentNullException("item");
+
+			_assemblyName = assemblyName;
+			_src = item.Target;
+		}
+
 		public void WriteAttributes(XmlWriter xw)
 		{
 			xw.WriteAttributeString("assemblyName", _assemblyName);
