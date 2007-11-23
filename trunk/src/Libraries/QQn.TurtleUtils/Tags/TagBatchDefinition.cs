@@ -44,6 +44,16 @@ namespace QQn.TurtleUtils.Tags
 
 			return type == _iTaskItem;
 		}
+
+		bool _prepared;
+
+		internal bool Prepared
+		{
+			get { return _prepared; }
+			set { _prepared = value; }
+		}
+
+		internal abstract void Prepare();		
 	}
 
 	/// <summary>
@@ -120,9 +130,14 @@ namespace QQn.TurtleUtils.Tags
 			return AllKeys.GetEnumerator();
 		}
 
-		internal void Prepare()
+		internal override void Prepare()
 		{
+			foreach (TagBatchItem item in _items.Values)
+				item.PrePrepare(this);
 
+			if (!Prepared)
+				foreach (TagBatchItem item in _items.Values)
+					item.Prepare(this);
 		}
 	}
 }

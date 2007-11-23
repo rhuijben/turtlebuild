@@ -9,6 +9,7 @@ using QQn.TurtleUtils.IO;
 using QQn.TurtleUtils.Tokens.Converters;
 using System.Xml.XPath;
 using QQn.TurtleUtils.Tokens;
+using Microsoft.Build.Framework;
 
 namespace QQn.TurtleMSBuild
 {
@@ -289,7 +290,7 @@ namespace QQn.TurtleMSBuild
 
 			if ((DebugSrc == null) || (DebugId == null))
 			{
-				string targetFile = QQnPath.Combine(ProjectPath, TargetPath);
+				string targetFile = GetFullPath(TargetPath);
 
 				if (QQnPath.IsAssemblyFile(targetFile) && File.Exists(targetFile))
 				{
@@ -302,7 +303,7 @@ namespace QQn.TurtleMSBuild
 
 						if (pdbTarget.Exists)
 						{
-							FileInfo pdbFrom = new FileInfo(QQnPath.Combine(ProjectPath, pdbSrc));
+							FileInfo pdbFrom = new FileInfo(GetFullPath(pdbSrc));
 
 							if (!pdbFrom.Exists || ((pdbFrom.Length == pdbTarget.Length) && (pdbFrom.LastWriteTime == pdbTarget.LastWriteTime)))
 								pdbSrc = EnsureRelativePath(pdbTarget.FullName);
@@ -336,6 +337,11 @@ namespace QQn.TurtleMSBuild
 			return QQnPath.EnsureRelativePath(ProjectPath, include);
 		}
 
+		public string GetFullPath(string include)
+		{
+			return Path.GetFullPath(QQnPath.Combine(ProjectPath, include));
+		}
+
 		public virtual bool IsSolution
 		{
 			get { return false; }
@@ -349,7 +355,7 @@ namespace QQn.TurtleMSBuild
 
 			string outDir = OutputPath;
 
-			outDir = Parameters.OutputPath ?? QQnPath.Combine(ProjectPath, OutputPath);
+			outDir = Parameters.OutputPath ?? GetFullPath(OutputPath);
 
 			if (!Directory.Exists(outDir))
 				Directory.CreateDirectory(outDir);
@@ -618,7 +624,25 @@ namespace QQn.TurtleMSBuild
 			get { return _buildEngineTargets; }
 			set { _buildEngineTargets = value; }
 		}
-
 		
+		/// <summary>
+		/// Calculates the target.
+		/// </summary>
+		/// <param name="pi">The pi.</param>
+		/// <returns></returns>
+		protected string CalculateTarget(ITaskItem pi)
+		{
+			string target = pi.GetMetadata("TargetPath");
+			if (!string.IsNullOrEmpty(target))
+				return QQnPath.Combine(OutputPath, target);
+
+			string destinationSubDirectory = pi.GetMetadata("DestinationSubDirectory");
+			string filename = Path.GetFileName(pi.ItemSpec);
+
+			if (!string.IsNullOrEmpty(destinationSubDirectory))
+				return QQnPath.Combine(OutputPath, destinationSubDirectory, filename);
+			else
+				return QQnPath.Combine(OutputPath, filename);
+		}
 	}
 }

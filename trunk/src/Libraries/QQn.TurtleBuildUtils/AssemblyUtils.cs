@@ -53,6 +53,43 @@ namespace QQn.TurtleBuildUtils
 		}
 
 		/// <summary>
+		/// Updates the version info in the file header from the attributes defined on the assembly.
+		/// </summary>
+		/// <param name="assembly">The assembly.</param>
+		/// <param name="keyFile">The key file.</param>
+		/// <param name="keyContainer">The key container.</param>
+		/// <returns></returns>
+		public static bool RefreshVersionInfoFromAttributes(Assembly assembly, string keyFile, string keyContainer)
+		{
+			if (assembly == null)
+				throw new ArgumentNullException("assembly");
+
+			string file = new Uri(assembly.CodeBase).LocalPath;
+
+			if (!File.Exists(file))
+				throw new FileNotFoundException("File to update not found", file);
+			else if (!string.IsNullOrEmpty(keyFile) && !File.Exists(keyFile))
+				throw new FileNotFoundException("File to update not found", keyFile);
+
+			string tmpDir = QQnPath.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+			Directory.CreateDirectory(tmpDir);
+			try
+			{
+				string tmpAssembly = GenerateAttributeAssembly(assembly, tmpDir);
+
+				if (tmpAssembly == null)
+					return false;
+
+				return CopyFileVersionInfo(tmpAssembly, file, keyFile, keyContainer);
+			}
+			finally
+			{
+				if (Directory.Exists(tmpDir))
+					Directory.Delete(tmpDir, true);
+			}
+		}
+
+		/// <summary>
 		/// Copies the file version info header from one file to an other
 		/// </summary>
 		/// <param name="fromFile">Source file.</param>
@@ -133,10 +170,26 @@ namespace QQn.TurtleBuildUtils
 		/// <returns></returns>
 		private static string GenerateAttributeAssembly(string file, string outputDirectory)
 		{
-			AssemblyName srcName = AssemblyName.GetAssemblyName(file);
+			if(string.IsNullOrEmpty(file))
+				throw new ArgumentNullException("file");
+			else if (string.IsNullOrEmpty(outputDirectory))
+				throw new ArgumentNullException("outputDirectory");
+
+			byte[] bytes = File.ReadAllBytes(file);
+
+			Assembly srcAssembly = Assembly.ReflectionOnlyLoad(bytes);
+
+			return GenerateAttributeAssembly(srcAssembly, outputDirectory);
+		}
+
+		private static string GenerateAttributeAssembly(Assembly assembly, string outputDirectory)
+		{
+			AssemblyName srcName = new AssemblyName(assembly.FullName);
 
 			if (srcName == null || string.IsNullOrEmpty(srcName.Name))
 				return null;
+
+			string file = new Uri(assembly.CodeBase).LocalPath;
 
 			try
 			{
@@ -151,16 +204,14 @@ namespace QQn.TurtleBuildUtils
 				string tmpFile = Path.GetFileNameWithoutExtension(file) + ".resTmp" + extension;
 				newAssembly.DefineDynamicModule(asmName.Name, tmpFile);
 
-				byte[] bytes = File.ReadAllBytes(file);
 				AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += new ResolveEventHandler(OnReflectionOnlyAssemblyResolve);
 
 				try
-				{
-					Assembly srcAssembly = Assembly.ReflectionOnlyLoad(bytes);
+				{					
 					Assembly mscorlib = Assembly.ReflectionOnlyLoad(typeof(int).Assembly.FullName);
 					Assembly system = Assembly.ReflectionOnlyLoad(typeof(Uri).Assembly.FullName);
 
-					foreach (CustomAttributeData attr in CustomAttributeData.GetCustomAttributes(srcAssembly))
+					foreach (CustomAttributeData attr in CustomAttributeData.GetCustomAttributes(assembly))
 					{
 						if ((attr.NamedArguments.Count > 0) || (attr.Constructor == null))
 						{

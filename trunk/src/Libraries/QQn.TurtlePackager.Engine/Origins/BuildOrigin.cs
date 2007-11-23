@@ -97,7 +97,7 @@ namespace QQn.TurtlePackager.Origins
 				// Add an initial set of dependencies directly from the project files
 				foreach (TBLogConfiguration config in LogFile.Configurations)
 				{
-					foreach (TBLogProjectReference project in config.References.Projects)
+					foreach (TBLogItem project in config.References.Projects)
 					{
 						string src = QQnPath.NormalizePath(project.FullSrc);
 
