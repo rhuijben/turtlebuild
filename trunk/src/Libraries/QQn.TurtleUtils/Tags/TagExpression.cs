@@ -63,5 +63,26 @@ namespace QQn.TurtleUtils.Tags
 		{
 			get { return _emptyEnumerable; }
 		}
+
+		/// <summary>
+		/// Gets all leave expressions.
+		/// </summary>
+		/// <returns></returns>
+		protected internal IEnumerable<TagExpression> GetAllLeaveExpressions()
+		{
+			bool foundOne = false;
+			foreach (TagExpression t in SubExpressions)
+			{
+				foundOne = true;
+
+				foreach (TagExpression tt in t.GetAllLeaveExpressions())
+				{
+					yield return tt;
+				}
+			}
+
+			if (!foundOne)
+				yield return this;
+		}
 	}
 }

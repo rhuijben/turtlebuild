@@ -13,7 +13,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 	{
 		const RegexOptions _reOptions = RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline | RegexOptions.CultureInvariant |RegexOptions.ExplicitCapture | RegexOptions.Compiled;
 		// Regexes have an extra paren around them for allowing combinations
-		const string _itemRegex = @"(@\( \s* (?<ITEM>[A-Z_][A-Z0-9_-]*]*) \s* (\[ \s* (?<ITEM_CONDITION> ([^\]']|'[^']*'])* ) \s* \] \s*)?  (-\> \s* '(?<TRANSFORM>[^']*)' \s* )? (\, \s* '(?<ITEM_SEPARATOR>[^']*)' \s*)? \))";
+		const string _itemRegex = @"(@\( \s* (?<ITEM>[A-Z_][A-Z0-9_-]*]*) \s* (-\> \s* '(?<TRANSFORM>[^']*)' \s* )? (\, \s* '(?<ITEM_SEPARATOR>[^']*)' \s*)? \))";
 		const string _keyRegex = @"(%\( \s* ((?<ITEM_PREFIX>[A-Z_][A-Z0-9-]*) \s* \. \s*)? (?<KEY>[A-Z_][A-Z0-9]*) \s* \))";
 		const string _propertyRegex = @"(\$\( \s* (?<PROPERTY>[A-Z_][A-Z0-9_-]*) \s* \))";
 
@@ -21,6 +21,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		static Regex _keyR;
 		static Regex _propertyR;
 		static Regex _ItemKeyOrPropertyR;
+		static Regex _KeyOrPropertyR;
 
 		#region Public Regex definitions
 		/// <summary>
@@ -38,11 +39,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// <summary>
 		/// The name of the Separator regex group in <see cref="ItemRegex"/>
 		/// </summary>
-		public const string RegexGroupSeparator = "ITEM_SEPARATOR";
-		/// <summary>
-		/// The name of the Item condition regex group in <see cref="ItemRegex"/>
-		/// </summary>
-		public const string RegexGroupItemCondition = "ITEM_CONDITION";
+		public const string RegexGroupSeparator = "ITEM_SEPARATOR";		
 		/// <summary>
 		/// The name of the Key regex group in <see cref="KeyRegex"/>
 		/// </summary>
@@ -87,10 +84,21 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// </summary>
 		/// <value>The item key or property regex.</value>
 		/// <remarks>Or-ed combination of <see cref="ItemRegex"/>, <see cref="KeyRegex"/> and <see cref="PropertyRegex"/></remarks>
-		static Regex ItemKeyOrPropertyRegex
+		internal static Regex ItemKeyOrPropertyRegex
 		{
 			get { return _ItemKeyOrPropertyR ?? (_ItemKeyOrPropertyR = new Regex(_itemRegex + "|" + _keyRegex + "|" + _propertyRegex, _reOptions)); }
 		}
+
+		/// <summary>
+		/// Gets the key or property regex.
+		/// </summary>
+		/// <value>The key or property regex.</value>
+		/// <remarks>Or-ed combination of <see cref="KeyRegex"/> and <see cref="PropertyRegex"/></remarks>
+		internal static Regex KeyOrPropertyRegex
+		{
+			get { return _KeyOrPropertyR ?? (_KeyOrPropertyR = new Regex(_keyRegex + "|" + _propertyRegex, _reOptions)); }
+		}
+
 		#endregion
 
 		/// <summary>

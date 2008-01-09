@@ -189,7 +189,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			{
 				case TagTokenType.String:
 					state.NextToken();
-					return new StringExpression(tk);
+					return DynamicStringExpression.IsDynamic(tk) ? new DynamicStringExpression(tk) : new StringExpression(tk);
 				case TagTokenType.Number:
 					state.NextToken();
 					return new NumberExpression(tk);

@@ -149,6 +149,8 @@ namespace TurtleTests.Tags
 			Assert.That(TagExpander.ItemRegex, Is.Not.Null);
 			Assert.That(TagExpander.KeyRegex, Is.Not.Null);
 			Assert.That(TagExpander.PropertyRegex, Is.Not.Null);
+			Assert.That(TagExpander.ItemKeyOrPropertyRegex, Is.Not.Null);
+			Assert.That(TagExpander.KeyOrPropertyRegex, Is.Not.Null);
 
 			Assert.That(TagExpander.Escape("ba%nana"), Is.EqualTo("ba%nana"));
 			Assert.That(TagExpander.Escape("ba%20nana"), Is.EqualTo("ba%2520nana"));

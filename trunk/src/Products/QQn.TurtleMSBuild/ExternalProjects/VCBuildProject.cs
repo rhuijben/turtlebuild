@@ -86,8 +86,6 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			base.PostParseBuildResult();
 		}
 
-		TagPropertyCollection _props;
-
 		string _targetPath;
 
 		public override string TargetPath
