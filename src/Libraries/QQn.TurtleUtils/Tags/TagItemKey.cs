@@ -133,6 +133,11 @@ namespace QQn.TurtleUtils.Tags
 		{
 			return new TagItemKey(Key, Value);
 		}
+
+		internal string ExpandedValue()
+		{
+			return Value;
+		}
 	}
 
 	/// <summary>

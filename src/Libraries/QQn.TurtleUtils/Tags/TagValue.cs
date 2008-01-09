@@ -4,7 +4,7 @@ using System.Text;
 
 namespace QQn.TurtleUtils.Tags
 {
-	/// <summary>
+/*	/// <summary>
 	/// 
 	/// </summary>
 	public abstract class TagValue
@@ -13,7 +13,5 @@ namespace QQn.TurtleUtils.Tags
 		/// 
 		/// </summary>
 		TagEnvironment _environment;
-
-
-	}
+	}*/
 }

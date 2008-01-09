@@ -6,9 +6,17 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 {
 	class StringExpression : TagExpression
 	{
+		readonly string _value;
 		public StringExpression(TagToken token)
 			: base(token)
 		{
+			_value = token.Value;
+			_value = _value.Substring(1, _value.Length - 2);
+		}
+
+		public string Value
+		{
+			get { return _value; }
 		}
 
 		/// <summary>

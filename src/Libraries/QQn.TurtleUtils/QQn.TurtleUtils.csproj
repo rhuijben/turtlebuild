@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{BB47C9BD-2E01-4EEC-9128-BDDCF80300B1}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -101,6 +101,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="QQn.TurtleUtils.snk" />
+    <Compile Include="Tags\BatchItems\StubItem.cs" />
+    <Compile Include="Tags\BatchItems\TagBatchItem.cs" />
+    <Compile Include="Tags\BatchItems\TagConditionItem.cs" />
+    <Compile Include="Tags\BatchItems\TagSingleBatchItem.cs" />
+    <Compile Include="Tags\BatchItems\TagMultiBatchItem.cs" />
     <Compile Include="Cryptography\QQnHashComparer.cs" />
     <Compile Include="Globalization\QQnDateUtils.cs" />
     <Compile Include="Items\ICollectionItem.cs" />
@@ -116,6 +121,7 @@
     <Compile Include="IO\DeleteOnCloseStream.cs" />
     <Compile Include="Items\ItemCollection.cs" />
     <Compile Include="Items\KeyedItemCollection.cs" />
+    <Compile Include="Items\Pair.cs" />
     <Compile Include="Tags\ExpressionParser\AndOrExpression.cs" />
     <Compile Include="Tags\ExpressionParser\BinaryExpression.cs" />
     <Compile Include="Tags\ExpressionParser\CompareExpression.cs" />
@@ -134,10 +140,11 @@
     <Compile Include="Tags\ExpressionParser\StringExpression.cs" />
     <Compile Include="Tags\ExpressionParser\Token.cs" />
     <Compile Include="Tags\ExpressionParser\UnaryExpression.cs" />
+    <Compile Include="Tags\ExpressionParser\ValueItems.cs" />
     <Compile Include="Tags\ITagItem.cs" />
     <Compile Include="Tags\TagBatchDefinition.cs" />
+    <Compile Include="Tags\TagBatchException.cs" />
     <Compile Include="Tags\TagBatchInstance.cs" />
-    <Compile Include="Tags\TagBatchItem.cs" />
     <Compile Include="Tags\TagContext.cs" />
     <Compile Include="Tags\ExpressionParser\TagExpander.cs" />
     <Compile Include="Tags\TagExpression.cs" />

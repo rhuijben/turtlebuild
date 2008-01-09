@@ -8,6 +8,8 @@ using QQn.TurtleUtils.Tokens;
 using System.ComponentModel;
 using System.IO;
 using QQn.TurtleUtils.IO;
+using QQn.TurtleUtils.Tags.ExpressionParser;
+using System.Text.RegularExpressions;
 
 namespace QQn.TurtleUtils.Tags
 {
@@ -206,6 +208,63 @@ namespace QQn.TurtleUtils.Tags
 		}
 
 		#endregion
+
+		/// <summary>
+		/// Expands the value.
+		/// </summary>
+		/// <param name="context">The context.</param>
+		/// <param name="definition">The definition.</param>
+		/// <returns></returns>
+		public string ExpandedValue(TagContext context, string definition)
+		{
+			if(context == null)
+				throw new ArgumentNullException("context");
+			if (definition == null)
+				return Include;
+
+			return TagExpander.KeyOrPropertyRegex.Replace(definition, delegate(Match match)
+			{
+				Group g;
+
+				if (null != (g = match.Groups[TagExpander.RegexGroupKey]) && g.Success)
+				{
+					Group gg = match.Groups[TagExpander.RegexGroupItemPrefix];
+
+					if (gg != null && gg.Success)
+						throw new NotImplementedException();
+
+					if (Keys.Contains(g.Value))
+						return Keys[g.Value].ExpandedValue();
+					else
+						return "";
+				}
+				else if (null != (g = match.Groups[TagExpander.RegexGroupProperty]))
+				{
+					if (context.Properties.Contains(g.Value))
+						return context.Properties[g.Value].ExpandedValue();
+					else
+						return "";
+				}
+				else
+					return "";
+			});
+		}
+
+		/// <summary>
+		/// Expandes the key.
+		/// </summary>
+		/// <param name="keyName">Name of the key.</param>
+		/// <returns></returns>
+		public string ExpandedKey(string keyName)
+		{
+			if (string.IsNullOrEmpty(keyName))
+				return Include;
+
+			if (Keys.Contains(keyName))
+				return Keys[keyName].ExpandedValue();
+
+			return null;		
+		}
 	}
 
 	/// <summary>

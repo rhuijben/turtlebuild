@@ -7,7 +7,7 @@ namespace QQn.TurtleUtils.Tags
 	/// <summary>
 	/// 
 	/// </summary>
-	public class TagContext
+	public abstract class TagContext
 	{
 		readonly TagEnvironment _environment;
 
@@ -36,6 +36,15 @@ namespace QQn.TurtleUtils.Tags
 		public bool EvaluateCondition(string condition)
 		{
 			return true;
+		}
+
+		/// <summary>
+		/// Gets the properties.
+		/// </summary>
+		/// <value>The properties.</value>
+		public abstract TagPropertyCollection Properties
+		{
+			get;
 		}
 	}
 }
