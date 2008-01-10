@@ -45,9 +45,10 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 
 		ValueItem[] _items;
 
-		protected void InitPreparation(TagBatchDefinition batchDefinition)
+		protected void InitPreparation(TagBatchDefinition batchDefinition, int offset)
 		{
 			_preparedFor = batchDefinition;
+			_offset = offset;
 		}
 
 		/// <summary>
@@ -57,10 +58,9 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 		/// <param name="offset">The offset.</param>
 		protected internal virtual void Prepare(TagBatchDefinition batchDefinition, int offset)
 		{
-			InitPreparation(batchDefinition);
+			InitPreparation(batchDefinition, offset);
 
 			_items = PrepareString(batchDefinition, Definition, ProvidesList ? PrepareMode.List : PrepareMode.String);
-			_offset = offset;
 		}
 
 		protected internal static ValueItem[] PrepareString(TagBatchDefinition batchDefinition, string definition, PrepareMode mode)
@@ -115,13 +115,14 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 		/// </summary>
 		protected virtual internal void PostPrepare(TagBatchDefinition batchDefinition)
 		{
-			foreach (ValueItem tv in _items)
-			{
-				tv.PostPrepare(batchDefinition);
-			}
+			if(_items != null)
+				foreach (ValueItem tv in _items)
+				{
+					tv.PostPrepare(batchDefinition);
+				}
 		}
 
-		protected string ApplyItems(TagBatchInstance instance)
+		protected virtual string ApplyItems(TagBatchInstance instance)
 		{
 			StringBuilder sb = new StringBuilder();
 

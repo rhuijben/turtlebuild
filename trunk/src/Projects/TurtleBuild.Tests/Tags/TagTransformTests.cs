@@ -4,6 +4,7 @@ using System.Text;
 using NUnit.Framework;
 using QQn.TurtleUtils.Tags;
 using NUnit.Framework.SyntaxHelpers;
+using System.Collections;
 
 namespace TurtleTests.Tags
 {
@@ -31,15 +32,14 @@ namespace TurtleTests.Tags
 			Assert.That(env, Is.Not.Null);
 
 			TagBatchDefinition<string> tbd = new TagBatchDefinition<string>();
-			tbd.Add("src", "@(ProjectOutput)", typeof(ITagItem[]));
+			tbd.Add("src", "@(ProjectOutput);static1", typeof(ITagItem[]));
 			tbd.Add("src2", "@(ProjectOutput)", typeof(string[]));
 			tbd.Add("to", "@(ProjectOutput->'%(FullPath)')", typeof(string));
 			tbd.Add("info", "%(FileOrigin)", typeof(string));
 			tbd.AddCondition("if", "'%(FileOrigin)' == 'c:\\work\\app\\bin\\debug'");
 
-			bool inside = false;
 			int n = 0;
-			foreach (TagBatchInstance<string> r in env.RunBatch(tbd))
+			foreach (TagBatchInstance<string> r in env.RunBatch(tbd, false))
 			{
 				Assert.That(r, Is.Not.Null);
 				Assert.That(r["src"], Is.TypeOf(typeof(ITagItem[])));
@@ -56,6 +56,18 @@ namespace TurtleTests.Tags
 						Assert.That(r["info"], Is.EqualTo("c:\\work\\app\\bin\\debug"));
 						Assert.That(r.ConditionResult("if"), "'if' condition true");
 						Assert.That(r.ConditionResult(), "All conditions true");
+						foreach (ITagItem ii in (IEnumerable)r["src"])
+						{
+							if (ii.ItemSpec == "static1")
+							{
+								Assert.That(ii.MetadataCount, Is.EqualTo(0));
+							}
+							else
+							{
+								Assert.That(ii.MetadataCount, Is.GreaterThan(0));
+								Assert.That(ii.KeyNames, Has.Some.EqualTo("FileOrigin"));
+							}
+						}
 						break;
 					case 1:
 						Assert.That(r["info"], Is.EqualTo("c:\\work\\app"));
@@ -64,11 +76,9 @@ namespace TurtleTests.Tags
 						Assert.That(r.ConditionResult(), Is.False, "'if' conditions false");
 						break;
 				}
-
-				inside = true;
 			}
 
-			Assert.That(inside);
+			Assert.That(n, Is.EqualTo(2));
 		}
 	}
 }

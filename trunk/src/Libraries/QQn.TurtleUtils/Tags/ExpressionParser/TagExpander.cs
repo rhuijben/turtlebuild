@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Collections.ObjectModel;
 
 namespace QQn.TurtleUtils.Tags.ExpressionParser
 {
@@ -233,5 +234,71 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		{
 			return Escape(value, true, true);
 		}
+
+		/// <summary>
+		/// Splits the item list.
+		/// </summary>
+		/// <param name="rawValue">The raw list value.</param>
+		/// <returns></returns>
+		public static IList<string> SplitItemList(string rawValue)
+		{
+			List<string> items = new List<string>();
+			string str;
+			
+			int offset = 0;
+			bool inTag = false;
+			bool inString = false;
+			for (int i = 0; i < rawValue.Length; i++)
+			{
+				switch (rawValue[i])
+				{
+					case '\'':
+						if (inTag)
+							inString = !inString;
+
+						break;
+
+					case ')':
+						if (inTag && !inString)
+							inTag = false;
+
+						break;
+
+					case ';':
+						if (!inTag)
+						{
+							str = rawValue.Substring(offset, i - offset).Trim();
+							if (str.Length > 0)
+							{
+								items.Add(str);
+							}
+							offset = i + 1;
+						}
+						break;
+
+					case '@':
+						if (!inTag)
+						{
+							if ((rawValue.Length + 1 > i) && (rawValue[i + 1] == '('))
+							{
+								i++;
+								inTag = true;
+							}
+						}
+						break;
+				}
+			}
+			str = rawValue.Substring(offset).Trim();
+			
+			if (str.Length > 0)
+				items.Add(str);
+			
+			return items;
+		}
+
+ 
+
+ 
+
 	}
 }
