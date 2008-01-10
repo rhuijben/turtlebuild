@@ -46,7 +46,7 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 
 		protected internal override void Prepare(TagBatchDefinition batchDefinition, int offset)
 		{
-			InitPreparation(batchDefinition);
+			InitPreparation(batchDefinition, offset);
 
 			foreach (TagExpression te in _expression.GetAllLeaveExpressions())
 			{
@@ -55,8 +55,6 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 				if (dse != null)
 					dse.Prepare(batchDefinition);
 			}
-
-			base.Prepare(batchDefinition, offset);
 		}
 
 		protected internal override void PostPrepare(TagBatchDefinition batchDefinition)
