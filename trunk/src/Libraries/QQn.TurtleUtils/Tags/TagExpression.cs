@@ -8,7 +8,7 @@ namespace QQn.TurtleUtils.Tags
 	/// <summary>
 	/// 
 	/// </summary>
-	public class TagExpression
+	public abstract class TagExpression
 	{
 		readonly TagToken _token;
 
@@ -84,5 +84,8 @@ namespace QQn.TurtleUtils.Tags
 			if (!foundOne)
 				yield return this;
 		}
+
+		internal abstract ExValue Evaluate<TKey>(TagBatchInstance<TKey> instance)
+			where TKey : class;
 	}
 }

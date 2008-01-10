@@ -155,7 +155,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 				state.Next();
 
 				// Scanning 0x0E3F hex string
-				state.SkipHexDigits(); // Bug: 0x is a valid value!
+				state.SkipHexDigits(); // Bug: Assumes 0x is a valid value!
 
 				return state.CreateToken(TagTokenType.Number, state.CurrentTokenText);
 			}

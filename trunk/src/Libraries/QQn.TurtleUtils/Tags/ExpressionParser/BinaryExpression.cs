@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Diagnostics;
 
 namespace QQn.TurtleUtils.Tags.ExpressionParser
 {
-	class BinaryExpression : TagExpression
+	abstract class BinaryExpression : TagExpression
 	{
 		TagExpression _lhs; // Only editted by and and or-reordering
 		TagExpression _rhs;
 		bool _editable;
 
-		public BinaryExpression(TagToken token, TagExpression lhs, TagExpression rhs)
+		protected BinaryExpression(TagToken token, TagExpression lhs, TagExpression rhs)
 			: base(token)
 		{
 			if (lhs == null)
@@ -37,6 +38,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// <value>The left hand.</value>
 		public TagExpression LeftHand
 		{
+			[DebuggerStepThrough]
 			get { return _lhs; }
 			internal set
 			{
@@ -52,6 +54,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// <value>The right hand.</value>
 		public TagExpression RightHand
 		{
+			[DebuggerStepThrough]
 			get { return _rhs; }
 			internal set
 			{

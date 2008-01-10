@@ -15,5 +15,10 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		{
 			return InnerExpression.ToString();
 		}
+
+		internal override ExValue Evaluate<TKey>(TagBatchInstance<TKey> instance)
+		{
+			return InnerExpression.Evaluate(instance);
+		}
 	}
 }

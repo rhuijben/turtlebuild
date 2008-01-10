@@ -16,5 +16,10 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 
 			_args = args;
 		}
+
+		internal override ExValue Evaluate<TKey>(TagBatchInstance<TKey> instance)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

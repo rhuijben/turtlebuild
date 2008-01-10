@@ -26,7 +26,7 @@ namespace QQn.TurtleUtils.Tags
 			_context = context;
 			_values = new object[definition.ItemCount];
 		}
-		
+
 		/// <summary>
 		/// Gets the <see cref="System.Object"/> with the specified key.
 		/// </summary>
@@ -93,9 +93,9 @@ namespace QQn.TurtleUtils.Tags
 				return Items[0];
 
 			int n = 0;
-			foreach(string s in _definition.ItemsUsed)
+			foreach (string s in _definition.ItemsUsed)
 			{
-				if(itemName == s)
+				if (itemName == s)
 				{
 					return _items[n];
 				}
@@ -120,7 +120,7 @@ namespace QQn.TurtleUtils.Tags
 
 			StringBuilder sb = new StringBuilder();
 			bool first = true;
-			foreach(TagItem i in items)
+			foreach (TagItem i in items)
 			{
 				if (first)
 					first = false;
@@ -131,6 +131,17 @@ namespace QQn.TurtleUtils.Tags
 			}
 
 			return sb.ToString();
+		}
+
+		internal string GetKeyValue(string item, string key)
+		{
+			TagItemCollection items = GetItems(item ?? DefaultItem);
+
+			if (items == null || items.Count == 0)
+				return null;
+
+			// The value of all items in the list is the same (batching requirement)
+			return items[0].ExpandedKey(key);
 		}
 
 		/// <summary>
@@ -169,6 +180,12 @@ namespace QQn.TurtleUtils.Tags
 		{
 			get { return _items; }
 		}
+
+		/// <summary>
+		/// Gets the result of all evaluated conditions
+		/// </summary>
+		/// <returns></returns>
+		public abstract bool ConditionResult();
 	}
 
 	/// <summary>
@@ -196,8 +213,8 @@ namespace QQn.TurtleUtils.Tags
 				TagBatchItem tbi = _definition[key];
 
 				object value = Values[tbi.Offset];
-				if(value == null)
-					return (Values[tbi.Offset] = tbi.GetValue(Context, _definition, this));
+				if (value == null)
+					return (Values[tbi.Offset] = tbi.GetValue(_definition, this));
 
 				return value;
 			}
@@ -210,7 +227,7 @@ namespace QQn.TurtleUtils.Tags
 		/// <returns></returns>
 		public bool ConditionResult(TKey key)
 		{
-			return true;
+			return (bool)_definition[key].GetValue(_definition, this);
 		}
 
 		/// <summary>
@@ -239,6 +256,23 @@ namespace QQn.TurtleUtils.Tags
 		protected internal override void Fill(TagItemCollection[] items)
 		{
 			base.Fill(items);
+		}
+
+		/// <summary>
+		/// Gets the result of all evaluated conditions
+		/// </summary>
+		/// <returns></returns>
+		public override bool ConditionResult()
+		{
+			foreach (TagBatchItem tbi in _definition.AllValues)
+			{
+				TagConditionItem tci = tbi as TagConditionItem;
+
+				if ((tci != null) && !tci.EvaluateCondition(this))
+					return false;
+			}
+
+			return true;
 		}
 	}
 }
