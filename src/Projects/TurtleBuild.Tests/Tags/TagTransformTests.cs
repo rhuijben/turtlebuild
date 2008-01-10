@@ -32,19 +32,38 @@ namespace TurtleTests.Tags
 
 			TagBatchDefinition<string> tbd = new TagBatchDefinition<string>();
 			tbd.Add("src", "@(ProjectOutput)", typeof(ITagItem[]));
+			tbd.Add("src2", "@(ProjectOutput)", typeof(string[]));
 			tbd.Add("to", "@(ProjectOutput->'%(FullPath)')", typeof(string));
 			tbd.Add("info", "%(FileOrigin)", typeof(string));
 			tbd.AddCondition("if", "'%(FileOrigin)' == 'c:\\work\\app\\bin\\debug'");
 
 			bool inside = false;
+			int n = 0;
 			foreach (TagBatchInstance<string> r in env.RunBatch(tbd))
 			{
 				Assert.That(r, Is.Not.Null);
-
 				Assert.That(r["src"], Is.TypeOf(typeof(ITagItem[])));
 				Assert.That(r["to"], Is.TypeOf(typeof(string)));
 				Assert.That(r["info"], Is.TypeOf(typeof(string)));
 				Assert.That(r["if"], Is.TypeOf(typeof(bool)));
+
+				switch(n++)
+				{
+					case 0:
+						Assert.That(r["src2"], Has.Some.EqualTo("assembly.dll"));
+						Assert.That(r["src2"], Has.Some.EqualTo("assembly.pdb"));
+						Assert.That(r["src2"], Has.Some.EqualTo("en\\assembly.resources.dll"));
+						Assert.That(r["info"], Is.EqualTo("c:\\work\\app\\bin\\debug"));
+						Assert.That(r.ConditionResult("if"), "'if' condition true");
+						Assert.That(r.ConditionResult(), "All conditions true");
+						break;
+					case 1:
+						Assert.That(r["info"], Is.EqualTo("c:\\work\\app"));
+						Assert.That(r["src2"], Has.All.EqualTo("res.txt"));
+						Assert.That(r.ConditionResult("if"), Is.False, "If condition false");
+						Assert.That(r.ConditionResult(), Is.False, "'if' conditions false");
+						break;
+				}
 
 				inside = true;
 			}

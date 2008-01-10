@@ -4,7 +4,7 @@ using System.Text;
 
 namespace QQn.TurtleUtils.Tags.ExpressionParser
 {
-	class UnaryExpression : TagExpression
+	abstract class UnaryExpression : TagExpression
 	{
 		TagExpression _inner;
 

@@ -124,6 +124,7 @@
     <Compile Include="Items\Pair.cs" />
     <Compile Include="Tags\ExpressionParser\AndOrExpression.cs" />
     <Compile Include="Tags\ExpressionParser\BinaryExpression.cs" />
+    <Compile Include="Tags\ExpressionParser\ExValue.cs" />
     <Compile Include="Tags\ExpressionParser\CompareExpression.cs" />
     <Compile Include="Tags\ExpressionParser\DynamicStringExpression.cs" />
     <Compile Include="Tags\ExpressionParser\ExpressionException.cs" />
@@ -152,7 +153,6 @@
     <Compile Include="Tags\TagItemKey.cs" />
     <Compile Include="Tags\TagProperty.cs" />
     <Compile Include="Tags\TagEnvironment.cs" />
-    <Compile Include="Tags\TagValue.cs" />
     <Compile Include="Tokens\Converters\UtcDateTimeConverter.cs" />
     <Compile Include="Tokens\Converters\VersionConverter.cs" />
     <Compile Include="Tokens\ITokenizerInitialize.cs" />

@@ -6,9 +6,15 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 {
 	sealed class NumberExpression : TagExpression
 	{
+		ExValue _value;
 		public NumberExpression(TagToken token)
 			: base(token)
 		{
+			string tv = token.Value;
+			if(tv.IndexOfAny(new char[] { '.', 'E', 'e' }) >= 0)
+				_value = new ExValue(double.Parse(tv));
+			else
+				_value = new ExValue(int.Parse(tv, System.Globalization.NumberStyles.AllowHexSpecifier | System.Globalization.NumberStyles.AllowLeadingSign));
 		}
 
 		/// <summary>
@@ -20,6 +26,11 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		public override string ToString()
 		{
 			return Token.ToString();
+		}
+
+		internal override ExValue Evaluate<TKey>(TagBatchInstance<TKey> instance)
+		{
+			return _value;
 		}
 	}
 }

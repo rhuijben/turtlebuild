@@ -113,15 +113,15 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 		/// <summary>
 		/// Posts the prepare.
 		/// </summary>
-		protected internal void PostPrepare(TagBatchDefinition batchDefinition)
+		protected virtual internal void PostPrepare(TagBatchDefinition batchDefinition)
 		{
 			foreach (ValueItem tv in _items)
 			{
-				tv.PostPrepare(this, batchDefinition);
+				tv.PostPrepare(batchDefinition);
 			}
 		}
 
-		protected string ApplyItems(TagContext context, TagBatchInstance instance)
+		protected string ApplyItems(TagBatchInstance instance)
 		{
 			StringBuilder sb = new StringBuilder();
 
@@ -153,7 +153,7 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 			get { return _offset; }
 		}
 
-		internal abstract object GetValue<TKey>(TagContext context, TagBatchDefinition<TKey> definition, TagBatchInstance<TKey> instance)
+		internal abstract object GetValue<TKey>(TagBatchDefinition<TKey> definition, TagBatchInstance<TKey> instance)
 			where TKey : class;
 
 		protected virtual object CreateValue(string value)

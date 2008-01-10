@@ -15,7 +15,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// <returns></returns>
 		public abstract string ToString(TagBatchInstance instance);
 
-		internal virtual void PostPrepare(TagBatchItem tagBatchItem, TagBatchDefinition batchDefinition)
+		internal virtual void PostPrepare(TagBatchDefinition batchDefinition)
 		{
 			//throw new NotImplementedException();
 		}
@@ -108,7 +108,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 
 		public override string ToString(TagBatchInstance instance)
 		{
-			return instance.GetItemValue(_item, _key, null);
+			return instance.GetKeyValue(_item, _key);
 		}
 
 		public string Key
@@ -126,9 +126,9 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			get { return true; }
 		}
 
-		internal override void PostPrepare(TagBatchItem tagBatchItem, TagBatchDefinition batchDefinition)
+		internal override void PostPrepare(TagBatchDefinition batchDefinition)
 		{
-			base.PostPrepare(tagBatchItem, batchDefinition);
+			base.PostPrepare(batchDefinition);
 
 			if(_item == null)
 				_item = batchDefinition.DefaultItemName;
@@ -176,9 +176,9 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		}
 
 		ValueItem[] _parts;
-		internal override void PostPrepare(TagBatchItem tagBatchItem, TagBatchDefinition batchDefinition)
+		internal override void PostPrepare(TagBatchDefinition batchDefinition)
 		{
-			base.PostPrepare(tagBatchItem, batchDefinition);
+			base.PostPrepare(batchDefinition);
 
 			if (Key != null)
 				_parts = TagBatchItem.PrepareString(batchDefinition, Key, _mode);

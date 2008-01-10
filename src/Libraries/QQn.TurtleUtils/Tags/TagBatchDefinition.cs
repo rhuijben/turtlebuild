@@ -140,6 +140,11 @@ namespace QQn.TurtleUtils.Tags
 		{
 			throw new NotImplementedException();
 		}
+
+		internal abstract ICollection<TagBatchItem> AllValues
+		{
+			get;
+		}
 	}
 
 	/// <summary>
@@ -203,6 +208,15 @@ namespace QQn.TurtleUtils.Tags
 		public ICollection<TKey> AllKeys
 		{
 			get { return _items.Keys; }
+		}
+
+		/// <summary>
+		/// Gets all values.
+		/// </summary>
+		/// <value>All values.</value>
+		internal override ICollection<TagBatchItem> AllValues
+		{
+			get { return _items.Values; }
 		}
 
 

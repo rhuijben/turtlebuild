@@ -59,14 +59,34 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 			base.Prepare(batchDefinition, offset);
 		}
 
+		protected internal override void PostPrepare(TagBatchDefinition batchDefinition)
+		{
+			base.PostPrepare(batchDefinition);
+
+			foreach (TagExpression te in _expression.GetAllLeaveExpressions())
+			{
+				DynamicStringExpression dse = te as DynamicStringExpression;
+
+				if (dse != null)
+					dse.PostPrepare(batchDefinition);
+			}
+
+		}
+
 		public override bool IsConstant
 		{
 			get { return false; }
 		}
 
-		internal override object GetValue<TKey>(TagContext context, TagBatchDefinition<TKey> definition, TagBatchInstance<TKey> instance)
+		internal override object GetValue<TKey>(TagBatchDefinition<TKey> definition, TagBatchInstance<TKey> instance)
 		{
-			throw new NotImplementedException();
+			return EvaluateCondition(instance);
+		}
+
+		internal bool EvaluateCondition<TKey>(TagBatchInstance<TKey> instance)
+			where TKey : class
+		{
+			return _expression.Evaluate(instance).ToBool();
 		}
 	}
 }

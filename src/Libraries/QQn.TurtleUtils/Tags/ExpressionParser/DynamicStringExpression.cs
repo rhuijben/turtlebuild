@@ -32,5 +32,22 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 
 			return value.StartsWith("\'") && value.EndsWith("\'") && TagExpander.ItemKeyOrPropertyRegex.Match(value).Success;
 		}
+
+		internal override ExValue Evaluate<TKey>(TagBatchInstance<TKey> instance)
+		{
+			StringBuilder sb = new StringBuilder();
+			foreach (ValueItem vi in _parts)
+			{
+				vi.ApplyTo(sb, instance);
+			}
+
+			return new ExValue(sb.ToString());
+		}
+
+		internal void PostPrepare(TagBatchDefinition batchDefinition)
+		{
+			foreach (ValueItem vi in _parts)
+				vi.PostPrepare(batchDefinition);
+		}
 	}
 }

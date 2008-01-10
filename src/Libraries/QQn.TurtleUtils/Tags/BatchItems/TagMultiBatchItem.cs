@@ -23,9 +23,9 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 			get { return false; }
 		}
 
-		internal override object GetValue<TKey>(TagContext context, TagBatchDefinition<TKey> definition, TagBatchInstance<TKey> instance)
+		internal override object GetValue<TKey>(TagBatchDefinition<TKey> definition, TagBatchInstance<TKey> instance)
 		{
-			string s = base.ApplyItems(context, instance);
+			string s = base.ApplyItems(instance);
 			//throw new NotImplementedException();
 
 			return CreateValue(s);

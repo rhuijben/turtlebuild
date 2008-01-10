@@ -63,5 +63,19 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			RightHand = rhs;
 			SetEditable(false);
 		}
+
+		internal override ExValue Evaluate<TKey>(TagBatchInstance<TKey> instance)
+		{
+			ExValue leftValue = LeftHand.Evaluate(instance);
+			bool leftResult = leftValue.ToBool();
+
+			if (IsAnd != leftResult)
+			{
+				// ((IsAnd && !leftResult) || (IsOr && leftResult))
+				return leftValue;
+			}
+
+			return RightHand.Evaluate(instance);
+		}
 	}
 }
