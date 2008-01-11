@@ -15,8 +15,9 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		/// <returns></returns>
 		public abstract string ToString(TagBatchInstance instance);
 
-		internal virtual void PostPrepare(TagBatchDefinition batchDefinition)
+		internal virtual void PostPrepare(TagBatchDefinition batchDefinition, TagBatchItem batchItem)
 		{
+
 			//throw new NotImplementedException();
 		}
 
@@ -96,7 +97,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 	class TagValueItem : ValueItem
 	{
 		readonly string _key;
-		string _item;
+		readonly string _item;
 
 		public TagValueItem(string item, string key)
 		{
@@ -126,15 +127,9 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			get { return true; }
 		}
 
-		internal override void PostPrepare(TagBatchDefinition batchDefinition)
+		internal override void PostPrepare(TagBatchDefinition batchDefinition, TagBatchItem batchItem)
 		{
-			base.PostPrepare(batchDefinition);
-
-			if(_item == null)
-				_item = batchDefinition.DefaultItemName;
-
-			if(_item == null)
-				throw new TagBatchException(string.Format("Item %({0}) must be suffixed with a valid item", Key));
+			base.PostPrepare(batchDefinition, batchItem);
 
 			if(IsConstraint)
 				batchDefinition.AddConstraint(Item, Key);
@@ -176,12 +171,12 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		}
 
 		ValueItem[] _parts;
-		internal override void PostPrepare(TagBatchDefinition batchDefinition)
+		internal override void PostPrepare(TagBatchDefinition batchDefinition, TagBatchItem batchItem)
 		{
-			base.PostPrepare(batchDefinition);
+			base.PostPrepare(batchDefinition, batchItem);
 
 			if (Key != null)
-				_parts = TagBatchItem.PrepareString(batchDefinition, Key, _mode);
+				_parts = batchItem.PrepareString(batchDefinition, Key, _mode);
 		}
 	}
 }

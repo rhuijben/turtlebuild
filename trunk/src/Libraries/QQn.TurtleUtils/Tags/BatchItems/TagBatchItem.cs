@@ -63,7 +63,7 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 			_items = PrepareString(batchDefinition, Definition, ProvidesList ? PrepareMode.List : PrepareMode.String);
 		}
 
-		protected internal static ValueItem[] PrepareString(TagBatchDefinition batchDefinition, string definition, PrepareMode mode)
+		protected internal ValueItem[] PrepareString(TagBatchDefinition batchDefinition, string definition, PrepareMode mode)
 		{
 			int lastOffset = 0;
 			int offset = 0;
@@ -85,7 +85,7 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 					gp = match.Groups[TagExpander.RegexGroupTransform];
 					gs = match.Groups[TagExpander.RegexGroupSeparator];
 
-					batchDefinition.AddUsedItem(g.Value);
+					batchDefinition.AddUsedItem(this, g.Value);
 
 					list.Add(new ItemValueItem(g.Value, gp.Success ? gp.Value : null, gs.Success ? gs.Value : null, mode));
 
@@ -118,7 +118,7 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 			if(_items != null)
 				foreach (ValueItem tv in _items)
 				{
-					tv.PostPrepare(batchDefinition);
+					tv.PostPrepare(batchDefinition, this);
 				}
 		}
 

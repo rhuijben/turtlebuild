@@ -270,9 +270,10 @@ namespace QQn.TurtleUtils.Tags
 	/// <summary>
 	/// Collection of <see cref="TagItem"/> instances
 	/// </summary>
-	public class TagItemCollection : Collection<TagItem>
+	public class TagItemCollection : Collection<TagItem>, IKeyed<string>
 	{
 		TagEnvironment _environment;
+		readonly string _name;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="TagItemCollection"/> class.
@@ -291,6 +292,12 @@ namespace QQn.TurtleUtils.Tags
 			_environment = environment;
 		}
 
+		TagItemCollection(TagEnvironment environment, string name)
+		{
+			_environment = environment;
+			_name = name;
+		}
+
 		/// <summary>
 		/// Adds the specified name.
 		/// </summary>
@@ -301,6 +308,15 @@ namespace QQn.TurtleUtils.Tags
 			TagItem item = new TagItem(name, include);
 			Add(item);
 			return item;
+		}
+
+		/// <summary>
+		/// Gets the name.
+		/// </summary>
+		/// <value>The name if initialized via <see cref="GetAllByName"/> otherwise <c>null</c></value>
+		public string Name
+		{
+			get { return _name; }
 		}
 
 		/// <summary>
@@ -324,6 +340,36 @@ namespace QQn.TurtleUtils.Tags
 		}
 
 		/// <summary>
+		/// Adds all provided items
+		/// </summary>
+		/// <param name="items">The items.</param>
+		public void AddRange(IEnumerable<TagItem> items)
+		{
+			if (items == null)
+				throw new ArgumentNullException("items");
+
+			foreach (TagItem i in items)
+				Add(i);
+		}
+
+		/// <summary>
+		/// Gets all items with the specified name
+		/// </summary>
+		/// <param name="name">The name.</param>
+		/// <returns></returns>
+		public TagItemCollection GetAllByName(string name)
+		{
+			TagItemCollection list = new TagItemCollection(Environment);
+			foreach (TagItem item in this)
+			{
+				if (StringComparer.OrdinalIgnoreCase.Equals(name, item.Name))
+					list.Add(item);
+			}
+
+			return list;
+		}
+
+		/// <summary>
 		/// Gets or sets the environment.
 		/// </summary>
 		/// <value>The environment.</value>
@@ -331,6 +377,27 @@ namespace QQn.TurtleUtils.Tags
 		{
 			get { return _environment; }
 			internal set { _environment = value; }
+		}
+
+		#region IKeyed<string> Members
+
+		string IKeyed<string>.Key
+		{
+			get { return Name; }
+		}
+
+		#endregion
+
+		/// <summary>
+		/// Clones this instance.
+		/// </summary>
+		/// <returns></returns>
+		public TagItemCollection Clone(bool withMembers)
+		{
+			TagItemCollection tic = new TagItemCollection(Environment, Name);
+			if(withMembers)
+				tic.AddRange(this);
+			return tic;
 		}
 	}
 }

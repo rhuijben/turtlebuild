@@ -12,7 +12,7 @@ namespace QQn.TurtleUtils.Items
 	/// <typeparam name="TSecond">The type of the second.</typeparam>
 	[Serializable]
 	[DebuggerDisplay("Pair: First={First}, Second={Second}")]
-	public sealed class Pair<TFirst,TSecond> : IComparable<Pair<TFirst, TSecond>>, IEquatable<Pair<TFirst, TSecond>>, IComparable
+	public sealed class Pair<TFirst,TSecond> : IComparable<Pair<TFirst, TSecond>>, IEquatable<Pair<TFirst, TSecond>>, IComparable, IKeyed<Pair<TFirst, TSecond>>, IKeyed<TFirst>
 		where TFirst : class
 		where TSecond : class
 	{
@@ -132,6 +132,32 @@ namespace QQn.TurtleUtils.Items
 		public int CompareTo(object obj)
 		{
 			return CompareTo(obj as Pair<TFirst, TSecond>);
+		}
+
+		#endregion
+
+		#region IKeyed<Pair<TFirst,TSecond>> Members
+
+		/// <summary>
+		/// Gets the key.
+		/// </summary>
+		/// <value>The key.</value>
+		Pair<TFirst, TSecond> IKeyed<Pair<TFirst, TSecond>>.Key
+		{
+			get { return this; }
+		}
+
+		#endregion
+
+		#region IKeyed<TFirst> Members
+
+		/// <summary>
+		/// Gets the key.
+		/// </summary>
+		/// <value>The key.</value>
+		TFirst IKeyed<TFirst>.Key
+		{
+			get { return First; }
 		}
 
 		#endregion

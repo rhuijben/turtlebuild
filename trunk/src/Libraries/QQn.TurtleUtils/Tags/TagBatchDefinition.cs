@@ -66,8 +66,8 @@ namespace QQn.TurtleUtils.Tags
 			set { _prepared = value; }
 		}
 
-		readonly SortedList<string, string> _itemsUsed = new SortedList<string, string>(StringComparer.OrdinalIgnoreCase);
-		SortedList<Pair<string, string>, string> _constraints = new SortedList<Pair<string,string>,string>();
+		readonly SortedList<string, List<TagBatchItem>> _itemsUsed = new SortedList<string, List<TagBatchItem>>(StringComparer.OrdinalIgnoreCase);
+		AutoKeyedCollection<Pair<string, string>> _constraints = new AutoKeyedCollection<Pair<string, string>>();
 
 		internal virtual void ClearPreparation()
 		{
@@ -77,28 +77,42 @@ namespace QQn.TurtleUtils.Tags
 
 		internal abstract void Prepare();
 
-
-		internal void AddUsedItem(string itemName)
+		internal void AddUsedItem(TagBatchItem batchItem, string itemName)
 		{
-			if(!_itemsUsed.ContainsKey(itemName))
-				_itemsUsed.Add(itemName, itemName);
+			List<TagBatchItem> list;
+
+			if (!_itemsUsed.TryGetValue(itemName, out list))
+			{
+				list = new List<TagBatchItem>();
+				_itemsUsed.Add(itemName, list);
+			}
+
+			if (!list.Contains(batchItem))
+				list.Add(batchItem);
 		}
 
 		internal void AddConstraint(string prefix, string tag)
 		{
+			if (string.IsNullOrEmpty(tag))
+				throw new ArgumentNullException("tag");
+
+			if (string.IsNullOrEmpty(prefix))
+				prefix = "";
+
 			Pair<string, string> pair = new Pair<string, string>(prefix, tag);
 
 			if (_constraints == null)
-				_constraints = new SortedList<Pair<string, string>, string>();
+				_constraints = new AutoKeyedCollection<Pair<string, string>>();
 
-			if (!_constraints.ContainsKey(pair))
-				_constraints.Add(pair, tag);			
+			if (!_constraints.Contains(pair))
+				_constraints.Add(pair);
 		}
 
 		/// <summary>
 		/// Gets the single item used in a batch
 		/// </summary>
 		/// <value>The default item. <c>null</c> if there are no items, or multiple items are used</value>
+		[Obsolete]
 		public string DefaultItemName
 		{
 			get { return ((_itemsUsed != null) && _itemsUsed.Count == 1) ? _itemsUsed.Keys[0] : null; }
@@ -115,7 +129,7 @@ namespace QQn.TurtleUtils.Tags
 
 		internal IList<Pair<string, string>> Constraints
 		{
-			get { return _constraints.Keys; }
+			get { return _constraints; }
 		}
 
 		/// <summary>
@@ -145,6 +159,13 @@ namespace QQn.TurtleUtils.Tags
 		{
 			get;
 		}
+
+		internal int GetConstraintOffset(string item, string key)
+		{
+			Pair<string, string> constraint = new Pair<string, string>(item ?? "" , key);
+
+			return _constraints.IndexOf(constraint);
+		}
 	}
 
 	/// <summary>
@@ -154,7 +175,7 @@ namespace QQn.TurtleUtils.Tags
 	public class TagBatchDefinition<TKey> : TagBatchDefinition, IEnumerable<TKey>
 		where TKey : class
 	{
-		Dictionary<TKey, TagBatchItem> _items = new Dictionary<TKey, TagBatchItem>();		
+		Dictionary<TKey, TagBatchItem> _items = new Dictionary<TKey, TagBatchItem>();
 
 		/// <summary>
 		/// Adds the specified definitionw
@@ -166,24 +187,40 @@ namespace QQn.TurtleUtils.Tags
 		{
 			if (key == null)
 				throw new ArgumentNullException("key");
-			else if(string.IsNullOrEmpty(definition))
+			else if (string.IsNullOrEmpty(definition))
 				throw new ArgumentNullException("definition");
 
-			if (resultType.IsArray)
+			Type elementType;
+			if (IsTagItemType(resultType))
+				_items.Add(key, new TagSingleBatchItem(definition, resultType));
+			else if (TryGetArrayType(resultType, out elementType) && IsTagItemType(elementType))
+				_items.Add(key, new TagMultiBatchItem(definition, elementType));
+			else
 			{
-				Type elementType = resultType.GetElementType();
-				if (IsTagItemType(elementType))
-					_items.Add(key, new TagMultiBatchItem(definition, elementType));
+				throw new ArgumentException("Invalid result type", "resultType");
+			}
+		}
+
+		private bool TryGetArrayType(Type resultType, out Type elementType)
+		{
+			if (resultType.IsArray)
+				elementType = resultType.GetElementType();
+			else if (resultType.IsInterface && resultType.IsGenericType)
+			{
+				Type gi = resultType.GetGenericTypeDefinition();
+
+				if ((gi == typeof(IList<>)) || (gi == typeof(ICollection<>)) || (gi == typeof(IEnumerable<>)))
+					elementType = resultType.GetGenericArguments()[0];
 				else
-					throw new ArgumentException("Invalid result type", "resultType");
+					elementType = null;
 			}
 			else
 			{
-				if (IsTagItemType(resultType))
-					_items.Add(key, new TagSingleBatchItem(definition, resultType));
-				else
-					throw new ArgumentException("Invalid result type", "resultType");
+				elementType = null;
+				return false;
 			}
+
+			return true;
 		}
 
 		/// <summary>

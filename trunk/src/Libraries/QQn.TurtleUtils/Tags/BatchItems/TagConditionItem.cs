@@ -53,7 +53,7 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 				DynamicStringExpression dse = te as DynamicStringExpression;
 
 				if (dse != null)
-					dse.Prepare(batchDefinition);
+					dse.Prepare(batchDefinition, this);
 			}
 		}
 
@@ -66,7 +66,7 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 				DynamicStringExpression dse = te as DynamicStringExpression;
 
 				if (dse != null)
-					dse.PostPrepare(batchDefinition);
+					dse.PostPrepare(batchDefinition, this);
 			}
 
 		}

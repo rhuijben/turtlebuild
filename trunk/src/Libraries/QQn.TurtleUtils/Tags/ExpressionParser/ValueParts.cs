@@ -9,7 +9,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 	{
 		public abstract void ApplyTo(List<ITagItem> tagItems, TagBatchInstance instance);
 
-		public virtual void PostPrepare(TagBatchDefinition batchDefinition)
+		public virtual void PostPrepare(TagBatchDefinition batchDefinition, TagBatchItem batchItem)
 		{
 		}
 	}
@@ -53,12 +53,12 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			tagItems.Add(new StubItem(sb.ToString()));
 		}
 
-		public override void PostPrepare(TagBatchDefinition batchDefinition)
+		public override void PostPrepare(TagBatchDefinition batchDefinition, TagBatchItem batchItem)
 		{
-			base.PostPrepare(batchDefinition);
+			base.PostPrepare(batchDefinition, batchItem);
 
 			foreach (ValueItem vi in _items)
-				vi.PostPrepare(batchDefinition);
+				vi.PostPrepare(batchDefinition, batchItem);
 		}
 	}
 
@@ -88,11 +88,11 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			}
 		}
 
-		public override void PostPrepare(TagBatchDefinition batchDefinition)
+		public override void PostPrepare(TagBatchDefinition batchDefinition, TagBatchItem batchItem)
 		{
-			base.PostPrepare(batchDefinition);
+			base.PostPrepare(batchDefinition, batchItem);
 
-			_item.PostPrepare(batchDefinition);
+			_item.PostPrepare(batchDefinition, batchItem);
 		}
 	}
 
