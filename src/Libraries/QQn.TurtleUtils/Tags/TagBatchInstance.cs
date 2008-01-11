@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using QQn.TurtleUtils.Tags.BatchItems;
+using QQn.TurtleUtils.Items;
 
 namespace QQn.TurtleUtils.Tags
 {
@@ -13,7 +14,8 @@ namespace QQn.TurtleUtils.Tags
 		readonly TagBatchDefinition _definition;
 		readonly TagContext _context;
 		readonly object[] _values;
-		TagItemCollection[] _items;
+		string[] _cValues;
+		IList<TagItemCollection> _items;
 
 		internal TagBatchInstance(TagContext context, TagBatchDefinition definition)
 		{
@@ -135,23 +137,19 @@ namespace QQn.TurtleUtils.Tags
 
 		internal string GetKeyValue(string item, string key)
 		{
-			TagItemCollection items = GetItems(item ?? DefaultItem);
-
-			if (items == null || items.Count == 0)
-				return null;
-
-			// The value of all items in the list is the same (batching requirement)
-			return items[0].ExpandedKey(key);
+			return _cValues[_definition.GetConstraintOffset(item, key)];
 		}
 
 		/// <summary>
-		/// Fills the specified context.
+		/// Fills the specified items.
 		/// </summary>
 		/// <param name="items">The items.</param>
-		protected internal virtual void Fill(TagItemCollection[] items)
+		/// <param name="constraintValues">The constraint values.</param>
+		internal protected void Fill(AutoKeyedCollection<string, TagItemCollection> items, string[] constraintValues)
 		{
 			ClearValues();
 			_items = items;
+			_cValues = constraintValues;
 		}
 
 		/// <summary>
@@ -176,7 +174,7 @@ namespace QQn.TurtleUtils.Tags
 		/// Gets the items.
 		/// </summary>
 		/// <value>The items.</value>
-		protected TagItemCollection[] Items
+		protected IList<TagItemCollection> Items
 		{
 			get { return _items; }
 		}
@@ -247,15 +245,6 @@ namespace QQn.TurtleUtils.Tags
 		public new TagBatchDefinition<TKey> BatchDefinition
 		{
 			get { return _definition; }
-		}
-
-		/// <summary>
-		/// Fills the specified context.
-		/// </summary>
-		/// <param name="items"></param>
-		protected internal override void Fill(TagItemCollection[] items)
-		{
-			base.Fill(items);
 		}
 
 		/// <summary>

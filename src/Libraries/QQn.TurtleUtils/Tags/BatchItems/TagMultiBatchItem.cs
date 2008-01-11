@@ -75,7 +75,7 @@ namespace QQn.TurtleUtils.Tags.BatchItems
 			base.PostPrepare(batchDefinition);
 
 			foreach (ValuePart vp in _parts)
-				vp.PostPrepare(batchDefinition);
+				vp.PostPrepare(batchDefinition, this);
 		}
 
 		internal override object GetValue<TKey>(TagBatchDefinition<TKey> definition, TagBatchInstance<TKey> instance)

@@ -76,12 +76,7 @@ namespace QQn.TurtleUtils.Tags
 
 			IList<string> itemsUsed = definition.ItemsUsed;
 
-			if (itemsUsed.Count == 1) // Most common case
-				return RunBatchInternal(definition, checkConditions);
-			else if (itemsUsed.Count == 0)
-				return RunSingleItemBatch(definition, checkConditions);
-			else
-				return RunMatrixBatchInternal(definition, checkConditions);
+			return RunBatchInternal(definition, checkConditions);
 		}
 
 		/// <summary>
@@ -94,65 +89,75 @@ namespace QQn.TurtleUtils.Tags
 		private IEnumerable<TagBatchInstance<TKey>> RunBatchInternal<TKey>(TagBatchDefinition<TKey> definition, bool checkConditions)
 			where TKey : class
 		{
-			string tagName = definition.DefaultItemName;
+			AutoKeyedCollection<string, TagItemCollection> restLists = new AutoKeyedCollection<string,TagItemCollection>(StringComparer.OrdinalIgnoreCase);
+			AutoKeyedCollection<string, TagItemCollection> currentLists = new AutoKeyedCollection<string, TagItemCollection>(StringComparer.OrdinalIgnoreCase);
 
-			if(string.IsNullOrEmpty(tagName))
-				throw new InvalidOperationException(); // Must be set
-
-			// Create a list of valid items
-			TagItemCollection rest = new TagItemCollection(this);
-			TagItemCollection current = new TagItemCollection(this);
-			foreach (TagItem item in Items)
+			int nLeft = 0;
+			foreach (string itemName in definition.ItemsUsed)
 			{
-				if (string.Equals(item.Name, tagName, StringComparison.OrdinalIgnoreCase))
-					rest.Add(item);
+				TagItemCollection tt = Items.GetAllByName(itemName);
+				restLists.Add(tt);
+				currentLists.Add(tt.Clone(false));
+				nLeft += tt.Count;
 			}
 
-			IList<Pair<string, string>> constraints = definition.Constraints;
-			string[] constraintValues = new string[constraints.Count];
-			ICollection<TagItem>[] instances = new ICollection<TagItem>[1];
-			while(rest.Count > 0)
+			// Create a list of valid items
+			IList<Pair<string, string>> constraints = definition.Constraints;			
+			TagBatchInstance<TKey> instance = new TagBatchInstance<TKey>(this, definition);
+			do
 			{
-				TagBatchInstance<TKey> instance = new TagBatchInstance<TKey>(this, definition);
-				bool fill = true;
-				for (int i = 0; i < rest.Count; i++)
-				{
-					TagItem ti = rest[i];
-					int n = 0;
-					bool next = false;
-					foreach (Pair<string, string> p in constraints)
-					{
-						string v = ti.ExpandedKey(p.Second);
-						if (fill)
-							constraintValues[n++] = v;
-						else
-							if (!string.Equals(v, constraintValues[n++], StringComparison.OrdinalIgnoreCase))
-							{
-								next = true;
-								break;
-							}
-					}
-					if(next)
-						continue;
-					else
-					{
-						rest.RemoveAt(i);
-						current.Add(ti);
-						i--;
-					}
+				string[] constraintValues = new string[constraints.Count];
 
-					fill = false;
+				for (int iList = 0; iList < restLists.Count; iList++)
+				{
+					TagItemCollection rest = restLists[iList];
+					TagItemCollection current = currentLists[iList];
+					string listName = restLists[iList].Name; 
+					
+					for (int iItem = 0; iItem < rest.Count; iItem++)
+					{
+						TagItem ti = rest[iItem];
+						int n = 0;
+						bool next = false;
+
+						foreach (Pair<string, string> p in constraints)
+						{
+							if (!string.IsNullOrEmpty(p.First) && !StringComparer.OrdinalIgnoreCase.Equals(p.First, listName))
+								continue;
+
+							string v = ti.ExpandedKey(p.Second);
+							if ((object)constraintValues[n] == null)
+								constraintValues[n++] = v;
+							else
+								if (!StringComparer.OrdinalIgnoreCase.Equals(v, constraintValues[n++]))
+								{
+									next = true;
+									break;
+								}
+						}
+						if (next)
+							continue;
+						else
+						{
+							rest.RemoveAt(iItem--);
+							current.Add(ti);
+							nLeft--;
+						}
+					}
 				}
 
 				// At least one item was added to current
-				instance.Fill(new TagItemCollection[] { current });
+				instance.Fill(currentLists, constraintValues);
 
-				if(!checkConditions || instance.ConditionResult())
+				if (!checkConditions || instance.ConditionResult())
 					yield return instance;
 
-				current.Clear();
+				foreach (TagItemCollection current in currentLists)
+				{
+					current.Clear();
+				}
 			}
-			while (rest.Count > 0);
+			while (nLeft > 0);
 		}
 
 		/// <summary>
@@ -167,9 +172,9 @@ namespace QQn.TurtleUtils.Tags
 		{
 			TagBatchInstance<TKey> instance = new TagBatchInstance<TKey>(this, definition);			
 
-			instance.Fill(new TagItemCollection[0]);
+			/*instance.Fill(new TagItemCollection[0], null);
 
-			if (checkConditions && !instance.ConditionResult())
+			if (checkConditions && !instance.ConditionResult())*/
 				yield break;
 
 			yield return instance;

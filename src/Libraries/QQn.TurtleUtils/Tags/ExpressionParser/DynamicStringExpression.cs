@@ -14,9 +14,9 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 		{
 		}
 
-		internal void Prepare(TagBatchDefinition batchDefinition)
+		internal void Prepare(TagBatchDefinition batchDefinition, TagBatchItem batchItem)
 		{
-			_parts = TagBatchItem.PrepareString(batchDefinition, Value, PrepareMode.Condition);
+			_parts = batchItem.PrepareString(batchDefinition, Value, PrepareMode.Condition);
 		}
 
 		/// <summary>
@@ -44,10 +44,10 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			return new ExValue(sb.ToString());
 		}
 
-		internal void PostPrepare(TagBatchDefinition batchDefinition)
+		internal void PostPrepare(TagBatchDefinition batchDefinition, TagBatchItem batchItem)
 		{
 			foreach (ValueItem vi in _parts)
-				vi.PostPrepare(batchDefinition);
+				vi.PostPrepare(batchDefinition, batchItem);
 		}
 	}
 }

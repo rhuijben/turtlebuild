@@ -13,7 +13,7 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 	}
 
 	/// <summary>
-	/// 
+	/// Expression value encapsulator
 	/// </summary>
 	sealed class ExValue : IEquatable<ExValue>, IComparable<ExValue>, IComparable, IFormattable
 	{
