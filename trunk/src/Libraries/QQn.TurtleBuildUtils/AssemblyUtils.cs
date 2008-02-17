@@ -35,27 +35,39 @@ namespace QQn.TurtleBuildUtils
 		/// <summary>
 		/// Updates the version info in the file header from the attributes defined on the assembly.
 		/// </summary>
-		/// <param name="file">The file.</param>
+		/// <param name="assemblyFile">The assembly.</param>
 		/// <param name="keyFile">The key file.</param>
 		/// <param name="keyContainer">The key container.</param>
 		/// <returns></returns>
-		public static bool RefreshVersionInfoFromAttributes(string file, string keyFile, string keyContainer)
+		public static bool RefreshVersionInfoFromAttributes(string assemblyFile, string keyFile, string keyContainer)
 		{
-			if (string.IsNullOrEmpty(file))
-				throw new ArgumentNullException("file");
+			if (string.IsNullOrEmpty(assemblyFile))
+				throw new ArgumentNullException("assemblyFile");
 
-			if (!File.Exists(file))
-				throw new FileNotFoundException("File to update not found", file);
+			if (!File.Exists(assemblyFile))
+				throw new FileNotFoundException("File to update not found", assemblyFile);
 			else if (!string.IsNullOrEmpty(keyFile) && !File.Exists(keyFile))
-				throw new FileNotFoundException("File to update not found", keyFile);
+				throw new FileNotFoundException("Keyfile not found", keyFile);
 
 			string tmpDir = QQnPath.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
 			Directory.CreateDirectory(tmpDir);
 			try
 			{
-				string tmpAssembly = GenerateAttributeAssembly(file, tmpDir);
+				string tmpName = QQnPath.Combine(tmpDir, Path.GetFileNameWithoutExtension(assemblyFile) + ".resTmp.dll");
 
-				return CopyFileVersionInfo(tmpAssembly, file, keyFile, keyContainer);
+				Assembly myAssembly = typeof(AssemblyUtils).Assembly;
+				AppDomainSetup setup = new AppDomainSetup();
+				setup.ApplicationName = "TB-AttributeRefresher";
+				setup.ApplicationBase = Path.GetDirectoryName(new Uri(myAssembly.CodeBase).LocalPath);
+				setup.AppDomainInitializer = new AppDomainInitializer(OnRefreshVersionInfo);			
+				setup.AppDomainInitializerArguments = new string[] { assemblyFile, tmpDir, tmpName};
+			
+				GC.KeepAlive(AppDomain.CreateDomain("AttributeRefresher", myAssembly.Evidence, setup)); // The appdomain will auto destruct
+
+				if(!File.Exists(tmpName))
+					return false;
+
+				return CopyFileVersionInfo(tmpName, assemblyFile, keyFile, keyContainer);
 			}
 			finally
 			{
@@ -64,41 +76,18 @@ namespace QQn.TurtleBuildUtils
 			}
 		}
 
-		/// <summary>
-		/// Updates the version info in the file header from the attributes defined on the assembly.
-		/// </summary>
-		/// <param name="assembly">The assembly.</param>
-		/// <param name="keyFile">The key file.</param>
-		/// <param name="keyContainer">The key container.</param>
-		/// <returns></returns>
-		public static bool RefreshVersionInfoFromAttributes(Assembly assembly, string keyFile, string keyContainer)
+		// Called in it's own appdomain
+		static void OnRefreshVersionInfo(string[] args)
 		{
-			if (assembly == null)
-				throw new ArgumentNullException("assembly");
+			string fromFile = args[0];
+			string toDir = args[1];
+			string toFile = args[2];
 
-			string file = new Uri(assembly.CodeBase).LocalPath;
+			Assembly asm = Assembly.ReflectionOnlyLoad(File.ReadAllBytes(fromFile));
 
-			if (!File.Exists(file))
-				throw new FileNotFoundException("File to update not found", file);
-			else if (!string.IsNullOrEmpty(keyFile) && !File.Exists(keyFile))
-				throw new FileNotFoundException("File to update not found", keyFile);
+			string result = GenerateAttributeAssembly(asm, toDir);
 
-			string tmpDir = QQnPath.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-			Directory.CreateDirectory(tmpDir);
-			try
-			{
-				string tmpAssembly = GenerateAttributeAssembly(assembly, tmpDir);
-
-				if (tmpAssembly == null)
-					return false;
-
-				return CopyFileVersionInfo(tmpAssembly, file, keyFile, keyContainer);
-			}
-			finally
-			{
-				if (Directory.Exists(tmpDir))
-					Directory.Delete(tmpDir, true);
-			}
+			Debug.Assert(string.Equals(result, toFile, StringComparison.OrdinalIgnoreCase));
 		}
 
 		/// <summary>
@@ -269,8 +258,6 @@ namespace QQn.TurtleBuildUtils
 			if (srcName == null || string.IsNullOrEmpty(srcName.Name))
 				return null;
 
-			string file = new Uri(assembly.CodeBase).LocalPath;
-
 			try
 			{
 				// Prepare dynamic assembly for resources
@@ -280,8 +267,7 @@ namespace QQn.TurtleBuildUtils
 				// Only create an on-disk assembly. We never have to execute anything
 				AssemblyBuilder newAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.ReflectionOnly, outputDirectory);
 
-				string extension = Path.GetExtension(file);
-				string tmpFile = Path.GetFileNameWithoutExtension(file) + ".resTmp" + extension;
+				string tmpFile = srcName.Name + ".resTmp.dll";
 				newAssembly.DefineDynamicModule(asmName.Name, tmpFile);
 
 				AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += new ResolveEventHandler(OnReflectionOnlyAssemblyResolve);
