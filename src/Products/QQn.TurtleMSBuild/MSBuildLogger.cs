@@ -6,6 +6,8 @@ using System.Xml;
 using System.Collections;
 using QQn.TurtleUtils.Tokens;
 using QQn.TurtleBuildUtils;
+using QQn.TurtleMSBuild.ExternalProjects;
+using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleMSBuild
 {
@@ -19,6 +21,7 @@ namespace QQn.TurtleMSBuild
 		string _parameters;
 		TurtleParameters _settings = new TurtleParameters();
 		int _nodeId;
+		Solution _solution;
 
 		/// <summary>
 		/// Initializes a new instance of the <see cref="MSBuildLogger"/> class.
@@ -49,53 +52,46 @@ namespace QQn.TurtleMSBuild
 
 			eventSource.ProjectStarted += new ProjectStartedEventHandler(ProjectBuildStarted);
 			eventSource.ProjectFinished += new ProjectFinishedEventHandler(ProjectBuildFinished);
-			eventSource.TaskFinished += new TaskFinishedEventHandler(ProjectTaskFinished);
-			//eventSource.CustomEventRaised += new CustomBuildEventHandler(eventSource_CustomEventRaised);
+			eventSource.CustomEventRaised += new CustomBuildEventHandler(eventSource_CustomEventRaised);
 		}
 
-#if NOT
 		void eventSource_CustomEventRaised(object sender, CustomBuildEventArgs e)
 		{
-			ExternalProjectStartedEventArgs projectStarted = e as ExternalProjectStartedEventArgs;
-
-			if (projectStarted != null)
-			{
-				OnExternalProjectStarted(sender, projectStarted);
-				return;
-			}
-
 			ExternalProjectFinishedEventArgs projectFinished = e as ExternalProjectFinishedEventArgs;
 
 			if (projectFinished != null)
-			{
 				OnExternalProjectFinished(sender, projectFinished);
-			}
 		}
 
-		private void OnExternalProjectFinished(object sender, ExternalProjectFinishedEventArgs projectFinished)
+		private void OnExternalProjectFinished(object sender, ExternalProjectFinishedEventArgs e)
 		{
-			GC.KeepAlive(projectFinished);
-		}
+			if (_solution == null)
+				return; // Shortcut
 
-		private void OnExternalProjectStarted(object sender, ExternalProjectStartedEventArgs projectStarted)
-		{
-			GC.KeepAlive(projectStarted);
-		}
-#endif
+			ExternalProject ep;
 
-		void ProjectTaskFinished(object sender, TaskFinishedEventArgs e)
-		{
-			if (e.TaskName == "VCBuild")
+			if (_solution.ExternalProjects.TryGetValue(e.ProjectFile, out ep))
 			{
-				Project project;
-				if (building.TryGetValue(e.ProjectFile, out project))
-				{
-					Solution solution = project as Solution;
+				ep.ProjectFinished(_solution);
+				return;
+			}
 
-					if (solution != null)
-					{
-						solution.UsedVCBuild = true;
-					}
+			// VC Uses temporary project files; look for the real file
+			string dir = Path.GetDirectoryName(e.ProjectFile);
+			string file = Path.GetFileNameWithoutExtension(e.ProjectFile);
+			string ext = Path.GetExtension(e.ProjectFile);
+
+			string ext2 = Path.GetExtension(file);
+
+			if (!string.IsNullOrEmpty(ext2) && ext2.StartsWith(".tmp_", StringComparison.OrdinalIgnoreCase))
+			{
+				// PROJECT.tmp_Win32_Release.VCPROJ -> PROJECT.VCPROJ
+				string realProject = QQnPath.Combine(dir, Path.GetFileNameWithoutExtension(file) + ext);
+
+				// Try in memory first, as this is always faster than on disk
+				if (_solution.ExternalProjects.TryGetValue(realProject, out ep) && File.Exists(realProject))
+				{
+					ep.ProjectFinished(_solution);
 				}
 			}
 		}
@@ -118,6 +114,8 @@ namespace QQn.TurtleMSBuild
 				{
 					case ".SLN":
 						project = new Solution(e.ProjectFile, e.TargetNames, e.Properties, e.Items, _settings);
+						if (_solution == null)
+							_solution = (Solution)project;
 						break;
 					default:
 						project = new MSBuildProject(e.ProjectFile, e.TargetNames, e.Properties, e.Items, _settings);

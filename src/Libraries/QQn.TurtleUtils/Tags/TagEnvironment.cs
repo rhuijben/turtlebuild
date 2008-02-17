@@ -159,38 +159,5 @@ namespace QQn.TurtleUtils.Tags
 			}
 			while (nLeft > 0);
 		}
-
-		/// <summary>
-		/// Runs the single item batch.
-		/// </summary>
-		/// <typeparam name="TKey">The type of the key.</typeparam>
-		/// <param name="definition">The definition.</param>
-		/// <param name="checkConditions">if set to <c>true</c> [check conditions].</param>
-		/// <returns></returns>
-		private IEnumerable<TagBatchInstance<TKey>> RunSingleItemBatch<TKey>(TagBatchDefinition<TKey> definition, bool checkConditions)
-			where TKey : class
-		{
-			TagBatchInstance<TKey> instance = new TagBatchInstance<TKey>(this, definition);			
-
-			/*instance.Fill(new TagItemCollection[0], null);
-
-			if (checkConditions && !instance.ConditionResult())*/
-				yield break;
-
-			yield return instance;
-		}
-
-		/// <summary>
-		/// Runs the matrix batch internal.
-		/// </summary>
-		/// <typeparam name="TKey">The type of the key.</typeparam>
-		/// <param name="definition">The definition.</param>
-		/// <param name="checkConditions">if set to <c>true</c> [check conditions].</param>
-		/// <returns></returns>
-		private IEnumerable<TagBatchInstance<TKey>> RunMatrixBatchInternal<TKey>(TagBatchDefinition<TKey> definition, bool checkConditions)
-			where TKey : class
-		{
-			yield break;
-		}
 	}
 }

@@ -214,6 +214,19 @@ namespace QQn.TurtleBuildUtils
 		}
 
 		/// <summary>
+		/// Adds the range of filenames
+		/// </summary>
+		/// <param name="filenames">The filenames.</param>
+		public virtual void AddRange(IEnumerable<string> filenames)
+		{
+			if (filenames == null)
+				throw new ArgumentNullException("filenames");
+
+			foreach (string s in filenames)
+				Add(s);
+		}
+
+		/// <summary>
 		/// Adds the specified file if it was not already added
 		/// </summary>
 		/// <param name="filename">The filename.</param>

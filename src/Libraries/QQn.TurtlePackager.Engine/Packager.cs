@@ -7,6 +7,11 @@ using QQn.TurtleBuildUtils.Files.TBLog;
 
 namespace QQn.TurtlePackager
 {
+	public class PackageList : SortedFileList<Pack>
+	{
+	}
+
+
 	public static class Packager
 	{
 		/// <summary>
@@ -15,7 +20,7 @@ namespace QQn.TurtlePackager
 		/// <param name="args">The args.</param>
 		/// <param name="newPackages">The new packages.</param>
 		/// <returns></returns>
-		public static bool TryCreatePackages(PackageArgs args, out SortedFileList<Pack> newPackages)
+		public static bool TryCreatePackages(PackageArgs args, out PackageList newPackages)
 		{
 			if (args == null)
 				throw new ArgumentNullException("args");
@@ -27,7 +32,7 @@ namespace QQn.TurtlePackager
 
 			state.CalculateDependencies();
 
-			newPackages = new SortedFileList<Pack>();
+			newPackages = new PackageList();
 			
 			return true;
 		}

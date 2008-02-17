@@ -102,7 +102,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 		protected void ResolveAdditionalOutput()
 		{
-			ResolveAdditionalOutput(Assembly.ReflectionOnlyLoadFrom(GetFullPath(TargetPath)));
+			ResolveAdditionalOutput(AssemblyUtils.GetCachedReflectionAssembly(GetFullPath(TargetPath)));
 		}
 
 		SortedFileList _projectReferences;
@@ -291,6 +291,11 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 		protected internal virtual void AddBuildConfiguration(string configuration)
 		{
 			FullProjectConfiguration = configuration;
+		}
+
+		public virtual void ProjectFinished(Solution solution)
+		{
+			
 		}
 	}
 }

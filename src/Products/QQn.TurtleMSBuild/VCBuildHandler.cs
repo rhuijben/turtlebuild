@@ -11,36 +11,9 @@ namespace QQn.TurtleMSBuild
 {
 	class ExternalBuildHandler
 	{
-		static string FilterWord(string word)
-		{
-			return word.TrimEnd(',').Trim('\"');
-		}
-
-		static readonly Guid solutionItem = new Guid("2150E333-8FDC-42A3-9474-1A3956D46DE8");
-
 		internal static void HandleProject(Solution solution)
 		{
-			List<ExternalProject> externalProjects = LoadExternalProjects(solution);
-
-			// The property CurrentSolutionConfigurationContents contains the 'real' configuration of external projects
-			string configData;
-			if (solution.BuildProperties.TryGetValue("CurrentSolutionConfigurationContents", out configData))
-			{
-				XmlDocument doc = new XmlDocument();
-				doc.LoadXml(configData);
-
-				foreach (ExternalProject ep in externalProjects)
-				{
-					XmlNode node = doc.SelectSingleNode("//ProjectConfiguration[@Project='" + ep.ProjectGuid.ToString("B").ToUpperInvariant() + "']");
-
-					if (node != null)
-					{
-						ep.AddBuildConfiguration(node.InnerText);
-					}
-				}
-			}
-
-			foreach (ExternalProject ep in externalProjects)
+			foreach (ExternalProject ep in solution.ExternalProjects.Values)
 			{
 				string prefix = "Project_" + ep.ProjectGuid.ToString().ToUpperInvariant() + "_";
 
@@ -53,45 +26,12 @@ namespace QQn.TurtleMSBuild
 				}
 			}
 
-			foreach (ExternalProject ep in externalProjects)
+			foreach (ExternalProject ep in solution.ExternalProjects.Values)
 			{
 				ep.ParseBuildResult(solution);
 				ep.PostParseBuildResult();
 				ep.WriteTBLog();
 			}
-		}
-
-		private static List<ExternalProject> LoadExternalProjects(MSBuildProject solution)
-		{
-			List<ExternalProject> externalProjects = new List<ExternalProject>();
-
-			using (StreamReader sr = File.OpenText(solution.ProjectFile))
-			{
-				string line;
-
-				while (null != (line = sr.ReadLine()))
-				{
-					if (line.StartsWith("Project("))
-					{
-						IList<string> words = Tokenizer.GetCommandlineWords(line);
-
-						if (words.Count < 5 || words[1] != "=")
-							continue;
-
-						Guid projectType = new Guid(words[0].Substring(8).TrimEnd(')').Trim('\"'));
-						string projectName = FilterWord(words[2]);
-						string projectFile = QQnPath.Combine(solution.ProjectPath, FilterWord(words[3]));
-						Guid projectGuid = new Guid(FilterWord(words[4]));
-
-						if (projectType != solutionItem && File.Exists(projectFile))
-						{
-							if(QQnPath.ExtensionEquals(projectFile, ".vcproj"))
-								externalProjects.Add(new VCBuildProject(projectGuid, projectFile, projectName, solution.Parameters));
-						}
-					}
-				}
-			}
-			return externalProjects;
 		}
 	}
 }

@@ -92,7 +92,7 @@ namespace QQn.TurtlePackager.Origins
 
 		public override void ApplyProjectDependencies(PackageState state)
 		{
-			if (state.DontUseProjectDependencies) // Allow disabling for testing
+			if (!state.DontUseProjectDependencies) // Allow disabling for testing
 			{
 				// Add an initial set of dependencies directly from the project files
 				foreach (TBLogConfiguration config in LogFile.Configurations)
