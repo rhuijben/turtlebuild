@@ -51,22 +51,7 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 			if (IsAssembly)
 			{
-				Assembly asm = Assembly.ReflectionOnlyLoadFrom(GetFullPath(TargetPath));
-
-				if (Parameters.UpdateVCVersionInfo)
-				{
-					string keyFile = KeyFile;
-
-					if (!string.IsNullOrEmpty(keyFile))
-						keyFile = GetFullPath(keyFile);
-
-					// Make sure there are no relative paths remaining
-					string targetFile = GetFullPath(TargetPath);
-
-					if (!AssemblyUtils.RefreshVersionInfoFromAttributes(asm, keyFile, KeyContainer))
-						Console.WriteLine("Refreshing attributes on {0} failed", targetFile);
-				}
-
+				Assembly asm = AssemblyUtils.GetCachedReflectionAssembly(GetFullPath(TargetPath));
 				TargetAssembly = new AssemblyReference(asm.FullName, ProjectOutput[TargetPath]);
 
 				foreach (Module m in asm.GetModules(true))
@@ -108,8 +93,13 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 			internal set { _isAssembly = value; }
 		}
 
+		bool _parsed;
 		private void ParseProjectFile(string fullConfiguration, Project parentProject)
 		{
+			if (_parsed)
+				return;
+
+			_parsed = true;
 			TagPropertyCollection tpc = new TagPropertyCollection();
 
 			string[] items = fullConfiguration.Split('|');
@@ -278,6 +268,38 @@ namespace QQn.TurtleMSBuild.ExternalProjects
 
 				if (extensions.ContainsKey(Path.GetExtension(file)))
 					ScriptFiles.AddUnique(file);
+			}
+		}
+
+		public override void ProjectFinished(Solution solution)
+		{
+			base.ProjectFinished(solution);
+			solution.UsedVCBuild = true; // Perform closing actions
+
+			ParseProjectFile(FullProjectConfiguration, solution);
+
+			string target = TargetPath;
+
+			if(target == null)
+				return; // Probably clean target
+
+			target = GetFullPath(target);
+
+			if (!File.Exists(target))
+				return; // Probably cleaned or failed
+
+			if (Parameters.UpdateVCVersionInfo && IsAssembly)
+			{
+				string keyFile = KeyFile;
+
+				if (!string.IsNullOrEmpty(keyFile))
+					keyFile = GetFullPath(keyFile);
+
+				// Make sure there are no relative paths remaining
+				string targetFile = GetFullPath(TargetPath);
+
+				if (!AssemblyUtils.RefreshVersionInfoFromAttributes(GetFullPath(TargetPath), keyFile, KeyContainer))
+					throw new InvalidOperationException(string.Format("Refreshing attributes on {0} failed", targetFile));
 			}
 		}
 	}

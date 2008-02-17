@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using QQn.TurtleUtils.Tokens;
+using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
@@ -10,6 +11,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 	/// </summary>
 	public class TBLogTarget : ITokenizerInitialize
 	{
+		TBLogConfiguration _configuration;
 		string _src;
 		string _targetName;
 		string _targetExt;
@@ -29,6 +31,14 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		{
 			get { return _src; }
 			set { EnsureWritable(); _src = value; }
+		}
+
+		/// <summary>
+		/// Gets the full path to the primary target file
+		/// </summary>
+		public string FullSrc
+		{
+			get { return (Configuration != null && !string.IsNullOrEmpty(Src)) ? QQnPath.Combine(Configuration.BasePath, Src) : null; }
 		}
 
 		/// <summary>
@@ -112,6 +122,16 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		{
 			get { return _debugReference; }
 			set { EnsureWritable(); _debugReference = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the configuration.
+		/// </summary>
+		/// <value>The configuration.</value>
+		public TBLogConfiguration Configuration
+		{
+			get { return _configuration; }
+			internal set { _configuration = value; }
 		}
 
 		#region ITokenizerInitialize Members

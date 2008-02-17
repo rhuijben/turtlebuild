@@ -144,6 +144,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 			References.Configuration = this;
 			ProjectOutput.Configuration = this;
 			Content.Configuration = this;
+			Target.Configuration = this;
 		}
 
 		#endregion

@@ -323,14 +323,13 @@ namespace TurtleTests
 			args.BuildRoot = Path.GetDirectoryName(Solution);
 			args.UseProjectDependencies = useProjectReferences;
 
-			foreach (string file in logCollection.KeysAsFullPaths)
-			{
-				args.ProjectsToPackage.Add(file);
-			}
+			args.ProjectsToPackage.AddRange(logCollection.KeysAsFullPaths);
 
-			SortedFileList<Pack> newPackages;
+			PackageList newPackages;
 
 			Assert.That(Packager.TryCreatePackages(args, out newPackages), "Created packages");
+
+			Assert.That(newPackages.Count, Is.EqualTo(args.ProjectsToPackage.Count), "All projects packaged");
 		}
 
 	}

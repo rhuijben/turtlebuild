@@ -9,9 +9,24 @@ using Microsoft.Win32;
 using System.Globalization;
 using System.Diagnostics;
 using QQn.TurtleUtils.IO;
+using System.Security.Policy;
+using System.Runtime.Remoting;
 
 namespace QQn.TurtleBuildUtils
 {
+	sealed class ReflectionOnlyLoader : MarshalByRefObject
+	{
+		public Assembly ReflectionOnlyLoad(string filename)
+		{
+			if (string.IsNullOrEmpty(filename))
+				throw new ArgumentNullException("filename");
+			else if (!File.Exists(filename))
+				throw new ArgumentException();
+
+			return Assembly.ReflectionOnlyLoad(File.ReadAllBytes(filename));
+		}
+	}
+
 	/// <summary>
 	/// Helper functions for updating file versions
 	/// </summary>
@@ -31,7 +46,7 @@ namespace QQn.TurtleBuildUtils
 
 			if (!File.Exists(file))
 				throw new FileNotFoundException("File to update not found", file);
-			else if(!string.IsNullOrEmpty(keyFile) && !File.Exists(keyFile))
+			else if (!string.IsNullOrEmpty(keyFile) && !File.Exists(keyFile))
 				throw new FileNotFoundException("File to update not found", keyFile);
 
 			string tmpDir = QQnPath.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -39,9 +54,6 @@ namespace QQn.TurtleBuildUtils
 			try
 			{
 				string tmpAssembly = GenerateAttributeAssembly(file, tmpDir);
-
-				if (tmpAssembly == null)
-					return false;
 
 				return CopyFileVersionInfo(tmpAssembly, file, keyFile, keyContainer);
 			}
@@ -162,6 +174,14 @@ namespace QQn.TurtleBuildUtils
 			return false;
 		}
 
+		static void InitLoader(string[] args)
+		{
+			foreach (string file in args)
+			{
+				GC.KeepAlive(Assembly.ReflectionOnlyLoad(File.ReadAllBytes(file)));
+			}
+		}
+
 		/// <summary>
 		/// Generates an attribute assembly from the specified file in the given directory.
 		/// </summary>
@@ -170,17 +190,77 @@ namespace QQn.TurtleBuildUtils
 		/// <returns></returns>
 		private static string GenerateAttributeAssembly(string file, string outputDirectory)
 		{
-			if(string.IsNullOrEmpty(file))
+			if (string.IsNullOrEmpty(file))
 				throw new ArgumentNullException("file");
 			else if (string.IsNullOrEmpty(outputDirectory))
 				throw new ArgumentNullException("outputDirectory");
+			else if (!File.Exists(file))
+				throw new FileNotFoundException("Source Assembly", file);
 
-			byte[] bytes = File.ReadAllBytes(file);
+			Evidence ed = typeof(AssemblyUtils).Assembly.Evidence;
 
-			Assembly srcAssembly = Assembly.ReflectionOnlyLoad(bytes);
+
+			AppDomainSetup domainSetup = new AppDomainSetup();
+			domainSetup.AppDomainInitializer = new AppDomainInitializer(InitLoader);
+			domainSetup.AppDomainInitializerArguments = new string[] { file };
+			Assembly myAssembly = typeof(ReflectionOnlyLoader).Assembly;
+			domainSetup.ApplicationBase = Path.GetDirectoryName(new Uri(myAssembly.CodeBase).LocalPath);
+			AppDomain domain = AppDomain.CreateDomain("AssemblyRefresher", typeof(AssemblyUtils).Assembly.Evidence, domainSetup);
+
+			// Ok, we have an appdomain with the required assembly loaded
+
+			Assembly srcAssembly = null;
+			AssemblyName name = AssemblyName.GetAssemblyName(file);
+
+			foreach (Assembly asm in domain.ReflectionOnlyGetAssemblies())
+			{
+				if (asm.FullName == name.FullName)
+				{
+					srcAssembly = asm;
+					break;
+				}
+			}
 
 			return GenerateAttributeAssembly(srcAssembly, outputDirectory);
 		}
+
+		static Assembly domain_AssemblyResolve(object sender, ResolveEventArgs args)
+		{
+			//throw new NotImplementedException();
+			return null;
+		}
+
+		static void domain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
+		{
+			//throw new NotImplementedException();
+		}
+
+		static SortedFileList<Assembly> _reflectionAssemblies = new SortedFileList<Assembly>();
+		/// <summary>
+		/// Gets the reflection assembly; cache te reference for future requests
+		/// </summary>
+		/// <param name="assemblyPath">The assembly path.</param>
+		/// <returns></returns>
+		public static Assembly GetCachedReflectionAssembly(string assemblyPath)
+		{
+			if (string.IsNullOrEmpty(assemblyPath))
+				throw new ArgumentNullException("assemblyPath");
+
+			lock (_reflectionAssemblies)
+			{
+				Assembly r;
+
+				if (_reflectionAssemblies.TryGetValue(assemblyPath, out r))
+					return r;
+
+
+				r = Assembly.ReflectionOnlyLoadFrom(assemblyPath);
+				_reflectionAssemblies.Add(assemblyPath, r);
+
+				return r;
+			}
+		}
+
 
 		private static string GenerateAttributeAssembly(Assembly assembly, string outputDirectory)
 		{
@@ -207,7 +287,7 @@ namespace QQn.TurtleBuildUtils
 				AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += new ResolveEventHandler(OnReflectionOnlyAssemblyResolve);
 
 				try
-				{					
+				{
 					Assembly mscorlib = Assembly.ReflectionOnlyLoad(typeof(int).Assembly.FullName);
 					Assembly system = Assembly.ReflectionOnlyLoad(typeof(Uri).Assembly.FullName);
 
