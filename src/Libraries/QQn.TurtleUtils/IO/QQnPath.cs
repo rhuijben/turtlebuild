@@ -620,5 +620,15 @@ namespace QQn.TurtleUtils.IO
 
 			return false;
 		}
+
+		// TODO: Implement something like SharpSvn's GetTruePath()
+		[Obsolete("Not implemented yet returns path. See SharpSvn's SvnUtils for some examples")]
+		public static string GetTruePath(string path)
+		{
+			if (string.IsNullOrEmpty(path))
+				throw new ArgumentNullException("path");
+
+			return path;
+		}
 	}
 }
