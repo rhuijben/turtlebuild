@@ -15,7 +15,7 @@ using System.Diagnostics;
 
 namespace QQn.TurtleTasks
 {
-	public sealed class CachedDownloadAndExtract : Task
+	public sealed class CachedDownloadAndExtract : ToolTask
 	{
 		ITaskItem[] _downloadDir;
 		ITaskItem[] _uris;
@@ -218,7 +218,7 @@ namespace QQn.TurtleTasks
 				string toDir = i.ToDir;
 				string ext = Path.GetExtension(i.Name).ToUpperInvariant();
 
-				Log.LogMessage(MessageImportance.Normal, "Extracting {0} to {1}", i.TmpFile, toDir);
+				Log.LogMessage(MessageImportance.Normal, "Extracting '{0}' to '{1}'", i.TmpFile, toDir);
 
 				if (!File.Exists(i.TmpFile))
 					Log.LogError("'{0}' does not exist", i.TmpFile);
@@ -252,6 +252,7 @@ namespace QQn.TurtleTasks
 
 				File.WriteAllText(Path.Combine(i.ToDir, i.Prefix + i.Name + ".tick"), "");
 			}
+			Log.LogMessage(MessageImportance.High, "== File extraction completed ==");
 
 			return true;
 		}
@@ -269,9 +270,6 @@ namespace QQn.TurtleTasks
 				_item = item;
 				_handler = handler;
 			}
-
-				
-			event EventHandler perform;
 
 			public void Start()
 			{
@@ -321,6 +319,10 @@ namespace QQn.TurtleTasks
 					_handler(this, this);
 			}
 
+			public ExtractItem ExtractItem
+			{
+			get { return _item; }
+			}
 			public string FileName
 			{
 				get { return _item.TmpFile; }
@@ -356,7 +358,10 @@ namespace QQn.TurtleTasks
 					nCompleted++;
 
 					if (!e.Ok())
+					{
+						Log.LogError("Downloading '{0}' failed", e.ExtractItem.Uri);
 						nError++;
+					}
 
 					done = (nCompleted >= clients.Count);
 				}
@@ -378,7 +383,7 @@ namespace QQn.TurtleTasks
 
 				if (clients.Count == 0)
 				{
-					Log.LogMessage(MessageImportance.Normal, "= No downloads required =");
+					Log.LogMessage(MessageImportance.Normal, "== No downloads required ==");
 					return true;
 				}
 
@@ -429,6 +434,16 @@ namespace QQn.TurtleTasks
 				}
 				throw;
 			}
+		}
+
+		protected override string GenerateFullPathToTool()
+		{
+			return "Downloader";
+		}
+
+		protected override string ToolName
+		{
+			get { return "Downloader"; }
 		}
 	}
 }
