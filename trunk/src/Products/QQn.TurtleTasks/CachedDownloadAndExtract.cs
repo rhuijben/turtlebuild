@@ -11,6 +11,7 @@ using System.Net.Cache;
 using System.Globalization;
 using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
+using System.Diagnostics;
 
 namespace QQn.TurtleTasks
 {
@@ -63,6 +64,56 @@ namespace QQn.TurtleTasks
 			get { return _cacheFiles.ToArray(); }
 		}
 
+		class ExtractItem
+		{
+			readonly Uri _uri;
+			readonly string _file;
+			readonly string _toDir;
+			readonly string _prefix;
+			readonly string _name;
+			bool _isUpdated;
+
+			public ExtractItem(Uri uri, string file, string toDir, string prefix, string filename)
+			{
+				_uri = uri;
+				_file = file;
+				_toDir = toDir;
+				_prefix = prefix;
+				_name = filename;
+			}
+
+			public Uri Uri
+			{
+				get { return _uri; }
+			}
+
+			public string TmpFile
+			{
+				get { return _file; }
+			}
+
+			public string ToDir
+			{
+				get { return _toDir; }
+			}
+
+			public string Prefix
+			{
+				get { return _prefix; }
+			}
+
+			public bool IsUpdated
+			{
+				get { return _isUpdated; }
+				set { _isUpdated = value; }
+			}
+
+			public string Name
+			{
+				get { return _name; }
+			}
+		}
+
 		public override bool Execute()
 		{
 			bool ok = false;
@@ -99,10 +150,7 @@ namespace QQn.TurtleTasks
 			if (Uris.Length == 0)
 				return true;
 
-			List<Uri> uris = new List<Uri>();
-			List<String> tmpPaths = new List<string>();
-			List<String> names = new List<string>();
-			List<String> extractorPaths = new List<string>();
+			List<ExtractItem> items = new List<ExtractItem>();
 
 			for (int i = 0; i < Uris.Length; i++)
 			{
@@ -113,53 +161,67 @@ namespace QQn.TurtleTasks
 				}
 				else
 				{
-					uris.Add(uri);
-					string path = uri.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
-
-					string fileName = path.Substring(path.LastIndexOf('/') + 1); // Error of LastIndexOf = -1
-
-					names.Add(fileName);
+					string fileName = uri.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
+					fileName = fileName.Substring(fileName.LastIndexOf('/') + 1); // Error of LastIndexOf = -1
 
 					string downloadDir = DownloadDir[DownloadDir.Length == 1 ? 0 : i].ItemSpec;
 					string extractDir = TargetDir[TargetDir.Length == 1 ? 0 : i].ItemSpec;
 
 					string prefix = (Prefix.Length > 0) ? Prefix[Prefix.Length == 1 ? 0 : i].ItemSpec : "";
 
-					if(prefix.Length > 0 && !prefix.EndsWith("-", StringComparison.Ordinal))
+					if (prefix.Length > 0 && !prefix.EndsWith("-", StringComparison.Ordinal))
 						prefix += "-";
 
 					// TODO: Use QQnPath
 					string tmpPath = Path.GetFullPath(Path.Combine(downloadDir, fileName));
-					tmpPaths.Add(tmpPath);
-					extractorPaths.Add(Path.GetFullPath(extractDir));
+
+					ExtractItem ei = new ExtractItem(uri, tmpPath, extractDir, prefix, fileName);
+
+					items.Add(ei);
 
 					_cacheFiles.Add(new TaskItem(tmpPath));
 				}
 			}
 
-			bool isUpdated;
-			if (!EnsureDownloads(uris, tmpPaths, out isUpdated))
+			if (!EnsureDownloads(items))
 				return false;
 
-			if(!isUpdated)
+			bool updateOne = false;
+			foreach (ExtractItem i in items)
 			{
-				Log.LogMessage("No download actions performed, no extraction required");
-				return false;
+				if(i.IsUpdated)
+				{}
+				else if(!File.Exists(Path.Combine(i.ToDir, i.Prefix + i.Name + ".tick")))
+				{
+					i.IsUpdated = true;
+				}
+
+				if (i.IsUpdated)
+				{
+					updateOne = true;
+				}
+			}
+
+			if(!updateOne)
+			{
+				Log.LogMessage(MessageImportance.High, "== No extraction required ==");
+				return true;
 			}
 
 			// Ok, we have all items; let's extract them			
 
-			for (int i = 0; i < uris.Count; i++)
+			foreach(ExtractItem i in items)
 			{
-				string tmp = tmpPaths[i];
-				string toDir = extractorPaths[i];
-				string name = names[i];
-				string ext = Path.GetExtension(name).ToUpperInvariant();
+				if (!i.IsUpdated)
+					continue;
 
-				Log.LogMessage("Extracting {0} to {1}", tmp, toDir);
+				string toDir = i.ToDir;
+				string ext = Path.GetExtension(i.Name).ToUpperInvariant();
 
-				if (!File.Exists(tmp))
-					Log.LogError("'{0}' does not exist", tmp);
+				Log.LogMessage(MessageImportance.Normal, "Extracting {0} to {1}", i.TmpFile, toDir);
+
+				if (!File.Exists(i.TmpFile))
+					Log.LogError("'{0}' does not exist", i.TmpFile);
 
 				if (!Directory.Exists(toDir))
 					Directory.CreateDirectory(toDir);
@@ -167,112 +229,187 @@ namespace QQn.TurtleTasks
 				if (ext == ".ZIP")
 				{
 					FastZipEvents fze = new FastZipEvents();
-					fze.CompletedFile += 
+					fze.CompletedFile +=
 						delegate(object sender, ScanEventArgs e)
 						{
 							_filesWritten.Add(new TaskItem(Path.Combine(toDir, e.Name)));
 							e.ContinueRunning = true;
 						};
-					
+
 					FastZip fz = new FastZip(fze);
 					fz.CreateEmptyDirectories = true;
 					fz.RestoreAttributesOnExtract = true;
 
-					fz.ExtractZip(tmp, toDir, FastZip.Overwrite.Always, null, null, null, false);
+					fz.ExtractZip(i.TmpFile, toDir, FastZip.Overwrite.Always, null, null, null, false);
 				}
-					// TODO: Check other types
+				// TODO: Check other types
 				else
 				{
-					string file = Path.Combine(toDir, names[i]);
-					File.Copy(tmp, file);
+					string file = Path.Combine(toDir, i.Name);
+					File.Copy(i.TmpFile, file);
 					_filesWritten.Add(new TaskItem(file));
 				}
+
+				File.WriteAllText(Path.Combine(i.ToDir, i.Prefix + i.Name + ".tick"), "");
 			}
 
 			return true;
 		}
 
-		private bool EnsureDownloads(List<Uri> uris, List<String> tmpPaths, out bool isUpdated)
+		sealed class DownloadData : EventArgs
 		{
-			List<WebClient> clients;
+			readonly ExtractItem _item;
+			readonly EventHandler<DownloadData> _handler;
+			WebClient client;
+			bool _completed;
+			bool _ok;
+
+			public DownloadData(ExtractItem item, EventHandler<DownloadData> handler)
+			{
+				_item = item;
+				_handler = handler;
+			}
+
+				
+			event EventHandler perform;
+
+			public void Start()
+			{
+				client = new WebClient();
+				client.CachePolicy = new RequestCachePolicy(RequestCacheLevel.Revalidate);
+
+				ThreadPool.QueueUserWorkItem(new WaitCallback(Run));
+			}				
+
+			void Run(object value)
+			{
+				Exception ex = null;
+				try
+				{
+					client.DownloadFile(_item.Uri, _item.TmpFile);
+				}
+				catch(Exception ee)
+				{
+					ex = ee;
+				}
+
+				client_DownloadFileCompleted(this, new AsyncCompletedEventArgs(ex, false, this));
+			}
+
+			public void Cancel()
+			{
+				if (!_completed)
+					client.CancelAsync();
+			}
+
+			void client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
+			{
+				_completed = true;
+				if (!e.Cancelled && e.Error == null)
+				{
+					_ok = true;
+					_item.IsUpdated = true;
+				}
+				else
+					try
+					{
+						File.Delete(_item.TmpFile);
+					}
+					catch { }
+
+				if (_handler != null)
+					_handler(this, this);
+			}
+
+			public string FileName
+			{
+				get { return _item.TmpFile; }
+			}
+
+			public bool Ok()
+			{
+				return _ok;
+			}
+
+			public bool Completed()
+			{
+				return _completed;
+			}
+		}
+
+		private bool EnsureDownloads(List<ExtractItem> items)
+		{
+			List<DownloadData> clients = new List<DownloadData>();
+			List<string> delOnError = new List<string>();
 			int nCompleted;
 
-			isUpdated = false;
-			clients = new List<WebClient>();
 			nCompleted = 0;
 			int nError = 0;
 
-			AsyncCompletedEventHandler handler = delegate(object sender, AsyncCompletedEventArgs e)
+			ManualResetEvent ev = new ManualResetEvent(false);
+			EventHandler<DownloadData> handler = 
+				delegate(object sender, DownloadData e)
 			{
-				Uri dlUri = (Uri)e.UserState;
-				if (e.Cancelled)
+				bool done = false;
+				lock (delOnError)
 				{
-					Log.LogError("Download of {0} was canceled", dlUri);
-					nError++;
-				}
-				else if (e.Error != null)
-				{
-					Log.LogError("Download of {0} failed: {1}", dlUri, e.Error);
-					nError++;
-				}
-				else
-				{
-					Log.LogMessage("Download of {0} completed", dlUri);
 					nCompleted++;
+
+					if (!e.Ok())
+						nError++;
+
+					done = (nCompleted >= clients.Count);
 				}
+				if (done)
+					ev.Set();
 			};
-			List<string> delOnError = new List<string>() ;
+			
 			try
 			{
-				for (int i = 0; i < uris.Count; i++)
+				foreach(ExtractItem i in items)
 				{
-					if (!File.Exists(tmpPaths[i]))
+					if (!File.Exists(i.TmpFile))
 					{
-						if (!Directory.Exists(Path.GetDirectoryName(tmpPaths[i])))
-							Directory.CreateDirectory(Path.GetDirectoryName(tmpPaths[i]));
+						clients.Add(new DownloadData(i, handler));
 
-						if(delOnError.Count == 0)
-							Log.LogMessage("== started dependency downloading ==");
-
-						WebClient wc = new WebClient();
-						wc.CachePolicy = new System.Net.Cache.RequestCachePolicy(RequestCacheLevel.Revalidate);
-						wc.DownloadFileCompleted += handler;
-						wc.DownloadFileAsync(uris[i], tmpPaths[i], uris[i]);
-						Log.LogMessage("Start downloading '{0}'...", uris[i], tmpPaths[i]);
-						clients.Add(wc);
-						delOnError.Add(tmpPaths[i]);
-						isUpdated = true;
+						delOnError.Add(i.TmpFile);
 					}
 				}
 
-				DateTime now = DateTime.Now;
-				DateTime start = now;
-				DateTime next = DateTime.Now + new TimeSpan(0, 0, 10);
-				DateTime err = DateTime.Now + new TimeSpan(1, 0, 0);
-
-				while (nCompleted + nError < clients.Count)
+				if (clients.Count == 0)
 				{
-					Thread.Sleep(50); // TODO: Use some kind of sleep event
-					now = DateTime.Now;
-										
-					if (now > next)
-					{
-						Log.LogMessage("Still downloading...");
-						next = DateTime.Now + new TimeSpan(0, 0, 10);
-					}
-					else if (now > err)
-					{
-						Log.LogError("Hard limit of 30 minutes exceeded");
-						throw new InvalidOperationException();
-					}
+					Log.LogMessage(MessageImportance.Normal, "= No downloads required =");
+					return true;
 				}
 
-				if (nCompleted < clients.Count)
+				Log.LogMessage(MessageImportance.High, "== started dependency downloading ==");
+
+
+				DateTime start = DateTime.Now;
+				foreach(DownloadData d in clients)
+					d.Start();
+
+
+				WaitHandle[] wh = new WaitHandle[] { ev };
+				if (0 > WaitHandle.WaitAny(wh, new TimeSpan(0, 30, 0), true))
+				{
+					foreach(DownloadData d in clients)
+					{
+						if(!d.Completed())
+							d.Cancel();
+					}
+
+					Log.LogError("== Timeout exceeded, aborted ==");
 					return false;
-				else if (nCompleted > 0)
-					Log.LogMessage("= Downloads completed successfully in {0} =", now-start);
-				else
-					Log.LogMessage("= No downloads required =");
+				}
+
+				if (nError > 0)
+				{
+					Log.LogError("== One or more downloads failed ==");
+					return false;
+				}
+
+				Log.LogMessage(MessageImportance.High, "= Downloads completed successfully in {0} =", (DateTime.Now - start));
 
 				return true;
 			}
