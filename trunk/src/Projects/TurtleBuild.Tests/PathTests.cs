@@ -81,5 +81,19 @@ namespace TurtleTests
 			}
 		}
 
+		[Test]
+		public void VerifyTrueName()
+		{
+			foreach(Environment.SpecialFolder sv in Enum.GetValues(typeof(Environment.SpecialFolder)))
+			{
+				string path = Environment.GetFolderPath(sv);
+
+				if (string.IsNullOrEmpty(path))
+					continue;
+
+				Assert.That(QQnPath.GetTruePath(path.ToUpperInvariant()), Is.Not.Null);
+			}
+		}
+
 	}
 }
