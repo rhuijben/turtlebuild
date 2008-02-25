@@ -45,8 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplyXslTransform.cs" />
+    <Compile Include="ApplyXslTransform.XslFilename.cs" />
     <Compile Include="CachedDownloadAndExtract.cs" />
+    <Compile Include="ApplyXslTransform.XslFile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QQnTaskBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="QQn.TurtleTasks.snk" />
