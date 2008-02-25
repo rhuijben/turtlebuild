@@ -15,7 +15,7 @@ using System.Diagnostics;
 
 namespace QQn.TurtleTasks
 {
-	public sealed class CachedDownloadAndExtract : ToolTask
+	public sealed class CachedDownloadAndExtract : QQnTaskBase
 	{
 		ITaskItem[] _downloadDir;
 		ITaskItem[] _uris;
@@ -131,21 +131,9 @@ namespace QQn.TurtleTasks
 			if (!ok)
 				return false;
 
-			ok = false;
-			if (DownloadDir.Length != Uris.Length && DownloadDir.Length > 1)
-				Log.LogError("DownloadDir.Length != Uri.Length && != 1");
-			else if (TargetDir.Length != Uris.Length && TargetDir.Length == 1)
-				Log.LogError("TargetDir.Length != Uri.Length && TargetDir.Length != 1");
-			else if (Prefix.Length != Uris.Length && Prefix.Length > 1)
-				Log.LogError("Prefix.Length != Uri.Length && Prefix.Length > 1");
-			else
-				ok = true;
-
-			if (DownloadDir.Length == 0)
-				DownloadDir = new ITaskItem[] { new TaskItem(Path.Combine(Path.GetTempPath(), "tbDownloadCache")) };
-
-			if (!ok)
-				return false;
+			string[] downloadDir = ApplySecondaryValue(DownloadDir, "DownloadDir", Uris);
+			string[] targetDir = ApplySecondaryValue(TargetDir, "TargetDir", Uris);
+			string[] prefix = ApplySecondaryValue(Prefix, "Prefix", Uris);
 
 			if (Uris.Length == 0)
 				return true;
@@ -164,18 +152,15 @@ namespace QQn.TurtleTasks
 					string fileName = uri.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
 					fileName = fileName.Substring(fileName.LastIndexOf('/') + 1); // Error of LastIndexOf = -1
 
-					string downloadDir = DownloadDir[DownloadDir.Length == 1 ? 0 : i].ItemSpec;
-					string extractDir = TargetDir[TargetDir.Length == 1 ? 0 : i].ItemSpec;
+					//string downloadDir = dirDownloadDir[DownloadDir.Length == 1 ? 0 : i].ItemSpec;
 
-					string prefix = (Prefix.Length > 0) ? Prefix[Prefix.Length == 1 ? 0 : i].ItemSpec : "";
-
-					if (prefix.Length > 0 && !prefix.EndsWith("-", StringComparison.Ordinal))
-						prefix += "-";
+					if (!String.IsNullOrEmpty(prefix[i]) && !prefix[i].EndsWith("-", StringComparison.Ordinal))
+						prefix[i] += "-";
 
 					// TODO: Use QQnPath
-					string tmpPath = Path.GetFullPath(Path.Combine(downloadDir, fileName));
+					string tmpPath = Path.GetFullPath(Path.Combine(downloadDir[i], fileName));
 
-					ExtractItem ei = new ExtractItem(uri, tmpPath, extractDir, prefix, fileName);
+					ExtractItem ei = new ExtractItem(uri, tmpPath, targetDir[i], prefix[i], fileName);
 
 					items.Add(ei);
 
@@ -189,9 +174,9 @@ namespace QQn.TurtleTasks
 			bool updateOne = false;
 			foreach (ExtractItem i in items)
 			{
-				if(i.IsUpdated)
-				{}
-				else if(!File.Exists(Path.Combine(i.ToDir, i.Prefix + i.Name + ".tick")))
+				if (i.IsUpdated)
+				{ }
+				else if (!File.Exists(Path.Combine(i.ToDir, i.Prefix + i.Name + ".tick")))
 				{
 					i.IsUpdated = true;
 				}
@@ -202,7 +187,7 @@ namespace QQn.TurtleTasks
 				}
 			}
 
-			if(!updateOne)
+			if (!updateOne)
 			{
 				Log.LogMessage(MessageImportance.High, "== No extraction required ==");
 				return true;
@@ -210,7 +195,7 @@ namespace QQn.TurtleTasks
 
 			// Ok, we have all items; let's extract them			
 
-			foreach(ExtractItem i in items)
+			foreach (ExtractItem i in items)
 			{
 				if (!i.IsUpdated)
 					continue;
@@ -261,9 +246,11 @@ namespace QQn.TurtleTasks
 		{
 			readonly ExtractItem _item;
 			readonly EventHandler<DownloadData> _handler;
+			string _errorText;
 			WebClient client;
 			bool _completed;
 			bool _ok;
+			bool _canceled;
 
 			public DownloadData(ExtractItem item, EventHandler<DownloadData> handler)
 			{
@@ -274,10 +261,10 @@ namespace QQn.TurtleTasks
 			public void Start()
 			{
 				client = new WebClient();
-				client.CachePolicy = new RequestCachePolicy(RequestCacheLevel.Revalidate);
+				client.CachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
 
 				ThreadPool.QueueUserWorkItem(new WaitCallback(Run));
-			}				
+			}
 
 			void Run(object value)
 			{
@@ -286,24 +273,16 @@ namespace QQn.TurtleTasks
 				{
 					client.DownloadFile(_item.Uri, _item.TmpFile);
 				}
-				catch(Exception ee)
+				catch (Exception ee)
 				{
 					ex = ee;
+
+					_errorText = string.Format("Downloading '{0}' failed: {1}", _item.Uri, ee.ToString());
 				}
 
-				client_DownloadFileCompleted(this, new AsyncCompletedEventArgs(ex, false, this));
-			}
-
-			public void Cancel()
-			{
-				if (!_completed)
-					client.CancelAsync();
-			}
-
-			void client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
-			{
 				_completed = true;
-				if (!e.Cancelled && e.Error == null)
+
+				if (!_canceled && ex == null)
 				{
 					_ok = true;
 					_item.IsUpdated = true;
@@ -319,9 +298,16 @@ namespace QQn.TurtleTasks
 					_handler(this, this);
 			}
 
+			public void Cancel()
+			{
+				_canceled = true;
+				if (!_ok && _errorText == null)
+					_errorText = "* aborted *";
+			}
+
 			public ExtractItem ExtractItem
 			{
-			get { return _item; }
+				get { return _item; }
 			}
 			public string FileName
 			{
@@ -337,6 +323,11 @@ namespace QQn.TurtleTasks
 			{
 				return _completed;
 			}
+
+			public string ErrorText
+			{
+				get { return _errorText; }
+			}
 		}
 
 		private bool EnsureDownloads(List<ExtractItem> items)
@@ -349,35 +340,46 @@ namespace QQn.TurtleTasks
 			int nError = 0;
 
 			ManualResetEvent ev = new ManualResetEvent(false);
-			EventHandler<DownloadData> handler = 
+			EventHandler<DownloadData> handler =
 				delegate(object sender, DownloadData e)
-			{
-				bool done = false;
-				lock (delOnError)
 				{
-					nCompleted++;
-
-					if (!e.Ok())
+					bool done = false;
+					lock (delOnError)
 					{
-						Log.LogError("Downloading '{0}' failed", e.ExtractItem.Uri);
-						nError++;
-					}
+						nCompleted++;
 
-					done = (nCompleted >= clients.Count);
-				}
-				if (done)
-					ev.Set();
-			};
-			
+						if (!e.Ok())
+							nError++;
+
+						done = (nCompleted >= clients.Count);
+					}
+					if (done)
+						ev.Set();
+				};
+
 			try
 			{
-				foreach(ExtractItem i in items)
-				{
-					if (!File.Exists(i.TmpFile))
+				foreach (ExtractItem i in items)
+				{	
+					FileInfo fif = new FileInfo(i.TmpFile);
+
+					if (!fif.Exists)
 					{
+						if (!Directory.Exists(fif.DirectoryName))
+							Directory.CreateDirectory(fif.DirectoryName);
+
 						clients.Add(new DownloadData(i, handler));
 
 						delOnError.Add(i.TmpFile);
+					}
+					else
+					{
+						try 
+						{
+							// Touch the file
+							fif.LastWriteTime = DateTime.Now;
+						}
+						catch { }
 					}
 				}
 
@@ -391,30 +393,34 @@ namespace QQn.TurtleTasks
 
 
 				DateTime start = DateTime.Now;
-				foreach(DownloadData d in clients)
+				foreach (DownloadData d in clients)
 					d.Start();
 
-
-				WaitHandle[] wh = new WaitHandle[] { ev };
-				if (0 > WaitHandle.WaitAny(wh, new TimeSpan(0, 30, 0), true))
+				if (0 > WaitHandle.WaitAny(new WaitHandle[] {ev}, 30 * 60 * 1000, true))
 				{
-					foreach(DownloadData d in clients)
+					foreach (DownloadData d in clients)
 					{
-						if(!d.Completed())
+						if (!d.Completed())
 							d.Cancel();
 					}
 
-					Log.LogError("== Timeout exceeded, aborted ==");
+					Log.LogError("== Download timeout exceeded, aborted ==");
 					return false;
 				}
 
 				if (nError > 0)
 				{
-					Log.LogError("== One or more downloads failed ==");
+					foreach (DownloadData d in clients)
+					{
+						if (d.ErrorText != null)
+							Log.LogError(d.ErrorText);
+					}
+
+					Log.LogError("== One or more downloads failed; aborting ==");
 					return false;
 				}
 
-				Log.LogMessage(MessageImportance.High, "= Downloads completed successfully in {0} =", (DateTime.Now - start));
+				Log.LogMessage(MessageImportance.High, "Downloads completed successfully in {0}", (DateTime.Now - start));
 
 				return true;
 			}
@@ -434,16 +440,6 @@ namespace QQn.TurtleTasks
 				}
 				throw;
 			}
-		}
-
-		protected override string GenerateFullPathToTool()
-		{
-			return "Downloader";
-		}
-
-		protected override string ToolName
-		{
-			get { return "Downloader"; }
 		}
 	}
 }
