@@ -158,7 +158,8 @@ namespace QQn.TurtleTasks
 						prefix[i] += "-";
 
 					// TODO: Use QQnPath
-					string tmpPath = Path.GetFullPath(Path.Combine(downloadDir[i], fileName));
+					string dlDir = string.IsNullOrEmpty(downloadDir[i]) ? Path.Combine(Path.GetTempPath(), "tbDownloadCache") : downloadDir[i];
+					string tmpPath = Path.GetFullPath(Path.Combine(dlDir, fileName));
 
 					ExtractItem ei = new ExtractItem(uri, tmpPath, targetDir[i], prefix[i], fileName);
 
@@ -396,7 +397,8 @@ namespace QQn.TurtleTasks
 				foreach (DownloadData d in clients)
 					d.Start();
 
-				if (0 > WaitHandle.WaitAny(new WaitHandle[] {ev}, 30 * 60 * 1000, true))
+				int n;
+				if (0 > (n = WaitAnyWithUI(new WaitHandle[] { ev }, new TimeSpan(0, 30, 0), true)) || n == WaitHandle.WaitTimeout)
 				{
 					foreach (DownloadData d in clients)
 					{
@@ -407,6 +409,8 @@ namespace QQn.TurtleTasks
 					Log.LogError("== Download timeout exceeded, aborted ==");
 					return false;
 				}
+
+				GC.KeepAlive(ev);
 
 				if (nError > 0)
 				{

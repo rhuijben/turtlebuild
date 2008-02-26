@@ -62,7 +62,8 @@ namespace QQn.TurtleBuildUtils
 				setup.AppDomainInitializer = new AppDomainInitializer(OnRefreshVersionInfo);			
 				setup.AppDomainInitializerArguments = new string[] { assemblyFile, tmpDir, tmpName};
 			
-				GC.KeepAlive(AppDomain.CreateDomain("AttributeRefresher", myAssembly.Evidence, setup)); // The appdomain will auto destruct
+				AppDomain dom = AppDomain.CreateDomain("AttributeRefresher", myAssembly.Evidence, setup); 
+				AppDomain.Unload(dom); // Remove locks
 
 				if(!File.Exists(tmpName))
 					return false;
