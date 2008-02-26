@@ -129,19 +129,19 @@ namespace QQn.TurtleTasks
 			for(int i = 0; i < Sources.Length; i++)
 			{
 				XslFilename name = new XslFilename(Sources[i].ItemSpec, _debug);
-				XslFile file;
+				XslFile xsl;
 				lock(_files)
 				{
-					if(!_files.TryGetValue(name, out file))
+					if(!_files.TryGetValue(name, out xsl))
 					{
-						file = new XslFile(name);
-						_files.Add(file, file);
+						xsl = new XslFile(name);
+						_files.Add(xsl, xsl);
 					}
 				}
 
 				try
 				{
-					file.EnsureCompiled();
+					xsl.EnsureCompiled();
 				}
 				catch (XsltCompileException xc)
 				{
@@ -151,6 +151,15 @@ namespace QQn.TurtleTasks
 				}
 
 				string srcFile = Sources[i].ItemSpec;
+				FileInfo fOut = new FileInfo(outputs[i]);
+
+				if (fOut.Exists &&
+					fOut.LastWriteTime > File.GetLastWriteTime(srcFile) &&
+					fOut.LastWriteTime > File.GetLastWriteTime(xsl.Filename))
+				{
+					continue; // Skip processing
+				}
+
 				XsltArgumentList al = new XsltArgumentList();
 				al.AddExtensionObject("http://schemas.qqn.nl/2008/02/ApplyXslTransform", new ApplyHelper(srcFile, this)); // Allows calling back into MSBuild
 				al.AddParam("Src", "", srcFile);
@@ -175,13 +184,13 @@ namespace QQn.TurtleTasks
 					al.AddParam(q[0].Trim(), "", q[1].Trim());
 				}
 
-				Log.LogMessage(MessageImportance.High, "Transforming '{0}' into '{1}' using '{2}'", Sources[i].ItemSpec, outputs[i], Path.GetFileName(file.Filename));
+				Log.LogMessage(MessageImportance.High, "Transforming '{0}' into '{1}' using '{2}'", Sources[i].ItemSpec, outputs[i], Path.GetFileName(xsl.Filename));
 
 				using(Stream wtr = File.Create(outputs[i]))
 				{
 					try
 					{
-						file.Transform.Transform(srcFile, al, wtr);
+						xsl.Transform.Transform(srcFile, al, wtr);
 					}
 					catch (XsltException xe)
 					{
