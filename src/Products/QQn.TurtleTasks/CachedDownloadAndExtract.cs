@@ -212,7 +212,7 @@ namespace QQn.TurtleTasks
 				if (!Directory.Exists(toDir))
 					Directory.CreateDirectory(toDir);
 
-				if (ext == ".ZIP" || ext == ".TPZ")
+				if (ext == ".ZIP" || ext == ".TPZIP")
 				{
 					FastZipEvents fze = new FastZipEvents();
 					fze.CompletedFile +=
