@@ -10,6 +10,10 @@ using System.Xml.XPath;
 using QQn.TurtleUtils.IO;
 using QQn.TurtleUtils.Tokens;
 using QQn.TurtleUtils.Cryptography;
+using ICSharpCode.SharpZipLib.Zip;
+using ICSharpCode.SharpZipLib.Core;
+using System.Collections.Specialized;
+using QQn.TurtleBuildUtils;
 
 namespace QQn.TurtlePackage
 {
@@ -21,12 +25,12 @@ namespace QQn.TurtlePackage
 		/// <summary>
 		/// 
 		/// </summary>
-		public const string PackageFileType = "application/x-QQn-TurtlePackage";
+		public const string PackageFileType = "QQn/tpZip-Package/1.0";
 		//readonly FileInfo _package;
 		//readonly IXPathNavigable _manifest;
 		readonly List<IDisposable> _disposeAtClose;
 		readonly MultipleStreamReader _reader;
-		MultipleStreamReader _contentReader;
+		Stream _zipStream;
 		readonly Pack _pack;
 
 		internal TPack(Stream baseStream, params IDisposable[] disposeAtClose)
@@ -44,7 +48,7 @@ namespace QQn.TurtlePackage
 			_reader = new MultipleStreamReader(baseStream, msa);
 
 			Pack pack;
-			using (Stream r = _reader.GetNextStream(0x01))
+			using (Stream r = _reader.GetNextStream(PackageDefinitionId))
 			{
 				XPathDocument doc = new XPathDocument(r);
 				XPathNavigator nav = doc.CreateNavigator();
@@ -65,17 +69,17 @@ namespace QQn.TurtlePackage
 		/// Gets the content reader.
 		/// </summary>
 		/// <value>The content reader.</value>
-		protected MultipleStreamReader ContentReader
+		protected Stream ZipStream
 		{
 			get
 			{
-				if (_contentReader == null)
+				if (_zipStream == null)
 				{
 					_reader.Reset();
-					_contentReader = _contentReader = new MultipleStreamReader(_reader.GetNextStream(0x02));
+					_zipStream = _reader.GetNextStream(ZipFileId);
 				}
 
-				return _contentReader;
+				return _zipStream;
 			}
 		}
 
@@ -120,6 +124,19 @@ namespace QQn.TurtlePackage
 			}
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		public const int PackageDefinitionId = 0x10;
+		/// <summary>
+		/// 
+		/// </summary>
+		public const int PackagingLogId = 0x11;
+		/// <summary>
+		/// 
+		/// </summary>
+		public const int ZipFileId = 0xFFFF;
+
 
 		/// <summary>
 		/// Creates the specified package
@@ -141,21 +158,18 @@ namespace QQn.TurtlePackage
 
 			args.FileType = PackageFileType;
 
-			MultipleStreamArgs fileCreateArgs = new MultipleStreamArgs();
-			fileCreateArgs.StreamType = 0x04;
-			fileCreateArgs.Assured = true;
-			fileCreateArgs.GZipped = true;
-
 			MultipleStreamCreateArgs msca = new MultipleStreamCreateArgs();
-			msca.MaximumNumberOfStreams = 8;
+			msca.MaximumNumberOfStreams = 4;
+			msca.VerificationMode = VerificationMode.None;
 
-			using (FileStream fs = File.Create(fileName, 16384))
+			using (FileStream fs = File.Create(fileName, 65536))
 			using (AssuredStream assurance = new AssuredStream(fs, args))
-			using (MultipleStreamWriter msw = new MultipleStreamWriter(assurance))
+			using (MultipleStreamWriter msw = new MultipleStreamWriter(assurance, msca))
 			{
 				MultipleStreamArgs msa = new MultipleStreamArgs();
-				msa.StreamType = 0x01;
+				msa.StreamType = 0x10;
 				msa.Assured = true;
+				msa.GZipped = true;
 				using (XmlWriter xw = new XmlTextWriter(msw.CreateStream(msa), Encoding.UTF8))
 				{
 					xw.WriteStartDocument();
@@ -164,28 +178,72 @@ namespace QQn.TurtlePackage
 					xw.WriteEndDocument();
 				}
 
-				MultipleStreamCreateArgs zipcArgs = new MultipleStreamCreateArgs();
-				zipcArgs.MaximumNumberOfStreams = definition.Containers.Count;
-				using (MultipleStreamWriter zipBase = new MultipleStreamWriter(msw.CreateStream(0x02), zipcArgs))
+				msa = new MultipleStreamArgs();
+				msa.StreamType = 0x11;
+
+				using (XmlWriter xw = new XmlTextWriter(msw.CreateStream(msa), Encoding.UTF8))
 				{
+					// TODO: Write tblog file
+				}
+
+
+				// Last stream: We add a zip file
+				msa = new MultipleStreamArgs();
+				msa.StreamType = ZipFileId; // Defined
+				msa.Assured = false; // Use the whole file assurance for the zip
+				msa.GZipped = false; // Don't compress again
+
+				using(Stream ms = msw.CreateStream(msa))
+				using (ZipFile zipFile = ZipFile.Create(ms))
+				{
+					zipFile.BeginUpdate();
+					zipFile.UseZip64 = UseZip64.Dynamic;
+
+					SetName setName = new SetName();
+
+					zipFile.NameTransform = setName;
+
+					SortedFileList added = new SortedFileList();
+					added.BaseDirectory = "c:\\" + Guid.NewGuid();
+
 					foreach (PackContainer container in definition.Containers)
 					{
-						MultipleStreamCreateArgs ccArgs = new MultipleStreamCreateArgs();
-						ccArgs.MaximumNumberOfStreams = container.Files.Count;
-						using (MultipleStreamWriter containerWriter = new MultipleStreamWriter(zipBase.CreateStream(0x03), ccArgs))
+						foreach (PackFile file in container.Files)
 						{
-							foreach (PackFile file in container.Files)
+							if (!QQnPath.IsRelativeSubPath(file.StreamName) || added.Contains(file.StreamName))
 							{
-								using (FileStream fileSrc = File.OpenRead(QQnPath.Combine(file.BaseDir, file.Name)))
-								using (Stream fileBlob = containerWriter.CreateStream(fileCreateArgs))
+								string name = Path.GetFileNameWithoutExtension(file.StreamName);
+								string ext = Path.GetExtension(file.StreamName);
+
+								string attempt = "_/" + name + ext;
+								int n = 0;
+								do
 								{
-									QQnPath.CopyStream(fileSrc, fileBlob);
+									if (!added.Contains(attempt))
+									{
+										file.StreamName = attempt;
+										break;
+									}
+
+									attempt = string.Format("_/{0}.{1}.{2}", name, n++, ext);
 								}
+								while (true);
 							}
+								
+							if (file.StreamName.Contains("\\"))
+								file.StreamName = file.StreamName.Replace('\\', '/');
+
+							added.Add(file.StreamName);
+							setName.NextName = file.StreamName;
+
+							zipFile.Add(file.FullName);
 						}
 					}
+
+					zipFile.CommitUpdate();
 				}
 			}
+
 			return null;
 		}
 
@@ -310,7 +368,72 @@ namespace QQn.TurtlePackage
 			return new TPack(rootStream, stream);
 		}
 
-		delegate void Extractor(PackFile file, Stream fileStream);
+		class ExtractorEventArgs : EventArgs, IDisposable
+		{
+			PackFile _file;
+			Stream _stream;
+			ZipFile _zipFile;
+			ZipEntry _entry;
+			bool _closed;
+
+			public ExtractorEventArgs(PackFile file, Stream stream)
+			{
+				if(file == null)
+					throw new ArgumentNullException("file");
+				else if(stream == null)
+					throw new ArgumentNullException("stream");
+
+				_file = file;
+				_stream = stream;
+			}
+
+			internal ExtractorEventArgs(PackFile file, ZipFile zipFile, ZipEntry entry)
+			{
+				if (file == null)
+					throw new ArgumentNullException("file");
+				else if (zipFile == null)
+					throw new ArgumentNullException("zipFile");
+				else if (entry == null)
+					throw new ArgumentNullException("entry");
+
+				_file = file;
+				_zipFile = zipFile;
+				_entry = entry;
+			}
+
+			public PackFile PackFile
+			{
+				get { return _file; }
+			}
+
+			public Stream Stream
+			{
+				get 
+				{
+					if (_stream == null)
+						_stream = _zipFile.GetInputStream(_entry);
+					return _stream; 
+				}
+			}
+
+			#region IDisposable Members
+
+			public void Dispose()
+			{
+				if (_closed)
+					return;
+
+				if (_stream != null)
+				{
+					_closed = true;
+					_stream.Close();
+				}
+			}
+
+			#endregion
+		}
+
+		delegate void Extractor(ExtractorEventArgs e);
 
 		/// <summary>
 		/// Extracts to.
@@ -338,24 +461,32 @@ namespace QQn.TurtlePackage
 			else if (extractor == null)
 				throw new ArgumentNullException("extract");
 
-			ContentReader.Reset();
+			ZipStream.Seek(0, SeekOrigin.Begin);
+
+			Dictionary<string, PackFile> extract = new Dictionary<string, PackFile>(StringComparer.OrdinalIgnoreCase);
 			
+			// Prepare a list of items to extract
 			foreach (PackContainer container in _pack.Containers)
 			{
-				using (Stream s = ContentReader.GetNextStream(0x03))
+				if (!args.ExtractContainer(container.Name))
+					continue;
+					
+				foreach (PackFile pf in container.Files)
 				{
-					if (!args.ExtractContainer(container.Name))
-						continue;
+					extract.Add(pf.StreamName, pf);
+				}
+			}
 
-					using(MultipleStreamReader fr = new MultipleStreamReader(s))
+			// Extract them in zip-order
+			using(ZipFile zip = new ZipFile(ZipStream))
+			{
+				foreach(ZipEntry entry in zip)
+				{
+					PackFile pf;
+
+					if(extract.TryGetValue(entry.Name, out pf))
 					{
-						foreach (PackFile pf in container.Files)
-						{
-							using (Stream fs = fr.GetNextStream(0x04))
-							{
-								extractor(pf, fs);
-							}
-						}
+						extractor(new ExtractorEventArgs(pf, zip, entry));
 					}
 				}
 			}			
@@ -386,14 +517,15 @@ namespace QQn.TurtlePackage
 			else if (args == null)
 				throw new ArgumentNullException("args");
 
-			ExtractFiles(args, delegate(PackFile file, Stream fileStream)
+			ExtractFiles(args, delegate(ExtractorEventArgs e)
 			{
+				PackFile file = e.PackFile;
 				DirectoryMapFile dmf = directory.GetFile(file.RelativePath);
 
 				if ((dmf == null) || !dmf.Unmodified() || !QQnCryptoHelpers.HashComparer.Equals(dmf.FileHash, file.FileHash))
 					using (Stream s = directory.CreateFile(file.RelativePath, file.FileHash, file.FileSize))
 					{
-						QQnPath.CopyStream(fileStream, s);
+						QQnPath.CopyStream(e.Stream, s);
 					}
 				else
 					directory.UnscheduleDelete(file.RelativePath); // Make sure it stays
@@ -421,11 +553,11 @@ namespace QQn.TurtlePackage
 				return;
 			}
 
-			ExtractFiles(args, delegate(PackFile file, Stream fileStream)
+			ExtractFiles(args, delegate(ExtractorEventArgs e)
 			{
-				using (Stream s = File.Create(QQnPath.Combine(directory, file.RelativePath)))
+				using (Stream s = File.Create(QQnPath.Combine(directory, e.PackFile.RelativePath)))
 				{
-					QQnPath.CopyStream(fileStream, s);
+					QQnPath.CopyStream(e.Stream, s);
 				}
 			});
 		}
@@ -467,6 +599,63 @@ namespace QQn.TurtlePackage
 		public Pack Pack
 		{
 			get { return _pack; }
+		}
+	}
+
+	class FileSource : IStaticDataSource
+	{
+		readonly string _path;
+
+		public FileSource(string path)
+		{
+			if (path == null)
+				throw new ArgumentNullException("path");
+
+			_path = path;
+		}
+
+
+		#region IStaticDataSource Members
+
+		public Stream GetSource()
+		{
+			return File.OpenRead(_path);
+		}
+
+		#endregion
+	}
+
+	class SetName : INameTransform
+	{
+		string _nextDirectory;
+		string _nextName;
+
+		public string NextDirectory
+		{
+			get { return _nextDirectory; }
+			set { _nextDirectory = (value != null) ? ZipEntry.CleanName(value) : null; }
+		}
+
+		public string NextName
+		{
+			get { return _nextName; }
+			set { _nextName = (value != null) ? ZipEntry.CleanName(value) : null; }
+		}
+
+		public string TransformDirectory(string name)
+		{
+			if (NextDirectory != null)
+				name = NextDirectory;
+
+			return name;
+		}
+
+		public string TransformFile(string name)
+		{
+			if (NextName != null)
+				name = NextName;
+
+			return name;
 		}
 	}
 }

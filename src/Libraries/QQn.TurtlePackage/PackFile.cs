@@ -18,6 +18,9 @@ namespace QQn.TurtlePackage
 		long _size = -1L;
 		string _hash;
 		DateTime _lastWriteTimeUtc;
+		string _assemblyName;
+		string _debugId;
+		string _streamName;
 
 		/// <summary>
 		/// Gets the size of the file.
@@ -39,6 +42,48 @@ namespace QQn.TurtlePackage
 		{
 			get { return _hash; }
 			set { EnsureWritable(); _hash = value; }
+		}
+
+		/// <summary>
+		/// Gets the assemblyname of the assembly.
+		/// </summary>
+		/// <value>The name of the assembly.</value>
+		[Token("assemblyName"), DefaultValue(null)]
+		public string AssemblyName
+		{
+			get { return _assemblyName; }
+			set { EnsureWritable(); _assemblyName = value; }
+		}
+
+		/// <summary>
+		/// Gets or sets the debug id.
+		/// </summary>
+		/// <value>The debug id.</value>
+		[Token("debugId"), DefaultValue(null)]
+		public string DebugId
+		{
+			get { return _debugId; }
+			set { EnsureWritable(); _debugId = value; }
+		}
+
+		/// <summary>
+		/// Gets the full name (based on BaseDir and Name)
+		/// </summary>
+		/// <value>The full name.</value>
+		public string FullName
+		{
+			get { return QQnPath.Combine(BaseDir, Name); }
+		}
+
+		/// <summary>
+		/// Gets the name of the stream within the package
+		/// </summary>
+		/// <value>The name of the stream.</value>
+		[Token("streamName"), DefaultValue(null)]
+		public string StreamName
+		{
+			get { return _streamName; }
+			set { EnsureWritable(); _streamName = value; }
 		}
 
 		/// <summary>

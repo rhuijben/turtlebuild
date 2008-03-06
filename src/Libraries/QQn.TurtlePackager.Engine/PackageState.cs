@@ -65,7 +65,11 @@ namespace QQn.TurtlePackager
 		public bool DontUseProjectDependencies
 		{
 			get { return _dontUseProjectDependencies; }
-		} 
+		}
+
+		public void LoadExternalOrigins()
+		{
+		}
 
 		public void CreateBuildOrigins()
 		{

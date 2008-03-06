@@ -14,7 +14,7 @@ namespace QQn.TurtlePackage
 	public static class PackUtils
 	{
 		/// <summary>
-		/// Tries the create pack.
+		/// Tries to create a pack.
 		/// </summary>
 		/// <param name="project">The project.</param>
 		/// <param name="pack">The pack.</param>
@@ -48,6 +48,8 @@ namespace QQn.TurtlePackage
 					continue;
 
 				PackFile pf = projectOutput.Files.AddItem(QQnPath.MakeRelativePath(projectOutput.BaseDir, QQnPath.Combine(projectDir, item.Src)));
+
+				pf.StreamName = item.Src;
 			}
 
 			PackContainer projectContent = p.Containers.AddItem("#ProjectContent");
@@ -61,6 +63,8 @@ namespace QQn.TurtlePackage
 			foreach (TBLogItem item in config.Content.Items)
 			{
 				PackFile pf = projectContent.Files.AddItem(QQnPath.MakeRelativePath(projectContent.BaseDir, QQnPath.Combine(projectDir, item.Src)));
+
+				pf.StreamName = item.Src;
 			}
 
 			PackContainer projectScripts = p.Containers.AddItem("#ProjectScripts");
@@ -74,6 +78,8 @@ namespace QQn.TurtlePackage
 			foreach (TBLogItem item in config.Content.Items)
 			{
 				PackFile pf = projectContent.Files.AddItem(QQnPath.MakeRelativePath(projectContent.BaseDir, QQnPath.Combine(projectDir, item.Src)));
+
+				pf.StreamName = item.Src;
 			}
 
 			if (config.Target.KeySrc != null)

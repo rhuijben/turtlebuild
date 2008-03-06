@@ -13,8 +13,10 @@ namespace QQn.TurtleUtils.Tags.ExpressionParser
 			string tv = token.Value;
 			if(tv.IndexOfAny(new char[] { '.', 'E', 'e' }) >= 0)
 				_value = new ExValue(double.Parse(tv));
+			else if(tv.StartsWith("0x", StringComparison.Ordinal))
+				_value = new ExValue(int.Parse(tv, System.Globalization.NumberStyles.AllowHexSpecifier));
 			else
-				_value = new ExValue(int.Parse(tv, System.Globalization.NumberStyles.AllowHexSpecifier | System.Globalization.NumberStyles.AllowLeadingSign));
+				_value = new ExValue(int.Parse(tv, System.Globalization.NumberStyles.AllowLeadingSign));
 		}
 
 		/// <summary>

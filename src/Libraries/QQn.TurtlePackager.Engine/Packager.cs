@@ -27,6 +27,7 @@ namespace QQn.TurtlePackager
 
 			PackageState state = new PackageState(args);
 
+			state.LoadExternalOrigins();
 			state.CreateBuildOrigins();
 			state.AddRequirements();
 
