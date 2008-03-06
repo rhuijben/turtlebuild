@@ -13,6 +13,28 @@ namespace QQn.TurtleUtils.IO
 		[DllImport("shlwapi.dll", CharSet = CharSet.Unicode)]
 		[return: MarshalAs(UnmanagedType.Bool)]
 		internal static extern bool PathRelativePathTo(StringBuilder pszPath, string pszFrom, [MarshalAs(UnmanagedType.U4)] int dwAttrFrom, string pszTo, [MarshalAs(UnmanagedType.U4)] int dwAttrTo);
+
+		[DllImport("kernel32.dll", CharSet = CharSet.Unicode)]
+		internal static extern IntPtr FindFirstFileW([In]StringBuilder lpFileName, out WIN32_FIND_DATA lpFindFileData);
+
+		[DllImportAttribute("kernel32.dll", CharSet = CharSet.Unicode)]
+		internal static extern bool FindClose(IntPtr handle);
+	}
+
+	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+	struct WIN32_FIND_DATA
+	{
+		uint dwFileAttributes;
+		long ftCreationTime;
+		long ftLastAccessTime;
+		long ftLastWriteTime;
+		uint sizeLow;
+		uint sizeHigh;
+		uint reserved0;
+		[MarshalAs(UnmanagedType.ByValTStr, SizeConst=260)]
+		public string filename;
+		[MarshalAs(UnmanagedType.ByValTStr, SizeConst=14)]
+		string alternateFilename;
 	}
 
 	/// <summary>
@@ -389,7 +411,7 @@ namespace QQn.TurtleUtils.IO
 				throw new ArgumentNullException("to");
 			else if (bufferSize <= 0)
 				throw new ArgumentOutOfRangeException("bufferSize", bufferSize, "Buffersize must be greater than 0");
-			byte[] buffer = new byte[Math.Max(512, bufferSize)];
+			byte[] buffer = new byte[Math.Max(4096, bufferSize)];
 			int nRead;
 
 			while (0 < (nRead = from.Read(buffer, 0, buffer.Length)))
@@ -621,14 +643,105 @@ namespace QQn.TurtleUtils.IO
 			return false;
 		}
 
+		static int NextSlash(StringBuilder sb, int startAt)
+		{
+			if (sb == null)
+				throw new ArgumentNullException("sb");
+
+			for(int i = startAt; i < sb.Length; i++)
+			{
+				if(sb[i] == '\\')
+					return i;
+			}
+			return -1;
+		}
+
 		// TODO: Implement something like SharpSvn's GetTruePath()
-		[Obsolete("Not implemented yet returns path. See SharpSvn's SvnUtils for some examples")]
+		/// <summary>
+		/// Gets the true path.
+		/// </summary>
+		/// <param name="path">The path.</param>
+		/// <returns></returns>
 		public static string GetTruePath(string path)
 		{
 			if (string.IsNullOrEmpty(path))
 				throw new ArgumentNullException("path");
 
-			return path;
+			int n = path.IndexOf('/');
+			if (n >= 0)
+				path = path.Replace('/', '\\');
+
+			String root = null;
+			char c = path[0];
+	
+			if (c == '\\' && path.StartsWith("\\\\?\\", StringComparison.Ordinal))
+				path = path.Substring(4); // We use this trick ourselves
+
+			if (path.Length > 2 && (path[1] == ':') && ((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z')))
+			{
+				if ((path[2] == '\\') && !path.Contains("\\."))
+					root = Path.GetPathRoot(path).ToUpperInvariant(); // 'a:\' -> 'A:\'
+			}
+			else if (path.StartsWith("\\\\", StringComparison.Ordinal))
+			{		
+				int next = path.IndexOf('\\', 2);
+
+				if (next > 0)
+					next = path.IndexOf('\\', next+1);
+
+				if ((next > 0) && (0 > path.IndexOf("\\.", next+1)))
+					root = Path.GetPathRoot(path);
+			}
+
+			if (root == null)
+			{
+				if(path[0] == '\\' || path.Contains("\\."))
+				{
+					path = Path.GetFullPath(path);
+					root = Path.GetPathRoot(path); // UNC paths are not case sensitive, but we keep the casing
+				}
+				else
+					root = "";
+			}
+
+			// Okay, now we have a normalized path and it's root in normal form. Now we need to find the exact casing of the next parts
+			StringBuilder result = new StringBuilder(root, path.Length + 16);
+			StringBuilder searcher = new StringBuilder("\\\\?\\" + path);
+
+			int nStart = 4 + root.Length;
+			bool isFirst = true;
+
+			while(nStart < path.Length)
+			{
+				WIN32_FIND_DATA filedata;
+
+				int nNext = NextSlash(searcher, nStart);
+
+				if(nNext > 0)
+					searcher[nNext] = '\0';
+
+				IntPtr hSearch = NativeMethods.FindFirstFileW(searcher, out filedata);
+
+				if(hSearch == (IntPtr)(-1))
+					return null;
+
+				if(!isFirst)
+					result.Append('\\');
+
+				result.Append(filedata.filename);
+
+				NativeMethods.FindClose(hSearch); // Close search request
+
+				if(nNext < 0)
+					break;
+				else
+					searcher[nNext] = '\\'; // Revert 0 to '\'
+
+				nStart = nNext+1;
+				isFirst= false;
+			}
+
+			return result.ToString();
 		}
 	}
 }

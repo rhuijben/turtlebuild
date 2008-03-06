@@ -41,7 +41,7 @@ namespace QQn.TurtleUtils.IO
 			else
 			{
 				length = _length;
-				if (length >= 0 && length < (256 * 1024))
+				if (length >= 0 && length < (1024 * 1024)) // Less than 1 MB, use memory
 				{
 					byte[] buffer = new byte[length];
 					innerStream.Read(buffer, 0, buffer.Length);

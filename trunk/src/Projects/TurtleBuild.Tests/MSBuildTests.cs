@@ -224,7 +224,7 @@ namespace TurtleTests
 			engine.RegisterLogger(logger);
 
 			Project p = new Project(engine);
-			p.Load("f:\\wfh\\trunk\\src\\WinForms-Html.sln"/*Solution*/);
+			p.Load(Solution);
 			Assert.That(p.Build(), Is.True, "Build succeeded");
 		}
 
@@ -277,8 +277,8 @@ namespace TurtleTests
 
 			Assert.That(PackUtils.TryCreatePack(log, out pack));
 
-			string path = QQnPath.Combine(PackagePath, "QQn.TurtleMSBuild.tbPkg");
-			TPack.Create(QQnPath.Combine(PackagePath, "QQn.TurtleMSBuild.tbPkg"), pack);
+			string path = QQnPath.Combine(PackagePath, "QQn.TurtleMSBuild.tpZip");
+			TPack.Create(path, pack);
 
 			using (TPack pkg = TPack.OpenFrom(path, VerificationMode.Full))
 			using(DirectoryMap dm = DirectoryMap.Get(ExtractPath))
