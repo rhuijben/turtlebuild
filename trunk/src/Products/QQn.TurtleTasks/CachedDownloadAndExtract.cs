@@ -212,7 +212,7 @@ namespace QQn.TurtleTasks
 				if (!Directory.Exists(toDir))
 					Directory.CreateDirectory(toDir);
 
-				if (ext == ".ZIP")
+				if (ext == ".ZIP" || ext == ".TPZ")
 				{
 					FastZipEvents fze = new FastZipEvents();
 					fze.CompletedFile +=
@@ -262,7 +262,7 @@ namespace QQn.TurtleTasks
 			public void Start()
 			{
 				client = new WebClient();
-				client.CachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
+				client.CachePolicy = new RequestCachePolicy(RequestCacheLevel.Revalidate);
 
 				ThreadPool.QueueUserWorkItem(new WaitCallback(Run));
 			}
