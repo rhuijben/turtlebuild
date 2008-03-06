@@ -52,6 +52,7 @@ namespace QQn.TurtleTasks
 			set { _intermediateDir = value; }
 		}
 
+		[Output]
 		public ITaskItem[] FilesWritten
 		{
 			get { return _filesWritten.ToArray(); }
@@ -126,16 +127,16 @@ namespace QQn.TurtleTasks
 			if (Sources.Length == 0)
 				return true;
 
-			for(int i = 0; i < Sources.Length; i++)
+			for (int i = 0; i < Sources.Length; i++)
 			{
-				XslFilename name = new XslFilename(Sources[i].ItemSpec, _debug);
+				XslFilename name = new XslFilename(templates[i], _debug);
 				XslFile xsl;
-				lock(_files)
+				lock (_files)
 				{
-					if(!_files.TryGetValue(name, out xsl))
+					if (!_files.TryGetValue(name, out xsl))
 					{
 						xsl = new XslFile(name);
-						_files.Add(xsl, xsl);
+						_files[name] = xsl;
 					}
 				}
 
@@ -143,22 +144,15 @@ namespace QQn.TurtleTasks
 				{
 					xsl.EnsureCompiled();
 				}
-				catch (XsltCompileException xc)
+				catch (System.Xml.Xsl.XsltException xc)
 				{
 					Log.LogError(null, null, null, xc.SourceUri, xc.LineNumber, xc.LinePosition, xc.LineNumber, xc.LinePosition, xc.Message);
 					Log.LogError(null, null, null, xc.SourceUri, xc.LineNumber, xc.LinePosition, xc.LineNumber, xc.LinePosition, xc.ToString());
-					throw;
+					return false;
 				}
 
 				string srcFile = Sources[i].ItemSpec;
 				FileInfo fOut = new FileInfo(outputs[i]);
-
-				if (fOut.Exists &&
-					fOut.LastWriteTime > File.GetLastWriteTime(srcFile) &&
-					fOut.LastWriteTime > File.GetLastWriteTime(xsl.Filename))
-				{
-					continue; // Skip processing
-				}
 
 				XsltArgumentList al = new XsltArgumentList();
 				al.AddExtensionObject("http://schemas.qqn.nl/2008/02/ApplyXslTransform", new ApplyHelper(srcFile, this)); // Allows calling back into MSBuild
@@ -174,8 +168,8 @@ namespace QQn.TurtleTasks
 				al.AddParam("ProjectFile", "", BuildEngine.ProjectFileOfTaskNode);
 				al.AddParam("TargetDir", "", TargetDir);
 				al.AddParam("IntermediateDir", "", IntermediateDir);
-				
-				foreach(string iAttr in Attributes.Split(';'))
+
+				foreach (string iAttr in Attributes.Split(';'))
 				{
 					if (string.IsNullOrEmpty(iAttr.Trim()))
 						continue;
@@ -186,20 +180,37 @@ namespace QQn.TurtleTasks
 
 				Log.LogMessage(MessageImportance.High, "Transforming '{0}' into '{1}' using '{2}'", Sources[i].ItemSpec, outputs[i], Path.GetFileName(xsl.Filename));
 
-				using(Stream wtr = File.Create(outputs[i]))
+				try
 				{
-					try
+					using (Stream wtr = File.Create(outputs[i]))
 					{
 						xsl.Transform.Transform(srcFile, al, wtr);
 					}
-					catch (XsltException xe)
-					{
-						Log.LogError(null, null, null, xe.SourceUri, xe.LineNumber, xe.LinePosition, xe.LineNumber, xe.LinePosition, xe.Message);
-						Log.LogError(null, null, null, xe.SourceUri, xe.LineNumber, xe.LinePosition, xe.LineNumber, xe.LinePosition, xe.ToString());
-					}
-
-					_filesWritten.Add(new TaskItem(outputs[i]));
 				}
+				catch (XsltException xe)
+				{
+					Log.LogError(null, null, null, xe.SourceUri, xe.LineNumber, xe.LinePosition, xe.LineNumber, xe.LinePosition, xe.Message);
+					Log.LogError(null, null, null, xe.SourceUri, xe.LineNumber, xe.LinePosition, xe.LineNumber, xe.LinePosition, xe.ToString());
+					try
+					{
+						File.Delete(outputs[i]);
+					}
+					catch
+					{ }
+				}
+				catch (Exception e)
+				{
+					try
+					{
+						File.Delete(outputs[i]);
+					}
+					catch
+					{ }
+					throw;
+				}
+
+				_filesWritten.Add(new TaskItem(outputs[i]));
+
 			}
 
 			return true;

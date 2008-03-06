@@ -9,7 +9,7 @@ namespace QQn.TurtleTasks
 {
 	partial class ApplyXslTransform
 	{
-		class XslFile : XslFilename
+		class XslFile : XslFilename, IEquatable<XslFile>
 		{
 			DateTime _lastModified;
 
@@ -28,7 +28,7 @@ namespace QQn.TurtleTasks
 				if (!fif.Exists)
 					throw new FileNotFoundException("Xsl not found", fif.FullName);
 
-				if ((_transform != null) && fif.LastWriteTime == fif.LastWriteTime)
+				if ((_transform != null) && fif.LastWriteTime == _lastModified)
 					return;
 
 
@@ -71,6 +71,18 @@ namespace QQn.TurtleTasks
 					return _transform; 
 				}
 			}
+
+			#region IEquatable<XslFile> Members
+
+			bool IEquatable<XslFile>.Equals(XslFile other)
+			{
+				if (other == null)
+					return false;
+
+				return base.Equals(other);
+			}
+
+			#endregion
 		}
 	}
 }

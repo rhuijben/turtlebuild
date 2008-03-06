@@ -8,8 +8,8 @@ namespace QQn.TurtleTasks
 	{
 		class XslFilename : IEquatable<XslFilename>
 		{
-			string _filename;
-			bool _debug;
+			readonly string _filename;
+			readonly bool _debug;
 
 			public XslFilename(string filename)
 				: this(filename, false)
@@ -41,23 +41,31 @@ namespace QQn.TurtleTasks
 			public string Filename
 			{
 				get { return _filename; }
-				set { _filename = value; }
 			}
 
 			public bool Debug
 			{
 				get { return _debug; }
-				set { _debug = value; }
+			}
+
+			public override int GetHashCode()
+			{
+				return Filename.GetHashCode();
 			}
 
 			#region IEquatable<XslFilename> Members
+
+			public override bool Equals(object obj)
+			{
+				return Equals(obj as XslFilename);
+			}
 
 			public bool Equals(XslFilename other)
 			{
 				if (other == null)
 					return false;
 
-				if (!string.Equals(other.Filename, Filename) || Debug != other.Debug)
+				if (!string.Equals(other.Filename, Filename, StringComparison.OrdinalIgnoreCase) || Debug != other.Debug)
 					return false;
 
 				return true;
