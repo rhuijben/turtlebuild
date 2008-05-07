@@ -91,9 +91,23 @@ namespace QQn.TurtleUtils.IO
                     _streamWriter.Write("--");
                     _streamWriter.Write(_topBoundary);
                     _streamWriter.Write(NetworkEol);
+                    _streamWriter.Flush();
                     break;
                 default:
                     throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "WriteBoundary() is not supported for encoding {0}", _encoding));
+            }
+        }
+
+        void WriteEndBoundary()
+        {
+            switch (_encoding)
+            {
+                case WebRequestPostDataEncoding.MultipartFormData:
+                    _streamWriter.Write("--");
+                    _streamWriter.Write(_topBoundary);
+                    _streamWriter.Write("--");
+                    _streamWriter.Write(NetworkEol);
+                    break;
             }
         }
 
@@ -123,7 +137,17 @@ namespace QQn.TurtleUtils.IO
                     WriteUrlEncoded(value);
                     break;
                 case WebRequestPostDataEncoding.MultipartFormData:
-                    AddValue(key, Encoding.UTF8.GetBytes(value));
+                    if (!IsSafeKeyName(key))
+                        throw new FormatException("Invalid character in key");
+
+                    WriteBoundary();
+                    _streamWriter.Write("Content-Disposition: form-data; name=\"{0}\"", key);
+                    _streamWriter.Write(NetworkEol);
+                    _streamWriter.Write(NetworkEol);
+                    _streamWriter.Flush();
+
+                    _streamWriter.Write(value);
+                    _streamWriter.Write(NetworkEol);
                     break;
 
                 default:
@@ -153,6 +177,7 @@ namespace QQn.TurtleUtils.IO
                     _streamWriter.Write("Content-Disposition: form-data; name=\"{0}\"", key);
                     _streamWriter.Write(NetworkEol);
                     _streamWriter.Write(NetworkEol);
+                    _streamWriter.Flush();
 
                     _webRequestStream.Write(value, 0, value.Length);
                     _streamWriter.Write(NetworkEol);
@@ -259,12 +284,12 @@ namespace QQn.TurtleUtils.IO
                         throw new FormatException("Invalid character in key");
 
                     WriteBoundary();
-                    _streamWriter.Write("Content-Disposition: form-data; name=\"{0}\" filename=\"{1}\"", key, filename);
+                    _streamWriter.Write("Content-Disposition: form-data; name=\"{0}\"; filename=\"{1}\"", key, filename);
                     _streamWriter.Write(NetworkEol);
                     _streamWriter.Write("Content-Type: {0}", contentType);
                     _streamWriter.Write(NetworkEol);
                     _streamWriter.Write(NetworkEol);
-
+                    _streamWriter.Flush();
                     byte[] buffer = new byte[8192];
                     int read;
 
@@ -306,6 +331,9 @@ namespace QQn.TurtleUtils.IO
         {
             if (_closed)
                 return;
+
+            if (_encoding == WebRequestPostDataEncoding.MultipartFormData)
+                WriteEndBoundary();
 
             _closed = true;
             _streamWriter.Dispose();

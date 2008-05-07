@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using QQn.TurtleBuildUtils;
 using QQn.TurtleBuildUtils.Files.TBLog;
+using QQn.TurtleUtils.IO;
+using System.IO;
 
 namespace QQn.TurtlePackager
 {
@@ -11,6 +13,7 @@ namespace QQn.TurtlePackager
 		SortedFileList _projectsToPackage;
 		TBLogCache _logCollection;
 		string _buildRoot;
+        string _releaseDir;
 		bool _dontUseProjectDependencies;
 
 		/// <summary>
@@ -57,5 +60,14 @@ namespace QQn.TurtlePackager
 			set { _dontUseProjectDependencies = !value; }
 		}
 
+        /// <summary>
+        /// Gets or sets the output dir.
+        /// </summary>
+        /// <value>The output dir.</value>
+        public string OutputDir
+        {
+            get { return _releaseDir ?? (_releaseDir = Environment.CurrentDirectory); }
+            set { _releaseDir = Path.GetFullPath(value); }
+        }
 	}
 }

@@ -5,6 +5,7 @@ using QQn.TurtleBuildUtils.Files.TBLog;
 using System.IO;
 using QQn.TurtleUtils.IO;
 using System.Diagnostics;
+using QQn.TurtlePackage;
 
 namespace QQn.TurtlePackager.Origins
 {
@@ -13,6 +14,7 @@ namespace QQn.TurtlePackager.Origins
 	{
 		readonly TBLogFile _log;
 		readonly string _projectFile;
+        Pack _pack;
 
 		public BuildOrigin(TBLogFile logFile)
 		{
@@ -27,6 +29,12 @@ namespace QQn.TurtlePackager.Origins
 		{
 			get { return _log; }
 		}
+
+        public Pack Pack
+        {
+            get { return _pack; }
+            set { _pack = value; }
+        }
 
 		public string ProjectName
 		{

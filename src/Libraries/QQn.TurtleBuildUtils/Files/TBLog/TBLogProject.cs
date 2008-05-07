@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using QQn.TurtleUtils.Tokens;
+using System.Diagnostics;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
 	/// <summary>
 	/// Project information container
 	/// </summary>
+    [DebuggerDisplay("Name={Name}, Path={Path}")]
 	public class TBLogProject : ITokenizerInitialize
 	{
 		string _name;

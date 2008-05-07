@@ -55,7 +55,7 @@
     <Compile Include="PackItem.cs" />
     <Compile Include="PackUtils.cs" />
     <Compile Include="TurtleExtractArgs.cs" />
-    <Compile Include="TurtlePackage.cs" />
+    <Compile Include="TPack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

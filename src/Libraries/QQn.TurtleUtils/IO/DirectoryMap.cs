@@ -411,5 +411,52 @@ namespace QQn.TurtleUtils.IO
 		{
 			get { return _directory; }
 		}
+
+        public void Annotate(string path, string key, string value)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException("path");
+            else if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException("key");
+
+            DirectoryMapItem item = GetFile(path);
+
+            if (item == null)
+                return; // TODO: Add directory support?
+
+            if (item.Annotations.Contains(key))
+            {
+                if (value != null)
+                    item.Annotations[key].Value = value;
+                else
+                    item.Annotations.Remove(key);
+            }
+            else if(value != null)
+                item.Annotations.Add(new DirectoryMapAnnotation(key, value));
+        }
+
+        /// <summary>
+        /// Gets the annotation.
+        /// </summary>
+        /// <param name="path">The path.</param>
+        /// <param name="key">The key.</param>
+        /// <returns></returns>
+        public string GetAnnotation(string path, string key)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException("path");
+            else if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException("key");
+
+            DirectoryMapItem item = GetFile(path);
+
+            if (item == null)
+                return null; // TODO: Add directory support?
+
+            if (item.Annotations.Contains(key))
+                return item.Annotations[key].Value;
+            else
+                return null;
+        }
 	}
 }

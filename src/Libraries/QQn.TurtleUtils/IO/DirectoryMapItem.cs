@@ -44,6 +44,17 @@ namespace QQn.TurtleUtils.IO
 			set { _toBeDeleted = value; }
 		}
 
+        DirectoryMapAnnotationCollection _annotations;
+        /// <summary>
+        /// Gets the annotations.
+        /// </summary>
+        /// <value>The annotations.</value>
+        [TokenGroup("A")]
+        public DirectoryMapAnnotationCollection Annotations
+        {
+            get { return _annotations ?? (_annotations = new DirectoryMapAnnotationCollection()); }
+        }
+
 		string _hash;
 		long _size;
 		DateTime _lwt;
