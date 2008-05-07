@@ -18,6 +18,7 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 		TBLogTarget _target;
 		TBLogProjectOutput _projectOutput;
 		TBLogContent _content;
+        TBLogAssembly _assembly;
 
 		string _name;
 		string _platform;
@@ -34,6 +35,17 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 			get { return _logFile; }
 			internal set { _logFile = value; }
 		}
+
+        /// <summary>
+        /// Gets or sets the assembly.
+        /// </summary>
+        /// <value>The assembly.</value>
+        [TokenGroup("Assembly")]
+        public TBLogAssembly Assembly
+        {
+            get { return _assembly ?? (_assembly = new TBLogAssembly()); }
+            set { EnsureWritable(); _assembly = value; }
+        }
 
 		/// <summary>
 		/// Gets or sets the target.

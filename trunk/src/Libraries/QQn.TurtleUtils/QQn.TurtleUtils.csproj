@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="QQn.TurtleUtils.snk" />
+    <Compile Include="IO\DirectoryMapAnnotation.cs" />
     <Compile Include="Items\AutoKeyedCollection.cs" />
     <Compile Include="Tags\BatchItems\StubItem.cs" />
     <Compile Include="Tags\BatchItems\TagBatchItem.cs" />

@@ -6,12 +6,15 @@ using System.Xml;
 using System.Xml.XPath;
 using QQn.TurtleUtils.Tokens.Definitions;
 using QQn.TurtleUtils.IO;
+using System.IO;
+using System.Diagnostics;
 
 namespace QQn.TurtleBuildUtils.Files.TBLog
 {
 	/// <summary>
 	/// 
 	/// </summary>
+    [DebuggerDisplay("Project={ProjectName}")]
 	public class TBLogFile : ITokenizerInitialize
 	{
 		TBLogGenerator _generator;
@@ -70,6 +73,12 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 			get { return _scripts ?? (_scripts = new TBLogScripts()); }
 			set { EnsureWritable(); _scripts = value; }
 		}
+
+        // Used from debugger
+        string ProjectName
+        {
+            get { return Project.Name; }
+        }
 
 		/// <summary>
 		/// Loads the logfile at the specified path and parses it into a <see cref="TBLogFile"/> instance
@@ -233,5 +242,42 @@ namespace QQn.TurtleBuildUtils.Files.TBLog
 				}
 			}
 		}
-	}
+
+        /// <summary>
+        /// Gets the last write time of any of the non shared files in the log
+        /// </summary>
+        /// <returns></returns>
+        public DateTime GetLastWriteTime()
+        {
+            DateTime last = File.GetLastWriteTime(Project.File);
+
+            foreach (TBLogItem item in AllPublishItems)
+            {
+                string src = item.FullSrc;
+
+                if(!item.IsShared && File.Exists(src))
+                {
+                    DateTime dt = File.GetLastWriteTime(src);
+
+                    if (dt > last)
+                        last = dt;
+                }
+            }
+
+            foreach (TBLogItem item in Scripts.Items)
+            {
+                string src = item.FullSrc;
+
+                if (File.Exists(src))
+                {
+                    DateTime dt = File.GetLastWriteTime(src);
+
+                    if (dt > last)
+                        last = dt;
+                }
+            }
+
+            return last;
+        }
+    }
 }

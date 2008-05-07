@@ -243,6 +243,8 @@ namespace TurtleTests
 
 			TBLogFile log = TBLogFile.Load(logFile);
 
+            Assert.That(!string.IsNullOrEmpty(log.Project.Name));
+
 			DebugReference reference = null;
 			foreach (TBLogItem item in log.Configurations[0].ProjectOutput.Items)
 			{
@@ -278,7 +280,7 @@ namespace TurtleTests
 			Assert.That(PackUtils.TryCreatePack(log, out pack));
 
 			string path = QQnPath.Combine(PackagePath, "QQn.TurtleMSBuild.tpZip");
-			TPack.Create(path, pack);
+			TPack tp = TPack.Create(path, pack);
 
 			using (TPack pkg = TPack.OpenFrom(path, VerificationMode.Full))
 			using(DirectoryMap dm = DirectoryMap.Get(ExtractPath))
@@ -289,11 +291,10 @@ namespace TurtleTests
 			}
 
 			using (TPack pkg = TPack.OpenFrom(path, VerificationMode.Full))
-			using (DirectoryMap dm = DirectoryMap.Get(ExtractPath))
 			{
 				Assert.That(pkg, Is.Not.Null);
 
-				pkg.ExtractTo(dm);
+				pkg.ExtractTo(ExtractPath);
 			}
 		}
 
@@ -330,6 +331,27 @@ namespace TurtleTests
 			Assert.That(Packager.TryCreatePackages(args, out newPackages), "Created packages");
 
 			Assert.That(newPackages.Count, Is.EqualTo(args.ProjectsToPackage.Count), "All projects packaged");
+
+            if(Directory.Exists("f:\\extractor"))
+                Directory.Delete("f:\\extractor", true);
+
+            if (Directory.Exists("f:\\extractor2"))
+                Directory.Delete("f:\\extractor2", true);
+
+            if (!Directory.Exists("f:\\extractor"))
+                Directory.CreateDirectory("f:\\extractor");
+            if (!Directory.Exists("f:\\extractor2"))
+                Directory.CreateDirectory("f:\\extractor2");
+
+            foreach (TPack p in newPackages)
+            {
+                p.ExtractTo("f:\\extractor");
+            }
+
+            foreach (TPack p in newPackages)
+            {
+                p.ExtractTo("f:\\extractor2", true);
+            }
 		}
 
 	}

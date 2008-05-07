@@ -6,9 +6,15 @@ using Microsoft.Build.Framework;
 using System.Diagnostics;
 using System.Threading;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 namespace QQn.TurtleTasks
 {
+    static class NativeMethods
+    {
+        [DllImport("user32.dll")]
+        public static extern bool IsGUIThread(bool bConvert);
+    }
 	public abstract class QQnTaskBase : Task
 	{
 		public string[] ApplySecondaryValue(ITaskItem[] values, string valueName, ITaskItem[] primaryValues)
@@ -74,12 +80,12 @@ namespace QQn.TurtleTasks
 			if (timeout < new TimeSpan(0))
 				throw new ArgumentOutOfRangeException();
 
-			if (IsNonInteractive)
+			if (IsNonInteractive || !NativeMethods.IsGUIThread(false))
 				return WaitHandle.WaitAny(handles, timeout, exitContext);
 			else
 			{
 				// We are running inside VS.Net, which blocks the UI thread for us.. Workaround it by pumping messages
-				// Informaly confirmed by MS for VS -2008, so perhaps it is resolved after thay
+				// Informally confirmed by MS for VS 2005-2008, so perhaps it is resolved after VS 2008
 				DateTime end = DateTime.Now + timeout;
 
 				do

@@ -212,7 +212,7 @@ namespace QQn.TurtleUtils.IO
 		byte[] CalculateHash(bool create)
 		{
 			if (create)
-				_hashLength = PositionToSubStream(BaseStream.Length);
+				_hashLength = Length;
 
 			long oldPos = Position;
 			Position = 0;
