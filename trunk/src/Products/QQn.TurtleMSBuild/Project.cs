@@ -364,10 +364,17 @@ namespace QQn.TurtleMSBuild
 
 			if (File.Exists(atPath))
 			{
-				using (FileStream fs = File.OpenRead(atPath))
-				{
-					_previousLog = new XPathDocument(fs);
-				}
+                try
+                {
+                    using (FileStream fs = File.OpenRead(atPath))
+                    {
+                        _previousLog = new XPathDocument(fs);
+                    }
+                }
+                catch
+                {
+                    _previousLog = null;
+                }
 			}
 
 			using (StreamWriter sw = new StreamWriter(atPath, false, Encoding.UTF8))
