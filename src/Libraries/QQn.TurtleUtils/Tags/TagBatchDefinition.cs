@@ -5,10 +5,10 @@ using QQn.TurtleUtils.Cryptography;
 using QQn.TurtleUtils.Items;
 using QQn.TurtleUtils.Tags.BatchItems;
 
-namespace QQn.TurtleUtils.Tags
+namespace QQn.TurtleUtils.Tag
 {
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	public abstract class TagBatchDefinition : System.Collections.IEnumerable
 	{
@@ -47,7 +47,7 @@ namespace QQn.TurtleUtils.Tags
 			{
 				if (_iTaskItem == null)
 				{
-					// Never load the assembly ourselves, but allow nevertheless
+					// Never load the assembly ourselves, but allow neverthele
 					AssemblyName name = new AssemblyName(type.Assembly.FullName);
 
 					if (QQnCryptoHelpers.HashString(name.GetPublicKeyToken()) == "b03f5f7f11d50a3a")
@@ -127,7 +127,7 @@ namespace QQn.TurtleUtils.Tags
 			get { return _itemsUsed.Keys; }
 		}
 
-		internal IList<Pair<string, string>> Constraints
+		internal IList<Pair<string, string>> Constraint
 		{
 			get { return _constraints; }
 		}
@@ -155,7 +155,7 @@ namespace QQn.TurtleUtils.Tags
 			throw new NotImplementedException();
 		}
 
-		internal abstract ICollection<TagBatchItem> AllValues
+		internal abstract ICollection<TagBatchItem> AllValue
 		{
 			get;
 		}
@@ -169,11 +169,11 @@ namespace QQn.TurtleUtils.Tags
 	}
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	/// <typeparam name="TKey">The type of the key.</typeparam>
 	public class TagBatchDefinition<TKey> : TagBatchDefinition, IEnumerable<TKey>
-		where TKey : class
+		where TKey : cla
 	{
 		Dictionary<TKey, TagBatchItem> _items = new Dictionary<TKey, TagBatchItem>();
 
@@ -242,7 +242,7 @@ namespace QQn.TurtleUtils.Tags
 		/// Gets a collection containing all defined keys.
 		/// </summary>
 		/// <value>All keys.</value>
-		public ICollection<TKey> AllKeys
+		public ICollection<TKey> AllKey
 		{
 			get { return _items.Keys; }
 		}
@@ -251,7 +251,7 @@ namespace QQn.TurtleUtils.Tags
 		/// Gets all values.
 		/// </summary>
 		/// <value>All values.</value>
-		internal override ICollection<TagBatchItem> AllValues
+		internal override ICollection<TagBatchItem> AllValue
 		{
 			get { return _items.Values; }
 		}
