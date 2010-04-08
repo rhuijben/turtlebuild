@@ -5,10 +5,10 @@ using QQn.TurtleUtils.Cryptography;
 using QQn.TurtleUtils.Items;
 using QQn.TurtleUtils.Tags.BatchItems;
 
-namespace QQn.TurtleUtils.Tag
+namespace QQn.TurtleUtils.Tags
 {
 	/// <summary>
-	///
+	/// 
 	/// </summary>
 	public abstract class TagBatchDefinition : System.Collections.IEnumerable
 	{
@@ -47,7 +47,7 @@ namespace QQn.TurtleUtils.Tag
 			{
 				if (_iTaskItem == null)
 				{
-					// Never load the assembly ourselves, but allow neverthele
+					// Never load the assembly ourselves, but allow nevertheless
 					AssemblyName name = new AssemblyName(type.Assembly.FullName);
 
 					if (QQnCryptoHelpers.HashString(name.GetPublicKeyToken()) == "b03f5f7f11d50a3a")
@@ -127,7 +127,7 @@ namespace QQn.TurtleUtils.Tag
 			get { return _itemsUsed.Keys; }
 		}
 
-		internal IList<Pair<string, string>> Constraint
+		internal IList<Pair<string, string>> Constraints
 		{
 			get { return _constraints; }
 		}
@@ -155,7 +155,7 @@ namespace QQn.TurtleUtils.Tag
 			throw new NotImplementedException();
 		}
 
-		internal abstract ICollection<TagBatchItem> AllValue
+		internal abstract ICollection<TagBatchItem> AllValues
 		{
 			get;
 		}
@@ -169,11 +169,11 @@ namespace QQn.TurtleUtils.Tag
 	}
 
 	/// <summary>
-	///
+	/// 
 	/// </summary>
 	/// <typeparam name="TKey">The type of the key.</typeparam>
 	public class TagBatchDefinition<TKey> : TagBatchDefinition, IEnumerable<TKey>
-		where TKey : cla
+		where TKey : class
 	{
 		Dictionary<TKey, TagBatchItem> _items = new Dictionary<TKey, TagBatchItem>();
 
@@ -242,7 +242,7 @@ namespace QQn.TurtleUtils.Tag
 		/// Gets a collection containing all defined keys.
 		/// </summary>
 		/// <value>All keys.</value>
-		public ICollection<TKey> AllKey
+		public ICollection<TKey> AllKeys
 		{
 			get { return _items.Keys; }
 		}
@@ -251,7 +251,7 @@ namespace QQn.TurtleUtils.Tag
 		/// Gets all values.
 		/// </summary>
 		/// <value>All values.</value>
-		internal override ICollection<TagBatchItem> AllValue
+		internal override ICollection<TagBatchItem> AllValues
 		{
 			get { return _items.Values; }
 		}
