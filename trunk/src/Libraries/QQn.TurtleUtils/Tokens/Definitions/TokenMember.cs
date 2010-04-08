@@ -5,7 +5,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Reflection;
 
-namespace QQn.TurtleUtils.Tokens.Definition
+namespace QQn.TurtleUtils.Tokens.Definitions
 {
 	/// <summary>
 	/// Specifies the way the tokenizer uses a member
@@ -31,7 +31,7 @@ namespace QQn.TurtleUtils.Tokens.Definition
 	}
 
 	/// <summary>
-	///
+	/// 
 	/// </summary>
 	public sealed class TokenMember : TokenItemBase
 	{
@@ -116,7 +116,7 @@ namespace QQn.TurtleUtils.Tokens.Definition
 		/// Gets the tokens.
 		/// </summary>
 		/// <value>The tokens.</value>
-		public IList<TokenItem> Token
+		public IList<TokenItem> Tokens
 		{
 			get { return _tokens; }
 		}
@@ -125,7 +125,7 @@ namespace QQn.TurtleUtils.Tokens.Definition
 		/// Gets the tokens.
 		/// </summary>
 		/// <value>The tokens.</value>
-		public IList<TokenGroupItem> Group
+		public IList<TokenGroupItem> Groups
 		{
 			get { return _groups; }
 		}
@@ -175,7 +175,7 @@ namespace QQn.TurtleUtils.Tokens.Definition
 						fieldType = fieldType.GetElementType();
 						_tokenMemberMode = TokenMemberMode.Array;
 					}
-					else
+					else 
 						foreach (Type iff in fieldType.GetInterfaces())
 						{
 							if (iff == typeof(IList))
@@ -220,7 +220,7 @@ namespace QQn.TurtleUtils.Tokens.Definition
 						// Before RTM there existed a method Nullable.Wrap<T>(T value) which we should have used all over the place;
 						// now we only need to unwrap the type to allow using TypeConverters... on the real type
 						//
-						fieldType = nullableBase;
+						fieldType = nullableBase;						
 					}
 
 					_dataType = fieldType;
@@ -344,7 +344,7 @@ namespace QQn.TurtleUtils.Tokens.Definition
 				case TokenMemberMode.Array:
 				case TokenMemberMode.List:
 				case TokenMemberMode.GenericList:
-
+					
 					List<object> items = new List<object>();
 					if(result != null)
 						foreach (object i in (IEnumerable)result)
