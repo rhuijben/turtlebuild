@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Net;
-using System.Threading;
 using System.IO;
+using System.Net;
 using System.Net.Cache;
+using System.Threading;
 
 namespace QQn.TurtleTasks
 {

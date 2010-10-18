@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.Build.Utilities;
-using Microsoft.Build.Framework;
-using System.Net;
 using System.IO;
-using System.ComponentModel;
 using System.Threading;
-using System.Net.Cache;
-using System.Globalization;
-using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Core;
-using System.Diagnostics;
+using ICSharpCode.SharpZipLib.Zip;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 
 namespace QQn.TurtleTasks
 {
