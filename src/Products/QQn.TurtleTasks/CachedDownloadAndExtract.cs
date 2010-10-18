@@ -64,56 +64,6 @@ namespace QQn.TurtleTasks
 			get { return _cacheFiles.ToArray(); }
 		}
 
-		class ExtractItem
-		{
-			readonly Uri _uri;
-			readonly string _file;
-			readonly string _toDir;
-			readonly string _prefix;
-			readonly string _name;
-			bool _isUpdated;
-
-			public ExtractItem(Uri uri, string file, string toDir, string prefix, string filename)
-			{
-				_uri = uri;
-				_file = file;
-				_toDir = toDir;
-				_prefix = prefix;
-				_name = filename;
-			}
-
-			public Uri Uri
-			{
-				get { return _uri; }
-			}
-
-			public string TmpFile
-			{
-				get { return _file; }
-			}
-
-			public string ToDir
-			{
-				get { return _toDir; }
-			}
-
-			public string Prefix
-			{
-				get { return _prefix; }
-			}
-
-			public bool IsUpdated
-			{
-				get { return _isUpdated; }
-				set { _isUpdated = value; }
-			}
-
-			public string Name
-			{
-				get { return _name; }
-			}
-		}
-
 		public override bool Execute()
 		{
 			bool ok = false;
@@ -243,94 +193,6 @@ namespace QQn.TurtleTasks
 			return true;
 		}
 
-		sealed class DownloadData : EventArgs
-		{
-			readonly ExtractItem _item;
-			readonly EventHandler<DownloadData> _handler;
-			string _errorText;
-			WebClient client;
-			bool _completed;
-			bool _ok;
-			bool _canceled;
-
-			public DownloadData(ExtractItem item, EventHandler<DownloadData> handler)
-			{
-				_item = item;
-				_handler = handler;
-			}
-
-			public void Start()
-			{
-				client = new WebClient();
-				client.CachePolicy = new RequestCachePolicy(RequestCacheLevel.Revalidate);
-
-				ThreadPool.QueueUserWorkItem(new WaitCallback(Run));
-			}
-
-			void Run(object value)
-			{
-				Exception ex = null;
-				try
-				{
-					client.DownloadFile(_item.Uri, _item.TmpFile);
-				}
-				catch (Exception ee)
-				{
-					ex = ee;
-
-					_errorText = string.Format("Downloading '{0}' failed: {1}", _item.Uri, ee.ToString());
-				}
-
-				_completed = true;
-
-				if (!_canceled && ex == null)
-				{
-					_ok = true;
-					_item.IsUpdated = true;
-				}
-				else
-					try
-					{
-						File.Delete(_item.TmpFile);
-					}
-					catch { }
-
-				if (_handler != null)
-					_handler(this, this);
-			}
-
-			public void Cancel()
-			{
-				_canceled = true;
-				if (!_ok && _errorText == null)
-					_errorText = "* aborted *";
-			}
-
-			public ExtractItem ExtractItem
-			{
-				get { return _item; }
-			}
-			public string FileName
-			{
-				get { return _item.TmpFile; }
-			}
-
-			public bool Ok()
-			{
-				return _ok;
-			}
-
-			public bool Completed()
-			{
-				return _completed;
-			}
-
-			public string ErrorText
-			{
-				get { return _errorText; }
-			}
-		}
-
 		private bool EnsureDownloads(List<ExtractItem> items)
 		{
 			List<DownloadData> clients = new List<DownloadData>();
@@ -361,7 +223,7 @@ namespace QQn.TurtleTasks
 			try
 			{
 				foreach (ExtractItem i in items)
-				{	
+				{
 					FileInfo fif = new FileInfo(i.TmpFile);
 
 					if (!fif.Exists)
@@ -375,7 +237,7 @@ namespace QQn.TurtleTasks
 					}
 					else
 					{
-						try 
+						try
 						{
 							// Touch the file
 							fif.LastWriteTime = DateTime.Now;
