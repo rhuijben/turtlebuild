@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using Microsoft.Build.Utilities;
-using System.Xml.Xsl;
 using System.IO;
+using System.Xml.Xsl;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 
 namespace QQn.TurtleTasks
 {
