@@ -105,21 +105,9 @@ namespace QQn.TurtleTasks
 			}
 		}
 
-		delegate void DoEventsHandler();
-		static DoEventsHandler _doEvents;
-
 		private static void DoEvents()
 		{
-			if (_doEvents == null)
-			{
-				Assembly asm = Assembly.Load("System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089");
-				Type tp = asm.GetType("System.Windows.Forms.Application");
-				MethodInfo doEvents = tp.GetMethod("DoEvents", BindingFlags.Static | BindingFlags.Public | BindingFlags.InvokeMethod);
-
-				_doEvents = (DoEventsHandler)Delegate.CreateDelegate(typeof(DoEventsHandler), null, doEvents);
-			}
-
-			_doEvents();
+            System.Windows.Forms.Application.DoEvents();
 		}
 	}
 }
