@@ -198,7 +198,7 @@ namespace QQn.TurtleTasks
 					catch
 					{ }
 				}
-				catch (Exception e)
+				catch (Exception)
 				{
 					try
 					{
