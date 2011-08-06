@@ -144,10 +144,31 @@ namespace QQn.TurtleBuildUtils
 					}
 				}
 
+				// Find existing resources to make sure we only have one version resource
+				List<ushort> languages = new List<ushort>();
+				using (DllHandle dllHandle = NativeMethods.LoadLibraryEx(toFile, IntPtr.Zero, 0x2))
+				{
+					
+					NativeMethods.EnumResourceLanguages(dllHandle, (IntPtr)16, (IntPtr)1,
+						delegate(IntPtr hModule, IntPtr lpszType, IntPtr lpszName, ushort wIDLanguage, IntPtr lParam)
+						{
+							if (wIDLanguage != 0)
+								languages.Add(wIDLanguage);
+							return true;
+						}, IntPtr.Zero);
+				}
+
 				using (ResourceUpdateHandle resHandle = NativeMethods.BeginUpdateResource(toFile, false))
 				{
 					if (resHandle != null)
 					{
+						/* Remove all language specific version resources */
+						foreach (ushort oldLang in languages)
+						{
+							if (oldLang != 0)
+								NativeMethods.UpdateResource(resHandle, (IntPtr)16, (IntPtr)1, oldLang, null, 0);
+						}
+
 						bool ok = NativeMethods.UpdateResource(resHandle, (IntPtr)16, (IntPtr)1, 0, versionInfo, size);
 						ok = resHandle.Commit() && ok;
 
