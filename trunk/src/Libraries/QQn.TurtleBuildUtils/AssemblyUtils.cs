@@ -1,28 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
-using System.Diagnostics;
-using QQn.TurtleUtils.IO;
+using System.Runtime.InteropServices;
 using System.Security.Policy;
+using QQn.TurtleUtils.IO;
 
 namespace QQn.TurtleBuildUtils
 {
-	sealed class ReflectionOnlyLoader : MarshalByRefObject
-	{
-		public Assembly ReflectionOnlyLoad(string filename)
-		{
-			if (string.IsNullOrEmpty(filename))
-				throw new ArgumentNullException("filename");
-			else if (!File.Exists(filename))
-				throw new ArgumentException();
-
-			return Assembly.ReflectionOnlyLoad(File.ReadAllBytes(filename));
-		}
-	}
-
 	/// <summary>
 	/// Helper functions for updating file versions
 	/// </summary>
@@ -161,8 +148,7 @@ namespace QQn.TurtleBuildUtils
 						/* Remove all language specific version resources */
 						foreach (ushort oldLang in languages)
 						{
-							if (oldLang != 0)
-								NativeMethods.UpdateResource(resHandle, (IntPtr)16, (IntPtr)1, oldLang, null, 0);
+							NativeMethods.UpdateResource(resHandle, (IntPtr)16, (IntPtr)1, oldLang, null, 0);
 						}
 
 						bool ok = NativeMethods.UpdateResource(resHandle, (IntPtr)16, (IntPtr)1, 0, versionInfo, size);
@@ -210,7 +196,7 @@ namespace QQn.TurtleBuildUtils
 			AppDomainSetup domainSetup = new AppDomainSetup();
 			domainSetup.AppDomainInitializer = new AppDomainInitializer(InitLoader);
 			domainSetup.AppDomainInitializerArguments = new string[] { file };
-			Assembly myAssembly = typeof(ReflectionOnlyLoader).Assembly;
+			Assembly myAssembly = typeof(AssemblyUtils).Assembly;
 			domainSetup.ApplicationBase = Path.GetDirectoryName(new Uri(myAssembly.CodeBase).LocalPath);
 			AppDomain domain = AppDomain.CreateDomain("AssemblyRefresher", typeof(AssemblyUtils).Assembly.Evidence, domainSetup);
 
@@ -330,6 +316,10 @@ namespace QQn.TurtleBuildUtils
 						newAssembly.SetCustomAttribute(
 								new CustomAttributeBuilder(typeof(AssemblyInformationalVersionAttribute).GetConstructor(new Type[] { typeof(String) }),
 														   new object[] { srcName.Version.ToString() }));
+
+					newAssembly.SetCustomAttribute(
+								new CustomAttributeBuilder(typeof(AssemblyCultureAttribute).GetConstructor(new Type[] { typeof(String) }),
+															new object[] { "" }));
 				}
 				finally
 				{
