@@ -53,14 +53,14 @@ namespace QQn.TurtleBuildUtils
 		protected override bool ReleaseHandle()
 		{
 			if (handle != IntPtr.Zero)
-				NativeMethods.EndUpdateResource(handle, true);
+				return NativeMethods.EndUpdateResource(handle, true);
 
 			return true;
 		}
 
 		public override bool IsInvalid
 		{
-			get { return handle != IntPtr.Zero; }
+			get { return handle == IntPtr.Zero; }
 		}
 
 		public bool Commit()
@@ -68,11 +68,35 @@ namespace QQn.TurtleBuildUtils
 			IntPtr h = handle;
 			if (h != IntPtr.Zero)
 			{
-				handle = h;
-				return NativeMethods.EndUpdateResource(h, false);
-				}
+				handle = IntPtr.Zero;
+				if (!NativeMethods.EndUpdateResource(h, false))
+					handle = h;
+				else
+					return true;
+			}
 
 			return false;
+		}
+	}
+
+	class DllHandle : SafeHandle
+	{
+		public DllHandle()
+			: base(IntPtr.Zero, true)
+		{
+		}
+
+		protected override bool ReleaseHandle()
+		{
+			if (handle != IntPtr.Zero)
+				return NativeMethods.FreeLibrary(handle);
+
+			return true;
+		}
+
+		public override bool IsInvalid
+		{
+			get { return handle == IntPtr.Zero; }
 		}
 	}
 
@@ -102,5 +126,18 @@ namespace QQn.TurtleBuildUtils
 		[DllImport("version.dll", SetLastError = true)]
 		[return: MarshalAs(UnmanagedType.U4)]
 		public static extern int GetFileVersionInfoSize(string pFilename, [MarshalAs(UnmanagedType.U4)] out int handle);
+
+		[DllImport("kernel32.dll", SetLastError=true)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool FreeLibrary(IntPtr hModule);
+
+		[DllImport("kernel32.dll", SetLastError=true)]
+		public static extern DllHandle LoadLibraryEx(string lpFileName, IntPtr hFile, uint dwFlags);
+
+		[DllImport("kernel32.dll")]
+		public static extern bool EnumResourceLanguages(DllHandle hModule, IntPtr lpszType, IntPtr lpName, EnumResLangDelegate lpEnumFunc, IntPtr lParam);
+
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public delegate bool EnumResLangDelegate(IntPtr hModule, IntPtr lpszType, IntPtr lpszName, ushort wIDLanguage, IntPtr lParam);
 	}
 }
