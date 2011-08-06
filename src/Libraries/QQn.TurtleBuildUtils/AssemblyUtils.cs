@@ -1,16 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
-using Microsoft.Win32;
-using System.Globalization;
 using System.Diagnostics;
 using QQn.TurtleUtils.IO;
 using System.Security.Policy;
-using System.Runtime.Remoting;
 
 namespace QQn.TurtleBuildUtils
 {
@@ -53,7 +49,7 @@ namespace QQn.TurtleBuildUtils
 			Directory.CreateDirectory(tmpDir);
 			try
 			{
-				string tmpName = QQnPath.Combine(tmpDir, Path.GetFileNameWithoutExtension(assemblyFile) + ".resTmp.dll");
+				string tmpName = QQnPath.Combine(tmpDir, Path.GetFileNameWithoutExtension(assemblyFile) + ".dll");
 
 				Assembly myAssembly = typeof(AssemblyUtils).Assembly;
 				AppDomainSetup setup = new AppDomainSetup();
@@ -235,17 +231,6 @@ namespace QQn.TurtleBuildUtils
 			return GenerateAttributeAssembly(srcAssembly, outputDirectory);
 		}
 
-		static Assembly domain_AssemblyResolve(object sender, ResolveEventArgs args)
-		{
-			//throw new NotImplementedException();
-			return null;
-		}
-
-		static void domain_AssemblyLoad(object sender, AssemblyLoadEventArgs args)
-		{
-			//throw new NotImplementedException();
-		}
-
 		static SortedFileList<Assembly> _reflectionAssemblies = new SortedFileList<Assembly>();
 		/// <summary>
 		/// Gets the reflection assembly; cache te reference for future requests
@@ -263,7 +248,6 @@ namespace QQn.TurtleBuildUtils
 
 				if (_reflectionAssemblies.TryGetValue(assemblyPath, out r))
 					return r;
-
 
 				r = Assembly.ReflectionOnlyLoadFrom(assemblyPath);
 				_reflectionAssemblies.Add(assemblyPath, r);
@@ -289,7 +273,7 @@ namespace QQn.TurtleBuildUtils
 				// Only create an on-disk assembly. We never have to execute anything
 				AssemblyBuilder newAssembly = AppDomain.CurrentDomain.DefineDynamicAssembly(asmName, AssemblyBuilderAccess.ReflectionOnly, outputDirectory);
 
-				string tmpFile = srcName.Name + ".resTmp.dll";
+				string tmpFile = srcName.Name + ".dll";
 				newAssembly.DefineDynamicModule(asmName.Name, tmpFile);
 
 				AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += new ResolveEventHandler(OnReflectionOnlyAssemblyResolve);
@@ -298,6 +282,8 @@ namespace QQn.TurtleBuildUtils
 				{
 					Assembly mscorlib = Assembly.ReflectionOnlyLoad(typeof(int).Assembly.FullName);
 					Assembly system = Assembly.ReflectionOnlyLoad(typeof(Uri).Assembly.FullName);
+					bool hasInformationalVersion = false;
+					bool hasVersion = false;
 
 					foreach (CustomAttributeData attr in CustomAttributeData.GetCustomAttributes(assembly))
 					{
@@ -309,17 +295,25 @@ namespace QQn.TurtleBuildUtils
 
 						Type type = attr.Constructor.ReflectedType;
 
-						if (type.Assembly != typeof(AssemblyVersionAttribute).Assembly && type.Assembly != mscorlib && type.Assembly != system)
+						if (type.Assembly != mscorlib && type.Assembly != system)
 						{
 							continue;
 						}
 
+						if (type.Assembly == mscorlib)
+							switch (type.Name)
+							{
+								case "System.Reflection.AssemblyInformationalVersionAttribute":
+									hasInformationalVersion = true;
+									break;
+								case "System.Reflection.AssemblyVersionAttribute":
+									hasVersion = true;
+									break;
+							}
+
 						List<object> values = new List<object>();
-						object value = null;
 						foreach (CustomAttributeTypedArgument arg in attr.ConstructorArguments)
 						{
-							if (value == null)
-								value = arg.Value;
 							values.Add(arg.Value);
 						}
 
@@ -327,6 +321,15 @@ namespace QQn.TurtleBuildUtils
 
 						newAssembly.SetCustomAttribute(cb);
 					}
+
+					if (!hasVersion)
+						newAssembly.SetCustomAttribute(
+								new CustomAttributeBuilder(typeof(AssemblyVersionAttribute).GetConstructor(new Type[] { typeof(String) }),
+														   new object[] { srcName.Version.ToString() }));
+					if (!hasInformationalVersion)
+						newAssembly.SetCustomAttribute(
+								new CustomAttributeBuilder(typeof(AssemblyInformationalVersionAttribute).GetConstructor(new Type[] { typeof(String) }),
+														   new object[] { srcName.Version.ToString() }));
 				}
 				finally
 				{
