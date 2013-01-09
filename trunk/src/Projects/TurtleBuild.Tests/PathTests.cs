@@ -49,7 +49,7 @@ namespace TurtleTests
 		{
 			DirectoryInfo dir = BuildTools.GetFrameworkDirectory(new Version("1.1"));
 
-            Assert.That(dir, Is.EqualTo("q"));
+            Assert.That(dir, Is.Null);
 		}
 
         [Test]
@@ -57,7 +57,7 @@ namespace TurtleTests
 	    {
             DirectoryInfo dir = BuildTools.GetFrameworkDirectory(new Version("2.0"));
 
-            Assert.That(dir, Is.EqualTo("q"));
+            Assert.That(dir.Name, Is.EqualTo("v2.0.50727"));
 	    }
 
         [Test]
@@ -65,7 +65,7 @@ namespace TurtleTests
         {
             DirectoryInfo dir = BuildTools.GetFrameworkDirectory(new Version("3.0"));
 
-            Assert.That(dir, Is.EqualTo("q"));
+            Assert.That(dir.Name, Is.EqualTo("v3.0"));
         }
 
         [Test]
@@ -73,7 +73,7 @@ namespace TurtleTests
         {
             DirectoryInfo dir = BuildTools.GetFrameworkDirectory(new Version("3.5"));
 
-            Assert.That(dir, Is.EqualTo("q"));
+            Assert.That(dir.Name, Is.EqualTo("v3.5"));
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace TurtleTests
         {
             DirectoryInfo dir = BuildTools.GetFrameworkDirectory(new Version("4.0"));
 
-            Assert.That(dir, Is.EqualTo("q"));
+            Assert.That(dir.Name, Is.EqualTo("v4.0.30319"));
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace TurtleTests
         {
             DirectoryInfo dir = BuildTools.GetFrameworkDirectory(new Version("4.5"));
 
-            Assert.That(dir, Is.EqualTo("q"));
+            Assert.That(dir.Name, Is.EqualTo("v4.0.30319"));
         }
 
 	    [Test]

@@ -182,6 +182,9 @@ namespace QQn.TurtleBuildUtils
             if (!dir.Exists)
                 return null;
 
+            if(version.Major == 4 && version.Minor == 5)
+                version = new Version(4,0);
+
             DirectoryInfo[] dirs = dir.GetDirectories("v*.*", SearchOption.TopDirectoryOnly);
 
             int start = 2;
