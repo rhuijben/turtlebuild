@@ -4,7 +4,7 @@ using System.Text;
 using NUnit.Framework;
 using System.IO;
 using QQn.TurtleUtils.Cryptography;
-using NUnit.Framework.SyntaxHelpers;
+
 using QQn.TurtleUtils.IO;
 
 namespace TurtleTests

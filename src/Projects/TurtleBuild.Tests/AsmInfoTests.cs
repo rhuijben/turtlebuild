@@ -5,7 +5,7 @@ using NUnit.Framework;
 using System.Text.RegularExpressions;
 using QQn.TurtleBuildUtils.AttributeParsers;
 using System.Diagnostics;
-using NUnit.Framework.SyntaxHelpers;
+
 
 namespace TurtleTests
 {

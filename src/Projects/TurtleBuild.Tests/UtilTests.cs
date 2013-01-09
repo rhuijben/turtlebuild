@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 using QQn.TurtleUtils.Globalization;
-using NUnit.Framework.SyntaxHelpers;
+
 
 namespace TurtleTests
 {
