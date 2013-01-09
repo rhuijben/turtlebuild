@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
 using QQn.TurtleUtils.IO;
-using NUnit.Framework.SyntaxHelpers;
 using System.IO;
 using QQn.TurtleBuildUtils;
 
@@ -46,20 +45,54 @@ namespace TurtleTests
 		}
 
 		[Test]
-		public void RuntimePaths()
+		public void GetFrameworkDirectory_11_ReturnsDirectory()
 		{
-			DirectoryInfo dir11 = BuildTools.GetFrameworkDirectory(new Version("1.1"));
-			DirectoryInfo dir20 = BuildTools.GetFrameworkDirectory(new Version("2.0"));
-			DirectoryInfo dir30 = BuildTools.GetFrameworkDirectory(new Version("3.0"));
-			DirectoryInfo dir35 = BuildTools.GetFrameworkDirectory(new Version("3.5"));
+			DirectoryInfo dir = BuildTools.GetFrameworkDirectory(new Version("1.1"));
 
-			Assert.That(dir11.Exists);
-			Assert.That(dir20.Exists);
-			Assert.That(dir35.Exists);
-
+            Assert.That(dir, Is.EqualTo("q"));
 		}
 
-		[Test]
+        [Test]
+	    public void GetFrameworkDirectory_20_ReturnsDirectory()
+	    {
+            DirectoryInfo dir = BuildTools.GetFrameworkDirectory(new Version("2.0"));
+
+            Assert.That(dir, Is.EqualTo("q"));
+	    }
+
+        [Test]
+        public void GetFrameworkDirectory_30_ReturnsDirectory()
+        {
+            DirectoryInfo dir = BuildTools.GetFrameworkDirectory(new Version("3.0"));
+
+            Assert.That(dir, Is.EqualTo("q"));
+        }
+
+        [Test]
+        public void GetFrameworkDirectory_35_ReturnsDirectory()
+        {
+            DirectoryInfo dir = BuildTools.GetFrameworkDirectory(new Version("3.5"));
+
+            Assert.That(dir, Is.EqualTo("q"));
+        }
+
+        [Test]
+        public void GetFrameworkDirectory_40_ReturnsDirectory()
+        {
+            DirectoryInfo dir = BuildTools.GetFrameworkDirectory(new Version("4.0"));
+
+            Assert.That(dir, Is.EqualTo("q"));
+        }
+
+        [Test]
+        public void GetFrameworkDirectory_45_ReturnsDirectory()
+        {
+            DirectoryInfo dir = BuildTools.GetFrameworkDirectory(new Version("4.5"));
+
+            Assert.That(dir, Is.EqualTo("q"));
+        }
+
+	    [Test]
 		public void CheckSolutionVersions()
 		{
 			DirectoryInfo di = new DirectoryInfo(Environment.CurrentDirectory);
