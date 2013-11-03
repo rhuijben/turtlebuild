@@ -152,6 +152,11 @@ namespace TurtleTests
 		{
 			Assert.That(File.Exists(MSBuild), Is.True, "MSBuild exists");
 			Assert.That(File.Exists(Solution), Is.True, "Solution exists");
+	}
+
+	[Test]
+	public void LoggerFound()
+	{
 			Assert.That(File.Exists(Logger), Is.True, "Logger exists");
 			Assert.That(Directory.Exists(LoggerPath), Is.True, "Loggerpath exists");
 		}
