@@ -125,6 +125,35 @@ namespace TurtleTests
         }
 
         [Test]
+        public void CheckFullSolutionVersion()
+        {
+            DirectoryInfo di = new DirectoryInfo(Environment.CurrentDirectory);
+            while (di.Parent.FullName != di.Root.FullName)
+            {
+                bool breakOut = false;
+                foreach (FileInfo f in di.GetFiles("TurtleBuild.sln", SearchOption.TopDirectoryOnly))
+                {
+                    Version slnVersion;
+                    Version vsVersion;
+                    Version minVsVersion;
+                    Assert.That(BuildTools.TryGetSolutionAndVisualStudioVersion(f.FullName, out slnVersion, out vsVersion, out minVsVersion));
+
+                    Assert.That(slnVersion, Is.EqualTo(new Version(12, 0)));
+
+                    Assert.That(minVsVersion, Is.GreaterThanOrEqualTo(new Version(10, 0)));
+                    Assert.That(minVsVersion, Is.LessThan(new Version(11, 0)));
+
+                    Assert.That(vsVersion, Is.GreaterThanOrEqualTo(new Version(10, 0)));
+                    breakOut = true;
+                    break;
+                }
+                if (breakOut)
+                    break;
+                di = di.Parent;
+            }
+        }
+
+        [Test]
         public void VerifyTrueName()
         {
             foreach (Environment.SpecialFolder sv in Enum.GetValues(typeof(Environment.SpecialFolder)))

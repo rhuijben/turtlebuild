@@ -227,8 +227,9 @@ namespace QQn.TurtleBuildUtils
 
             Version slnVersion;
             Version vsVersion;
+            Version vsMinVersion;
 
-            if (TryGetSolutionAndVisualStudioVersion(solution, out slnVersion, out vsVersion))
+            if (TryGetSolutionAndVisualStudioVersion(solution, out slnVersion, out vsVersion, out vsMinVersion))
                 return slnVersion;
 
             return null;
@@ -236,6 +237,7 @@ namespace QQn.TurtleBuildUtils
 
         const string _slnVersionStart = "Microsoft Visual Studio Solution File, Format Version ";
         const string _vsVersionStart = "VisualStudioVersion =";
+        const string _minVersionStart = "MinimumVisualStudioVersion =";
 
         /// <summary>
         /// Gets the solution and visual studio from a solution file.
@@ -243,15 +245,17 @@ namespace QQn.TurtleBuildUtils
         /// <param name="solution">The solution file</param>
         /// <param name="slnVersion">The solution version</param>
         /// <param name="vsVersion">The visual studio version (or NULL for old solutions)</param>
+        /// <param name="vsMinVersion"></param>
         /// <returns>true if obtained the requested information, otherwise false</returns>
-        public static bool TryGetSolutionAndVisualStudioVersion(string solution, out Version slnVersion, out Version vsVersion)
+        public static bool TryGetSolutionAndVisualStudioVersion(string solution, out Version slnVersion, out Version vsVersion, out Version vsMinVersion)
         {
             slnVersion = null;
             vsVersion = null;
+            vsMinVersion = null;
             using (StreamReader sr = File.OpenText(solution))
             {
-                // Match MSBuild behavior: Read 4 lines max
-                for (int lineNr = 0; lineNr < 4; lineNr++)
+                // Match MSBuild behavior: Read 4 lines max. Add 1 lines for MinimumVisualStudioVersion
+                for (int lineNr = 0; lineNr < 5; lineNr++)
                 {
                     string line = sr.ReadLine();
 
@@ -270,6 +274,10 @@ namespace QQn.TurtleBuildUtils
                     {
                         vsVersion = new Version(line.Substring(_vsVersionStart.Length).Trim());
                     }
+                    else if (line.StartsWith(_minVersionStart, StringComparison.OrdinalIgnoreCase))
+                    {
+                        vsMinVersion = new Version(line.Substring(_minVersionStart.Length).Trim());
+                    }
                 }
             }
 
@@ -279,6 +287,32 @@ namespace QQn.TurtleBuildUtils
                 return (vsVersion != null);
 
             return true;
+        }
+
+        /// <summary>
+        /// Obtains the solution and current tools version
+        /// </summary>
+        /// <param name="solution"></param>
+        /// <param name="slnVersion"></param>
+        /// <param name="vsVersion"></param>
+        /// <returns></returns>
+        public static bool TryGetSolutionAndVisualStudioVersion(string solution, out Version slnVersion, out Version vsVersion)
+        {
+            Version vsMinVersion;
+            return TryGetSolutionAndVisualStudioVersion(solution, out slnVersion, out vsVersion, out vsMinVersion);
+        }
+
+        /// <summary>
+        /// Obtains the solution version
+        /// </summary>
+        /// <param name="solution"></param>
+        /// <param name="slnVersion"></param>
+        /// <returns></returns>
+        public static bool TryGetSolutionVersion(string solution, out Version slnVersion)
+        {
+            Version vsMinVersion;
+            Version vsVersion;
+            return TryGetSolutionAndVisualStudioVersion(solution, out slnVersion, out vsVersion, out vsMinVersion);
         }
 	}
 }
