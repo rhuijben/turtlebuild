@@ -56,7 +56,7 @@ namespace QQn.TurtleMSBuild
 		/// </summary>
 		/// <param name="metadataName">The name of the metadata entry.</param>
 		/// <returns>
-		/// The value of the <paramref name="attributeName"/> metadata.
+        /// The value of the <paramref name="metadataName"/> metadata.
 		/// </returns>
 		public string GetMetadata(string metadataName)
 		{

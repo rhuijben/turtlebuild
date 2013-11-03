@@ -412,6 +412,12 @@ namespace QQn.TurtleUtils.IO
 			get { return _directory; }
 		}
 
+        /// <summary>
+        /// Adds an annotation to <paramref name="path"/>
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void Annotate(string path, string key, string value)
         {
             if (string.IsNullOrEmpty(path))
