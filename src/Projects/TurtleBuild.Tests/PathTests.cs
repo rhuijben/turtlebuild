@@ -92,6 +92,36 @@ namespace TurtleTests
             Assert.That(dir.Name, Is.EqualTo("v4.0.30319"));
         }
 
+
+        [Test]
+        public void GetToolsDirectory_40_ReturnsDirectory()
+        {
+            DirectoryInfo dir = BuildTools.GetBuildToolsDirectory(new Version("4.0"));
+
+            Assert.That(dir.Name, Is.EqualTo("v4.0.30319"));
+            Assert.That(File.Exists(QQnPath.Combine(dir.FullName, "msbuild.exe")), "MSBuild exists");
+        }
+
+        [Test]
+        public void GetToolsDirectory_45_ReturnsDirectory()
+        {
+            DirectoryInfo dir = BuildTools.GetBuildToolsDirectory(new Version("4.5"));
+
+            Assert.That(dir.Name, Is.EqualTo("v4.0.30319"));
+            Assert.That(File.Exists(QQnPath.Combine(dir.FullName, "msbuild.exe")), "MSBuild exists");
+        }
+
+        [Test]
+        public void GetToolsDirectory_120_ReturnsDirectory()
+        {
+            DirectoryInfo dir = BuildTools.GetBuildToolsDirectory(new Version(12, 0));
+
+            Assert.That(dir.Name, Is.EqualTo("bin"));
+            Assert.That(File.Exists(QQnPath.Combine(dir.FullName, "msbuild.exe")), "MSBuild exists");
+        }
+
+
+
         [Test]
         public void CheckSolutionVersions()
         {

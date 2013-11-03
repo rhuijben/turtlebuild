@@ -168,12 +168,12 @@ namespace QQn.TurtleBuildUtils
         /// <summary>
         /// Gets the framework path which best matches the specified version
         /// </summary>
-        /// <param name="version">The version.</param>
+        /// <param name="frameworkVersion">The framework version.</param>
         /// <returns></returns>
-        public static DirectoryInfo GetFrameworkDirectory(Version version)
+        public static DirectoryInfo GetFrameworkDirectory(Version frameworkVersion)
         {
-            if (version == null)
-                throw new ArgumentNullException("version");
+            if (frameworkVersion == null)
+                throw new ArgumentNullException("frameworkVersion");
 
             string runtimeDir = QQnPath.NormalizePath(RuntimeEnvironment.GetRuntimeDirectory());
             string frameworkDir = Path.GetDirectoryName(runtimeDir);
@@ -182,20 +182,20 @@ namespace QQn.TurtleBuildUtils
             if (!dir.Exists)
                 return null;
 
-            if(version.Major == 4 && version.Minor == 5)
-                version = new Version(4,0);
+            if(frameworkVersion.Major == 4 && frameworkVersion.Minor == 5)
+                frameworkVersion = new Version(4,0);
 
             DirectoryInfo[] dirs = dir.GetDirectories("v*.*", SearchOption.TopDirectoryOnly);
 
             int start = 2;
-            if (version.Build >= 0)
+            if (frameworkVersion.Build >= 0)
                 start = 4;
-            else if (version.Revision >= 0)
+            else if (frameworkVersion.Revision >= 0)
                 start = 3;
 
             for (int i = start; i >= 2; i--)
             {
-                string name = "v" + version.ToString(i);
+                string name = "v" + frameworkVersion.ToString(i);
 
                 foreach (DirectoryInfo d in dirs)
                 {
@@ -209,6 +209,37 @@ namespace QQn.TurtleBuildUtils
                 {
                     if (d.Name.StartsWith(name, StringComparison.InvariantCultureIgnoreCase))
                         return d;
+                }
+            }
+
+            return null;
+        }
+
+         /// <summary>
+        /// Get the MSBuild tools directory for the specified tools version
+        /// </summary>
+        /// <param name="toolsVersion"></param>
+        /// <returns></returns>
+        public static DirectoryInfo GetBuildToolsDirectory(Version toolsVersion)
+        {
+            if (toolsVersion == null)
+                throw new ArgumentNullException("toolsVersion");
+
+            // Before Visual Studio 2013 the build tools were part of the .Net Framework
+            if (toolsVersion.Major <= 4)
+                return GetFrameworkDirectory(toolsVersion);
+
+            using(RegistryKey rk = Registry.LocalMachine.OpenSubKey("SOFTWARE\\Microsoft\\MSBuild\\ToolsVersions", false))
+            {
+                using(RegistryKey tool = rk.OpenSubKey(string.Format("{0}.{1}", toolsVersion.Major, toolsVersion.Minor), false))
+                {
+                    if (tool == null)
+                        return null;
+
+                    string path = tool.GetValue("MSBuildToolsPath") as string;
+
+                    if (path != null)
+                        return new DirectoryInfo(path);
                 }
             }
 
