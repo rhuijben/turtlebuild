@@ -225,22 +225,60 @@ namespace QQn.TurtleBuildUtils
             if (string.IsNullOrEmpty("solution"))
                 throw new ArgumentNullException("solution");
 
+            Version slnVersion;
+            Version vsVersion;
+
+            if (TryGetSolutionAndVisualStudioVersion(solution, out slnVersion, out vsVersion))
+                return slnVersion;
+
+            return null;
+        }
+
+        const string _slnVersionStart = "Microsoft Visual Studio Solution File, Format Version ";
+        const string _vsVersionStart = "VisualStudioVersion =";
+
+        /// <summary>
+        /// Gets the solution and visual studio from a solution file.
+        /// </summary>
+        /// <param name="solution">The solution file</param>
+        /// <param name="slnVersion">The solution version</param>
+        /// <param name="vsVersion">The visual studio version (or NULL for old solutions)</param>
+        /// <returns>true if obtained the requested information, otherwise false</returns>
+        public static bool TryGetSolutionAndVisualStudioVersion(string solution, out Version slnVersion, out Version vsVersion)
+        {
+            slnVersion = null;
+            vsVersion = null;
             using (StreamReader sr = File.OpenText(solution))
             {
-                string line = sr.ReadLine();
-
-                // First line should be empty
-                while (line != null && line.Trim().Length == 0)
-                    line = sr.ReadLine();
-
-                string start = "Microsoft Visual Studio Solution File, Format Version ";
-                if (line.StartsWith(start, StringComparison.InvariantCultureIgnoreCase))
+                // Match MSBuild behavior: Read 4 lines max
+                for (int lineNr = 0; lineNr < 4; lineNr++)
                 {
-                    return new Version(line.Substring(start.Length).Trim());
+                    string line = sr.ReadLine();
+
+                    if (line == null)
+                        break;
+
+                    line = line.Trim();
+                    if (line.Length == 0)
+                        continue;
+
+                    if (line.StartsWith(_slnVersionStart, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        slnVersion = new Version(line.Substring(_slnVersionStart.Length).Trim());
+                    }
+                    else if (line.StartsWith(_vsVersionStart, StringComparison.OrdinalIgnoreCase))
+                    {
+                        vsVersion = new Version(line.Substring(_vsVersionStart.Length).Trim());
+                    }
                 }
-                else
-                    return null;
             }
+
+            if (slnVersion == null)
+                return false;
+            if (slnVersion >= new Version(12, 0))
+                return (vsVersion != null);
+
+            return true;
         }
 	}
 }
