@@ -1,0 +1,1 @@
+Several tools extending MSBuild for binary-intermediate-releases
