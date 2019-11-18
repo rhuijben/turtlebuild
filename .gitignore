@@ -1,0 +1,24 @@
+﻿################################################################################
+# 此 .gitignore 文件已由 Microsoft(R) Visual Studio 自动创建。
+################################################################################
+
+/src/Libraries/QQn.TurtleBuildUtils/bin/Debug
+/src/Libraries/QQn.TurtleBuildUtils/obj/Debug
+/src/Libraries/QQn.TurtleBuildUtils/obj/Debug
+/src/Libraries/QQn.TurtlePackage/bin/Debug
+/src/Libraries/QQn.TurtlePackage/obj/Debug
+/src/Libraries/QQn.TurtlePackager.Engine/bin/Debug
+/src/Libraries/QQn.TurtlePackager.Engine/obj/Debug
+/src/Libraries/QQn.TurtleUtils/bin/Debug
+/src/Libraries/QQn.TurtleUtils/obj/Debug
+/src/Products/QQn.ReportViewer.Tasks/bin/Debug
+/src/Products/QQn.ReportViewer.Tasks/obj/Debug
+/src/Products/QQn.TurtleMSBuild/bin/Debug
+/src/Products/QQn.TurtleMSBuild/obj/Debug
+/src/Products/QQn.TurtleMSBuild.Distributed/bin/Debug
+/src/Products/QQn.TurtleMSBuild.Distributed/obj/Debug
+/src/Products/QQn.TurtleTasks/bin/Debug
+/src/Products/QQn.TurtleTasks/obj/Debug
+/src/Projects/TurtleBuild.Tests/bin/Debug
+/src/Projects/TurtleBuild.Tests/obj/Debug
+*.suo
